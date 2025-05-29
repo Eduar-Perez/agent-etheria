@@ -9,7 +9,7 @@ from mangum import Mangum
 import uvicorn
 import os
 from dotenv import load_dotenv
-from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 
 #PARA OBTENER VARIBLES DEL FILE .env 
 #load_dotenv()
@@ -42,11 +42,15 @@ def create_api_fastapi_app(agent: Agent) -> FastAPIApp:
         try:
             agent = agente_generico(request.model_id)
             response = agent.run(request.question)
-            response_dict = response.__dict__ if hasattr(response, "__dict__") else {"response": str(response)}
-            if "timer" in response_dict:
-                del response_dict["timer"]
-
-            return {"response": response_dict}
+            if hasattr(response, "__dict__"):
+                safe_dict = {}
+                for k, v in response.__dict__.items():
+                    # Omitimos Timer y objetos no serializables
+                    if isinstance(v, (str, int, float, bool, list, dict)) or v is None:
+                        safe_dict[k] = v
+                return JSONResponse(content={"response": safe_dict})
+            else:
+                return JSONResponse(content={"response": str(response)})
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         
