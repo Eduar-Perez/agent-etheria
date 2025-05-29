@@ -42,9 +42,11 @@ def create_api_fastapi_app(agent: Agent) -> FastAPIApp:
         try:
             agent = agente_generico(request.model_id)
             response = agent.run(request.question)
-            serializable_response = jsonable_encoder(response)
-            
-            return {"response": serializable_response}
+            response_dict = response.__dict__ if hasattr(response, "__dict__") else {"response": str(response)}
+            if "timer" in response_dict:
+            del response_dict["timer"]
+
+            return {"response": response_dict}
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         
