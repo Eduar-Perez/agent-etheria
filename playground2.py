@@ -44,7 +44,7 @@ def create_api_fastapi_app(agent: Agent) -> FastAPIApp:
             response = agent.run(request.question)
             response_dict = response.__dict__ if hasattr(response, "__dict__") else {"response": str(response)}
             if "timer" in response_dict:
-            del response_dict["timer"]
+                del response_dict["timer"]
 
             return {"response": response_dict}
         except Exception as e:
