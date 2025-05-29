@@ -9,6 +9,7 @@ from mangum import Mangum
 import uvicorn
 import os
 from dotenv import load_dotenv
+from fastapi.encoders import jsonable_encoder
 
 #PARA OBTENER VARIBLES DEL FILE .env 
 #load_dotenv()
