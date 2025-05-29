@@ -10,6 +10,7 @@ import uvicorn
 import os
 from dotenv import load_dotenv
 from fastapi.responses import JSONResponse
+from typing import Any
 
 #PARA OBTENER VARIBLES DEL FILE .env 
 #load_dotenv()
