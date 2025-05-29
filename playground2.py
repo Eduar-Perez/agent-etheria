@@ -41,7 +41,9 @@ def create_api_fastapi_app(agent: Agent) -> FastAPIApp:
         try:
             agent = agente_generico(request.model_id)
             response = agent.run(request.question)
-            return {"response": response}
+            serializable_response = jsonable_encoder(response)
+            
+            return {"response": serializable_response}
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         
