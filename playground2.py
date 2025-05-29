@@ -6,6 +6,7 @@ from agno.app.fastapi.serve import serve_fastapi_app
 from secrets_loader import load_aws_secrets
 from pydantic import BaseModel
 from mangum import Mangum
+import uvicorn
 import os
 from dotenv import load_dotenv
 
