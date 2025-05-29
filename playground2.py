@@ -33,6 +33,18 @@ def agente_generico(model_id: str) -> Agent:
     )
     return agent_Claude
 
+def safe_serialize(obj: Any):
+    if isinstance(obj, (str, int, float, bool)) or obj is None:
+        return obj
+    elif isinstance(obj, dict):
+        return {k: safe_serialize(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [safe_serialize(v) for v in obj]
+    elif hasattr(obj, "__dict__"):
+        return safe_serialize(vars(obj))
+    else:
+        return str(obj)  # Último recurso: convertir a string
+
 def create_api_fastapi_app(agent: Agent) -> FastAPIApp:
     app_wrapper = FastAPI(agent = agent)
     app = app_wrapper if isinstance(app_wrapper, FastAPI) else app_wrapper.app
@@ -42,18 +54,10 @@ def create_api_fastapi_app(agent: Agent) -> FastAPIApp:
         try:
             agent = agente_generico(request.model_id)
             response = agent.run(request.question)
-            if hasattr(response, "__dict__"):
-                safe_dict = {}
-                for k, v in response.__dict__.items():
-                    # Omitimos Timer y objetos no serializables
-                    if isinstance(v, (str, int, float, bool, list, dict)) or v is None:
-                        safe_dict[k] = v
-                return JSONResponse(content={"response": safe_dict})
-            else:
-                return JSONResponse(content={"response": str(response)})
+            response_dict = safe_serialize(response)
+            return JSONResponse(content={"response": response_dict})
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
-        
     return app
 
 # def main():
