@@ -13,10 +13,10 @@ from fastapi.responses import JSONResponse
 from typing import Any
 
 #PARA OBTENER VARIBLES DEL FILE .env 
-load_dotenv()
+#load_dotenv()
 
 #PARA OBTENER SECRETS MANAGER DE AWS
-#load_aws_secrets()
+load_aws_secrets()
 
 MODELS = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
