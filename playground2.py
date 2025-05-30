@@ -77,5 +77,5 @@ if __name__ == "__main__":
     agent = agente_generico(MODELS)
     app = create_api_fastapi_app(agent)
     uvicorn.run(app, host="0.0.0.0", port=8080)
-    main()
+    #main()
     #handler = Mangum(app)
