@@ -13,10 +13,10 @@ from fastapi.responses import JSONResponse
 from typing import Any
 
 #PARA OBTENER VARIBLES DEL FILE .env 
-#load_dotenv()
+load_dotenv()
 
 #PARA OBTENER SECRETS MANAGER DE AWS
-load_aws_secrets()
+#load_aws_secrets()
 
 MODELS = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
@@ -77,5 +77,5 @@ if __name__ == "__main__":
     agent = agente_generico(MODELS)
     app = create_api_fastapi_app(agent)
     uvicorn.run(app, host="0.0.0.0", port=8080)
-    #main()
+    main()
     #handler = Mangum(app)
