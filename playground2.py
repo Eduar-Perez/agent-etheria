@@ -1,16 +1,19 @@
 from fastapi import FastAPI
 from agno.agent import Agent
 from agno.models.aws import Claude
-from agno.app.fastapi.app import FastAPIApp, HTTPException
-from agno.app.fastapi.serve import serve_fastapi_app
+from fastapi import FastAPI
+from fastapi import HTTPException
+#from agno.app.fastapi.serve import serve_fastapi_app
 from secrets_loader import load_aws_secrets
 from pydantic import BaseModel
 from mangum import Mangum
 import uvicorn
 import os
+import boto3
 from dotenv import load_dotenv
 from fastapi.responses import JSONResponse
-from typing import Any
+from typing import Any, Optional
+from agent_selector import get_agent, AgentType
 
 #PARA OBTENER VARIBLES DEL FILE .env 
 #load_dotenv()
@@ -22,7 +25,11 @@ MODELS = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
 class QuestionsRequest(BaseModel):
     question: str
-    model_id: str
+    model: str
+    agent: str
+    user: Optional[str] = None
+    session: Optional[str] = None
+
 
 def agente_generico(model_id: str) -> Agent:
     agent_Claude = Agent(
@@ -46,36 +53,31 @@ def safe_serialize(obj: Any):
     else:
         return str(obj)  # Último recurso: convertir a string
 
-def create_api_fastapi_app(agent: Agent) -> FastAPIApp:
-    app_wrapper = FastAPI(agent = agent)
-    app = app_wrapper if isinstance(app_wrapper, FastAPI) else app_wrapper.app
+def create_api_fastapi_app(agent: Agent) -> FastAPI:
+    app = FastAPI()
     
     @app.post("/task")
     async def ask_question(request: QuestionsRequest):
         try:
-            agent = agente_generico(request.model_id)
+            agent_enum = AgentType(request.agent_id)
+            agent = get_agent(
+                model = request.model_id,
+                agent = agent_enum,
+                user = request.user_id,
+                session = request.session_id,
+                debug_mode = True
+            )   
             response = agent.run(request.question)
             response_dict = safe_serialize(response)
             return JSONResponse(content={"response": response_dict})
+        except ValueError as ve:
+            raise HTTPException(status_code=400, detail=str(ve))
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
     return app
 
-# def main():
-#     try:
-#         agent = agente_generico(model_id=MODELS)
-#         fastapi_app = create_api_fastapi_app(agent)
-#         app = fastapi_app if isinstance(fastapi_app, FastAPI) else fastapi_app.app
-        
-#        # Set the title and description of the FastAPI app
-#         serve_fastapi_app(app = app, host = "0.0.0.0", port = 8001, reload = False)
-#     except Exception as e:
-#         print(f"Error: {e}")
-#         return 1
+agent = agente_generico(MODELS)
+app = create_api_fastapi_app(agent)
 
 if __name__ == "__main__":
-    agent = agente_generico(MODELS)
-    app = create_api_fastapi_app(agent)
     uvicorn.run(app, host="0.0.0.0", port=8080)
-    #main()
-    #handler = Mangum(app)
