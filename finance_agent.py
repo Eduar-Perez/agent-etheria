@@ -7,9 +7,9 @@ from agno.tools.yfinance import YFinanceTools
 
 
 def get_finance_agent(
-    model: str = "gpt-4.1",
-    user: Optional[str] = None,
-    session: Optional[str] = None,
+    model_id: str = "gpt-4.1",
+    user_id: Optional[str] = None,
+    session_id: Optional[str] = None,
     debug_mode: bool = False,
 ) -> Agent:
     """
@@ -17,10 +17,10 @@ def get_finance_agent(
     """
     return Agent(
         name="Finance Agent",
-        agent="finance_agent",
-        user=user,
-        session=session,
-        model=Claude(id=model),
+        agent_id="finance_agent",
+        user_id=user_id,
+        session_id=session_id,
+        model_id=Claude(id=model_id),
         tools=[
             DuckDuckGoTools(),
             YFinanceTools(
@@ -39,8 +39,7 @@ def get_finance_agent(
             Your goal is to provide users with comprehensive, accurate, and actionable financial insights, presented in a clear and professional manner.
             """
         ),
-        instructions=dedent(
-            """\
+        instructions=dedent(f"""\
             As FinMaster, your goal is to deliver insightful and data-driven responses. Adhere to the following process:
 
             1. Understand the Query:
@@ -86,7 +85,7 @@ def get_finance_agent(
                - If data is missing or inconclusive, state limitations clearly.
 
             Additional Info:
-            - You are interacting with user: {current_user}
+            - You are interacting with user_id: {user_id}
             - Ask for user's name if needed and personalize responses.
             - Always use tools to fetch latest data; do not rely on static knowledge.
             """
@@ -103,10 +102,10 @@ def get_finance_agent(
     )
 
 
-def run_agent(query: str, model: str = "gpt-4.1") -> str:
+def run_agent(query: str, model_id: str = "gpt-4.1") -> str:
     """
     Función para ejecutar el agente financiero con una consulta.
     """
-    agent = get_finance_agent(model=model)
+    agent = get_finance_agent(model_id=model_id)
     response = agent.run(query)
     return response

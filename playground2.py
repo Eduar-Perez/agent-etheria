@@ -1,45 +1,36 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from agno.agent import Agent
 from agno.models.aws import Claude
-from fastapi import FastAPI
-from fastapi import HTTPException
-#from agno.app.fastapi.serve import serve_fastapi_app
 from secrets_loader import load_aws_secrets
 from pydantic import BaseModel
 from mangum import Mangum
 import uvicorn
-import os
-import boto3
-from dotenv import load_dotenv
 from fastapi.responses import JSONResponse
 from typing import Any, Optional
 from agent_selector import get_agent, AgentType
 
-#PARA OBTENER VARIBLES DEL FILE .env 
-#load_dotenv()
-
-#PARA OBTENER SECRETS MANAGER DE AWS
+# PARA OBTENER SECRETS MANAGER DE AWS
 load_aws_secrets()
 
 MODELS = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
 class QuestionsRequest(BaseModel):
     question: str
-    model: str
-    agent: str
-    user: Optional[str] = None
-    session: Optional[str] = None
+    model_id: str
+    agent_id: str  # corregido de "agent" a "agent_id"
+    user_id: Optional[str] = None  # corregido de "user"
+    session_id: Optional[str] = None  # corregido de "session"
 
 
-def agente_generico(model: str) -> Agent:
-    agent_Claude = Agent(
+def agente_generico(model_id: str) -> Agent:
+    return Agent(
         name="Claude Agent",
-        model=Claude(id=model),
+        model_id=Claude(id=model_id),
         show_tool_calls=True,
         markdown=True,
         debug_mode=True
     )
-    return agent_Claude
+
 
 def safe_serialize(obj: Any):
     if isinstance(obj, (str, int, float, bool)) or obj is None:
@@ -53,19 +44,20 @@ def safe_serialize(obj: Any):
     else:
         return str(obj)  # Último recurso: convertir a string
 
+
 def create_api_fastapi_app(agent: Agent) -> FastAPI:
     app = FastAPI()
     
     @app.post("/task")
     async def ask_question(request: QuestionsRequest):
         try:
-            agent_enum = AgentType(request.agent)
+            agent_enum = AgentType(request.agent_id)
             agent = get_agent(
-                model = request.model,
-                agent = agent_enum,
-                user = request.user,
-                session = request.session,
-                debug_mode = True
+                model_id=request.model_id,
+                agent_id=agent_enum,  # siempre con "_id"
+                user_id=request.user_id,
+                session_id=request.session_id,
+                debug_mode=True
             )   
             response = agent.run(request.question)
             response_dict = safe_serialize(response)
@@ -74,7 +66,9 @@ def create_api_fastapi_app(agent: Agent) -> FastAPI:
             raise HTTPException(status_code=400, detail=str(ve))
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
+    
     return app
+
 
 agent = agente_generico(MODELS)
 app = create_api_fastapi_app(agent)
