@@ -25,10 +25,10 @@ MODELS = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
 class QuestionsRequest(BaseModel):
     question: str
-    model: str
-    agent: str
-    user: Optional[str] = None
-    session: Optional[str] = None
+    model_id: str
+    agent_id: str
+    user_id: Optional[str] = None
+    session_id: Optional[str] = None
 
 
 def agente_generico(model_id: str) -> Agent:
