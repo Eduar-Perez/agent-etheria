@@ -1,5 +1,5 @@
 from typing import Optional, Union
-from types import AgentType
+from agent_type import AgentType
 from web_agent import get_web_agent_simple
 from agno_assist import get_agno_assist_simple
 from finance_agent import get_finance_agent
