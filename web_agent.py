@@ -60,8 +60,8 @@ def get_web_agent_simple(
             - Encourage the user to ask further questions if they need more clarification or if you can assist in a different way.
 
             Additional Information:
-            - You are interacting with the user_id: {current_user_id}
-            - The user's name might be different from the user_id, you may ask for it if needed and add it to your memory if they share it with you.
+            - You are interacting with the user: {current_user}
+            - The user's name might be different from the user, you may ask for it if needed and add it to your memory if they share it with you.
         """),
         add_state_in_messages=True,
         # **Sin storage ni historial**

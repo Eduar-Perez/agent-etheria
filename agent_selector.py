@@ -18,27 +18,27 @@ def get_available_agents() -> List[str]:
 
 
 def get_agent(
-    model_id: str = "gpt-4.1",
-    agent_id: Optional[Union[AgentType, str]] = None,
-    user_id: Optional[str] = None,
-    session_id: Optional[str] = None,
+    model: str = "gpt-4.1",
+    agent: Optional[Union[AgentType, str]] = None,
+    user: Optional[str] = None,
+    session: Optional[str] = None,
     debug_mode: bool = True,
 ):
-    if agent_id is None:
+    if agent is None:
         raise ValueError("Agent ID must be provided")
 
     # Si llega como string, convierto a AgentType
-    if isinstance(agent_id, str):
+    if isinstance(agent, str):
         try:
-            agent_id = AgentType(agent_id)
+            agent = AgentType(agent)
         except ValueError:
-            raise ValueError(f"Unknown agent ID: {agent_id}")
+            raise ValueError(f"Unknown agent ID: {agent}")
 
-    if agent_id == AgentType.WEB_AGENT:
-        return get_web_agent_simple(model_id=model_id, user_id=user_id, session_id=session_id, debug_mode=debug_mode)
-    elif agent_id == AgentType.AGNO_ASSIST:
-        return get_agno_assist_simple(model_id=model_id, user_id=user_id, session_id=session_id, debug_mode=debug_mode)
-    elif agent_id == AgentType.FINANCE_AGENT:
-        return get_finance_agent(model_id=model_id, user_id=user_id, session_id=session_id, debug_mode=debug_mode)
+    if agent == AgentType.WEB_AGENT:
+        return get_web_agent_simple(model=model, user=user, session=session, debug_mode=debug_mode)
+    elif agent == AgentType.AGNO_ASSIST:
+        return get_agno_assist_simple(model=model, user=user, session=session, debug_mode=debug_mode)
+    elif agent == AgentType.FINANCE_AGENT:
+        return get_finance_agent(model=model, user=user, session=session, debug_mode=debug_mode)
 
-    raise ValueError(f"Agent: {agent_id} not found")
+    raise ValueError(f"Agent: {agent} not found")

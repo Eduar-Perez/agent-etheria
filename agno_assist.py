@@ -5,17 +5,17 @@ from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.models.aws import Claude
 
 def get_agno_assist_simple(
-    model_id: str = "gpt-4.1",
-    user_id: Optional[str] = None,
-    session_id: Optional[str] = None,
+    model: str = "gpt-4.1",
+    user: Optional[str] = None,
+    session: Optional[str] = None,
     debug_mode: bool = True,
 ) -> Agent:
     return Agent(
         name="Agno Assist",
-        agent_id="agno_assist",
-        user_id=user_id,
-        session_id=session_id,
-        model=Claude(id=model_id),
+        agent="agno_assist",
+        user=user,
+        session=session,
+        model=Claude(id=model),
         tools=[DuckDuckGoTools()],
         description=dedent("""\
             You are AgnoAssist, an advanced AI Agent specializing in Agno: a lightweight framework for building multi-modal, reasoning Agents.
@@ -30,7 +30,7 @@ def get_agno_assist_simple(
             3. Provide clear, concise, and correct explanations and examples.
 
             Additional Information:
-            - You are interacting with the user_id: {current_user_id}
+            - You are interacting with the user: {current_user}
         """),
         # **No storage ni base de datos**
         storage=None,

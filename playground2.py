@@ -25,16 +25,16 @@ MODELS = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
 class QuestionsRequest(BaseModel):
     question: str
-    model_id: str
-    agent_id: str
-    user_id: Optional[str] = None
-    session_id: Optional[str] = None
+    model: str
+    agent: str
+    user: Optional[str] = None
+    session: Optional[str] = None
 
 
-def agente_generico(model_id: str) -> Agent:
+def agente_generico(model: str) -> Agent:
     agent_Claude = Agent(
         name="Claude Agent",
-        model=Claude(id=model_id),
+        model=Claude(id=model),
         show_tool_calls=True,
         markdown=True,
         debug_mode=True
@@ -59,12 +59,12 @@ def create_api_fastapi_app(agent: Agent) -> FastAPI:
     @app.post("/task")
     async def ask_question(request: QuestionsRequest):
         try:
-            agent_enum = AgentType(request.agent_id)
+            agent_enum = AgentType(request.agent)
             agent = get_agent(
-                model = request.model_id,
+                model = request.model,
                 agent = agent_enum,
-                user = request.user_id,
-                session = request.session_id,
+                user = request.user,
+                session = request.session,
                 debug_mode = True
             )   
             response = agent.run(request.question)
