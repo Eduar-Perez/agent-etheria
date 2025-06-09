@@ -7,17 +7,17 @@ from agno.tools.duckduckgo import DuckDuckGoTools
 
 
 def get_web_agent_simple(
-    model_id: str = "gpt-4.1",
-    user_id: Optional[str] = None,
-    session_id: Optional[str] = None,
+    model: str = "gpt-4.1",
+    user: Optional[str] = None,
+    session: Optional[str] = None,
     debug_mode: bool = True,
 ) -> Agent:
     return Agent(
         name="Web Search Agent",
-        agent_id="web_search_agent",
-        user_id=user_id,
-        session_id=session_id,
-        model=Claude(id=model_id),
+        agent="web_search_agent",
+        user=user,
+        session=session,
+        model=Claude(id=model),
         tools=[DuckDuckGoTools()],
         description=dedent("""\
             You are WebX, an advanced Web Search Agent designed to deliver accurate, context-rich information from the web.
