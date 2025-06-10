@@ -42,7 +42,7 @@ def safe_serialize(obj: Any):
     elif hasattr(obj, "__dict__"):
         return safe_serialize(vars(obj))
     else:
-        return str(obj)  # Último recurso: convertir a string
+        return str(obj)
 
 
 def create_api_fastapi_app(agent: Agent) -> FastAPI:
@@ -54,7 +54,7 @@ def create_api_fastapi_app(agent: Agent) -> FastAPI:
             agent_enum = AgentType(request.agent_id)
             agent = get_agent(
                 model=request.model,
-                agent_id=agent_enum,  # siempre con "_id"
+                agent_id=agent_enum,
                 user_id=request.user_id,
                 session_id=request.session_id,
                 debug_mode=True
