@@ -25,7 +25,7 @@ class QuestionsRequest(BaseModel):
 def agente_generico(model_id: str) -> Agent:
     return Agent(
         name="Claude Agent",
-        model_id=Claude(id=model_id),
+        model=Claude(id=model_id),
         show_tool_calls=True,
         markdown=True,
         debug_mode=True
@@ -53,7 +53,7 @@ def create_api_fastapi_app(agent: Agent) -> FastAPI:
         try:
             agent_enum = AgentType(request.agent_id)
             agent = get_agent(
-                model_id=request.model_id,
+                model=request.model_id,
                 agent_id=agent_enum,  # siempre con "_id"
                 user_id=request.user_id,
                 session_id=request.session_id,

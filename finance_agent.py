@@ -20,7 +20,7 @@ def get_finance_agent(
         agent_id="finance_agent",
         user_id=user_id,
         session_id=session_id,
-        model_id=Claude(id=model_id),
+        model=Claude(id=model_id),
         tools=[
             DuckDuckGoTools(),
             YFinanceTools(

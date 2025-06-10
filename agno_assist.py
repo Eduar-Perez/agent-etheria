@@ -15,7 +15,7 @@ def get_agno_assist_simple(
         agent_id="agno_assist",
         user_id=user_id,
         session_id=session_id,
-        model_id=Claude(id=model_id),
+        model=Claude(id=model_id),
         tools=[DuckDuckGoTools()],
         description=dedent("""\
             You are AgnoAssist, an advanced AI Agent specializing in Agno: a lightweight framework for building multi-modal, reasoning Agents.

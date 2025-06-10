@@ -17,7 +17,7 @@ def get_web_agent_simple(
         agent_id="web_search_agent",
         user_id=user_id,
         session_id=session_id,
-        model_id=Claude(id=model_id),
+        model=Claude(id=model_id),
         tools=[DuckDuckGoTools()],
         description=dedent("""\
             You are WebX, an advanced Web Search Agent designed to deliver accurate, context-rich information from the web.
