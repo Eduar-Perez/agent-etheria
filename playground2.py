@@ -16,7 +16,7 @@ MODELS = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
 class QuestionsRequest(BaseModel):
     question: str
-    model_id: str
+    model: str
     agent_id: str  # corregido de "agent" a "agent_id"
     user_id: Optional[str] = None  # corregido de "user"
     session_id: Optional[str] = None  # corregido de "session"
