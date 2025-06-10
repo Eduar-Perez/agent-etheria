@@ -53,7 +53,7 @@ def create_api_fastapi_app(agent: Agent) -> FastAPI:
         try:
             agent_enum = AgentType(request.agent_id)
             agent = get_agent(
-                model=request.model_id,
+                model=request.model,
                 agent_id=agent_enum,  # siempre con "_id"
                 user_id=request.user_id,
                 session_id=request.session_id,
