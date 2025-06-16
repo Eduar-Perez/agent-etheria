@@ -41,8 +41,8 @@ def agente_generico(model_id: str) -> Agent:
         show_tool_calls=True,
         markdown=True,
         debug_mode=True,
-        fileName=None,
-        file=None
+        #fileName=None,
+        #file=None
     )
 
 
