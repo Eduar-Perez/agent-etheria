@@ -18,9 +18,9 @@ from agent_selector import get_agent, AgentType
 from dotenv import load_dotenv
 
 # PARA OBTENER SECRETS MANAGER DE AWS
-#load_aws_secrets()
+load_aws_secrets()
 # PARA OBTENER VATRIABLES DE ENTORNO DE .env
-load_dotenv() 
+#load_dotenv() 
 
 MODELS = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
