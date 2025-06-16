@@ -30,8 +30,8 @@ class QuestionsRequest(BaseModel):
     agent_id: str
     user_id: Optional[str] = None
     session_id: Optional[str] = None
-    file: Optional[str] = None
-    fileName: Optional[str] = None
+    #file: Optional[str] = None
+    #fileName: Optional[str] = None
 
 
 def agente_generico(model_id: str) -> Agent:
