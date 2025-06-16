@@ -74,15 +74,15 @@ def create_api_fastapi_app(agent: Agent) -> FastAPI:
                 debug_mode=True
             )  
 
-            file_base64 = None
-            if request.file:
-                try:
-                    fileBytes = base64.b64decode(request.file)
-                    fileName = request.fileName
-                    extractedText = extractFileFromBytes(fileBytes, fileName)
-                    request.question = f"Analiza el siguiente contenido del archivo:\n\n{extractedText}"
-                except Exception as e:
-                    raise HTTPException(status_code=400, detail=f"Archivo invalido o no procesable: {str(e)}")
+            #file_base64 = None
+            #if request.file:
+                #try:
+                    #fileBytes = base64.b64decode(request.file)
+                    #fileName = request.fileName
+                    #extractedText = extractFileFromBytes(fileBytes, fileName)
+                    #request.question = f"Analiza el siguiente contenido del archivo:\n\n{extractedText}"
+                #except Exception as e:
+                 #   raise HTTPException(status_code=400, detail=f"Archivo invalido o no procesable: {str(e)}")
 
             response = agent.run(request.question)
             response_dict = safe_serialize(response)
