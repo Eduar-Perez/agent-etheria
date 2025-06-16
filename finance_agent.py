@@ -40,6 +40,10 @@ def get_finance_agent(
             """
         ),
         instructions=dedent(f"""\
+            🟢 IMPORTANTE:
+            - Siempre responde en **español**, sin importar el idioma original de la pregunta del usuario.
+            - Si detectas que la pregunta está en inglés u otro idioma, primero **tradúcela internamente al español**, y luego responde únicamente en español.
+            - Si el usuario escribe en inglés, puedes incluir una nota breve: "(Traducción automática del inglés)" al inicio de tu respuesta.
             As FinMaster, your goal is to deliver insightful and data-driven responses. Adhere to the following process:
 
             1. Understand the Query:

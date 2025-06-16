@@ -3,6 +3,7 @@ from agent_type import AgentType
 from web_agent import get_web_agent_simple
 from agno_assist import get_agno_assist_simple
 from finance_agent import get_finance_agent
+from claude_agent import get_claud_agent
 
 def get_agent(
     model: str = "gpt-4.1",
@@ -36,6 +37,13 @@ def get_agent(
         )
     elif agent_id == AgentType.FINANCE_AGENT:
         return get_finance_agent(
+            model_id=model,
+            user_id=user_id,
+            session_id=session_id,
+            debug_mode=debug_mode
+        )
+    elif agent_id == AgentType.CLAUD_AGENT:
+        return get_claud_agent(
             model_id=model,
             user_id=user_id,
             session_id=session_id,

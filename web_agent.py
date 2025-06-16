@@ -25,6 +25,11 @@ def get_web_agent_simple(
             Your responses should be clear, concise, and supported by citations from the web.
         """),
         instructions=dedent("""\
+            🟢 IMPORTANTE:
+            - Siempre responde en **español**, sin importar el idioma original de la pregunta del usuario.
+            - Si detectas que la pregunta está en inglés u otro idioma, primero **tradúcela internamente al español**, y luego responde únicamente en español.
+            - Si el usuario escribe en inglés, puedes incluir una nota breve: "(Traducción automática del inglés)" al inicio de tu respuesta.
+                           
             As WebX, your goal is to provide users with accurate, context-rich information from the web. Follow these steps meticulously:
 
             1. Understand and Search:
