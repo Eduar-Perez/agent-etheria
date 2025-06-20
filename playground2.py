@@ -1,10 +1,10 @@
 import uvicorn
 import base64
 import mimetypes
+import pytesseract
 import fitz
 import docx
 from PIL import Image
-import pytesseract
 import io
 from fastapi import FastAPI, HTTPException
 from agno.agent import Agent
@@ -18,9 +18,9 @@ from agent_selector import get_agent, AgentType
 from dotenv import load_dotenv
 
 # PARA OBTENER SECRETS MANAGER DE AWS
-load_aws_secrets()
+#load_aws_secrets()
 # PARA OBTENER VATRIABLES DE ENTORNO DE .env
-#load_dotenv() 
+load_dotenv() 
 
 MODELS = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
@@ -30,8 +30,8 @@ class QuestionsRequest(BaseModel):
     agent_id: str
     user_id: Optional[str] = None
     session_id: Optional[str] = None
-    #file: Optional[str] = None
-    #fileName: Optional[str] = None
+    file: Optional[str] = None
+    fileName: Optional[str] = None
 
 
 def agente_generico(model_id: str) -> Agent:
@@ -74,15 +74,15 @@ def create_api_fastapi_app(agent: Agent) -> FastAPI:
                 debug_mode=True
             )  
 
-            #file_base64 = None
-            #if request.file:
-                #try:
-                    #fileBytes = base64.b64decode(request.file)
-                    #fileName = request.fileName
-                    #extractedText = extractFileFromBytes(fileBytes, fileName)
-                    #request.question = f"Analiza el siguiente contenido del archivo:\n\n{extractedText}"
-                #except Exception as e:
-                 #   raise HTTPException(status_code=400, detail=f"Archivo invalido o no procesable: {str(e)}")
+            file_base64 = None
+            if request.file:
+                try:
+                    fileBytes = base64.b64decode(request.file)
+                    fileName = request.fileName
+                    extractedText = extractFileFromBytes(fileBytes, fileName)
+                    request.question = f"Analiza el siguiente contenido del archivo:\n\n{extractedText}"
+                except Exception as e:
+                    raise HTTPException(status_code=400, detail=f"Archivo invalido o no procesable: {str(e)}")
 
             response = agent.run(request.question)
             response_dict = safe_serialize(response)
