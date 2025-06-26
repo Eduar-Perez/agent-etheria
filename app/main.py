@@ -9,7 +9,7 @@ import io
 from fastapi import FastAPI, HTTPException
 from agno.agent import Agent
 from agno.models.aws import Claude
-from secrets_loader import load_aws_secrets
+# from secrets_loader import load_aws_secrets
 from pydantic import BaseModel
 from mangum import Mangum
 from fastapi.responses import JSONResponse
