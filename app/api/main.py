@@ -1,6 +1,5 @@
 import uvicorn
 import base64
-import logging
 import mimetypes
 import pytesseract
 import fitz
@@ -18,8 +17,6 @@ from typing import Any, Optional, List
 from agent_selector import get_agent, AgentType
 from dotenv import load_dotenv
 
-logging.basicConfig(level=logging.INFO)
-
 # PARA OBTENER SECRETS MANAGER DE AWS
 #load_aws_secrets()
 # PARA OBTENER VATRIABLES DE ENTORNO DE .env
@@ -28,7 +25,7 @@ load_dotenv()
 MODELS = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
 class InstructionItem(BaseModel):
-    intruction: str  # <-- Ojo con el typo: se recomienda cambiarlo a `instruction`
+    instruction: str  
     description: Optional[str] = None
 
 class FileItem(BaseModel):
@@ -54,38 +51,27 @@ def agente_generico(model_id: str) -> Agent:
         #fileName=None,
         #file=None
     )
-
+    
 # Crea el prompt para la pregunta
 def build_prompt(request: QuestionsRequest) -> str:
-    # Instrucciones
-    instruction_block = ""
-    if request.instructions:
-        lines = [
-            f"- {i.intruction}" + (f" ({i.description})" if i.description else "")
-            for i in request.instructions
-        ]
-        instruction_block = "INSTRUCCIONES:\n" + "\n".join(lines)
-
     # Archivos
     files_block = ""
     if request.files:
         file_texts = []
         for f in request.files:
             try:
-                decoded = base64.b64decode(f.file).decode("utf-8", errors="replace")
-                file_texts.append(f"--- Archivo: {f.fileName} ---\n{decoded}")
+                file_bytes = base64.b64decode(f.file)
+                file_content = extractFileFromBytes(file_bytes, f.fileName)
+                file_texts.append(f"--- Archivo: {f.fileName} ---\n{file_content}")
             except Exception:
                 file_texts.append(f"--- Archivo: {f.fileName} ---\n[Contenido binario no mostrado]")
-
         files_block = "ARCHIVOS ADJUNTOS:\n" + "\n\n".join(file_texts)
 
-    # Pregunta
-    return f"""{instruction_block}
-
-{files_block}
+    # Solo archivos + pregunta
+    return f"""{files_block}
 
 PREGUNTA:
-{request.question}
+{request.question.strip()}
 """
 
 
@@ -100,45 +86,7 @@ def safe_serialize(obj: Any):
         return safe_serialize(vars(obj))
     else:
         return str(obj)
-
-
-def create_api_fastapi_app(agent: Agent) -> FastAPI:
-    app = FastAPI()
     
-    @app.post("/task")
-    async def ask_question(request: QuestionsRequest):
-        try:
-            agent_enum = AgentType(request.agent_id)
-            logging.info(f"Creando el agente: {agent_enum}\nCon los parametros:\n1. instructions: {request.instructions}\n2. file_name: {request.files['fileName']}\n3. file_content: {request.files['file']}")
-
-            agent = get_agent(
-                model=request.model,
-                agent_id=agent_enum,
-                user_id=request.user_id,
-                session_id=request.session_id,
-                debug_mode=True
-            )  
-
-            file_base64 = None
-            if request.file:
-                try:
-                    fileBytes = base64.b64decode(request.file)
-                    fileName = request.fileName
-                    extractedText = extractFileFromBytes(fileBytes, fileName)
-                    request.question = f"Analiza el siguiente contenido del archivo:\n\n{extractedText}"
-                except Exception as e:
-                    raise HTTPException(status_code=400, detail=f"Archivo invalido o no procesable: {str(e)}")
-
-            response = agent.run(request.question)
-            response_dict = safe_serialize(response)
-            return JSONResponse(content={"response": response_dict})
-        except ValueError as ve:
-            raise HTTPException(status_code=400, detail=str(ve))
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-    
-    return app
-
 def extractFileFromBytes(file_byts: bytes, file_name: str) -> str:
     mime_type, _ = mimetypes.guess_type(file_name)
     if mime_type == 'application/pdf':
@@ -156,8 +104,34 @@ def extractFileFromBytes(file_byts: bytes, file_name: str) -> str:
         return pytesseract.image_to_string(image)
     return ValueError("Tipo de retorno no soportado")
 
-agent = agente_generico(MODELS)
-app = create_api_fastapi_app(agent)
+def create_api_fastapi_app() -> FastAPI:
+    app = FastAPI()
+    @app.post("/task")
+    async def ask_question(request: QuestionsRequest):
+        try:
+            agent_enum = AgentType(request.agent_id)
+            agent = get_agent(
+                model=request.model,
+                agent_id=agent_enum,
+                user_id=request.user_id,
+                session_id=request.session_id,
+                debug_mode=True,
+                instructions_user = request.instructions                
+            )  
+            
+            inputPrompt = build_prompt(request)
+            response = agent.run(inputPrompt)
+            response_dict = safe_serialize(response)
+            return JSONResponse(content={"response": response_dict})
+        except ValueError as ve:
+            raise HTTPException(status_code=400, detail=str(ve))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+    
+    return app
+
+# agent = agente_generico(MODELS)
+app = create_api_fastapi_app()
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8081)
