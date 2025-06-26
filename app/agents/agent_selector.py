@@ -20,7 +20,9 @@ def get_agent(
     user_id: Optional[str] = None,
     session_id: Optional[str] = None,
     debug_mode: bool = True,
-    instruction: Optional[str] = None
+    instruction_user: Optional[str] = None,
+    description_user: Optional[str] = None
+    
     # file_name: Optional[str] = None,
     # file_content: Optional[str] = None
     
@@ -46,7 +48,8 @@ def get_agent(
         user_id=user_id,
         session_id=session_id,
         debug_mode=debug_mode,
-        instruction=instruction
+        instruction_user=instruction_user,
+        description_user=description_user
         # file_name=file_name,
         # file_content=file_content
     )

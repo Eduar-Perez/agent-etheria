@@ -14,8 +14,11 @@ from pydantic import BaseModel
 from mangum import Mangum
 from fastapi.responses import JSONResponse
 from typing import Any, Optional, List
-from agent_selector import get_agent, AgentType
+from agents.agent_selector import get_agent, AgentType
 from dotenv import load_dotenv
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # PARA OBTENER SECRETS MANAGER DE AWS
 #load_aws_secrets()
@@ -74,7 +77,6 @@ PREGUNTA:
 {request.question.strip()}
 """
 
-
 def safe_serialize(obj: Any):
     if isinstance(obj, (str, int, float, bool)) or obj is None:
         return obj
@@ -94,21 +96,36 @@ def extractFileFromBytes(file_byts: bytes, file_name: str) -> str:
             return "\n".join(page.get_text() for page in doc)
         
     elif mime_type in ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword']:
-        with open("temp.docx", "wb") as temp:
-            temp.write(file_byts)
+        # with open("temp.docx", "wb") as temp:
+        #     temp.write(file_byts)
         doc = docx.Document(io.BytesIO(file_byts))
         return "\n".join(p.text for p in doc.paragraphs)
 
     elif mime_type and mime_type.startswith('image/'):
         image = Image.open(io.BytesIO(file_byts))
         return pytesseract.image_to_string(image)
-    return ValueError("Tipo de retorno no soportado")
+    return  ValueError("Tipo de archivo no soportado")
+
 
 def create_api_fastapi_app() -> FastAPI:
     app = FastAPI()
     @app.post("/task")
     async def ask_question(request: QuestionsRequest):
         try:
+            logging.info(f"Received request for agent={request.agent_id}, model={request.model}, question={request.question[:50]}, instructions={request.instructions}")
+            instructions_user = None
+            description_user = None
+            if request.instructions:
+                lines = []
+                for i in request.instructions:
+                    inst = getattr(i, "instruction", None) or getattr(i, "intruction", None) # revisar como se envían los datos para hacer el cambio de intructon a instruction
+                    if inst:
+                        line = f"- {inst}"
+                        if i.description:
+                            line += f" ({i.description})"
+                        lines.append(line)
+                instructions_user = "\n".join(lines)
+                description_user = request.instructions[0].description or None
             agent_enum = AgentType(request.agent_id)
             agent = get_agent(
                 model=request.model,
@@ -116,9 +133,9 @@ def create_api_fastapi_app() -> FastAPI:
                 user_id=request.user_id,
                 session_id=request.session_id,
                 debug_mode=True,
-                instructions_user = request.instructions                
-            )  
-            
+                instruction_user = instructions_user,
+                description_user = description_user
+            )
             inputPrompt = build_prompt(request)
             response = agent.run(inputPrompt)
             response_dict = safe_serialize(response)
