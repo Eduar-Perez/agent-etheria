@@ -9,7 +9,7 @@ import io
 from fastapi import FastAPI, HTTPException
 from agno.agent import Agent
 from agno.models.aws import Claude
-# from secrets_loader import load_aws_secrets
+from secrets_loader import load_aws_secrets
 from pydantic import BaseModel
 from mangum import Mangum
 from fastapi.responses import JSONResponse
@@ -21,9 +21,9 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # PARA OBTENER SECRETS MANAGER DE AWS
-#load_aws_secrets()
-# PARA OBTENER VATRIABLES DE ENTORNO DE .env
-load_dotenv() 
+load_aws_secrets()
+# # PARA OBTENER VATRIABLES DE ENTORNO DE .env
+# load_dotenv() 
 
 MODELS = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
