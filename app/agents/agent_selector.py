@@ -1,9 +1,9 @@
 from typing import Optional, Union, Callable
-from app.agents.agent_type import AgentType
-from app.agents.web_agent import get_web_agent_simple
-from app.agents.agno_assist import get_agno_assist_simple
-from app.agents.finance_agent import get_finance_agent
-from app.agents.claude_agent import get_claud_agent
+from agents.agent_type import AgentType
+from agents.web_agent import get_web_agent_simple
+from agents.agno_assist import get_agno_assist_simple
+from agents.finance_agent import get_finance_agent
+from agents.claude_agent import get_claud_agent
 
 
 # Diccionario para mapear y construit cada tipo de agente
