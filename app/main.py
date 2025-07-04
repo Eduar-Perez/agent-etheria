@@ -159,9 +159,10 @@ def create_api_fastapi_app() -> FastAPI:
                 debug_mode=True,
                 instruction_user=instructions_user,
                 description_user=description_user,
+                tools=False,
             )
-            inputPrompt = build_prompt(request)
-            response = agent.run(inputPrompt)
+            input_prompt = build_prompt(request)
+            response = agent.run(input_prompt)
             response_dict = safe_serialize(response)
             return JSONResponse(content={"response": response_dict})
         except ValueError as ve:
@@ -172,7 +173,6 @@ def create_api_fastapi_app() -> FastAPI:
     return fastapi_app
 
 
-# agent = agente_generico(MODELS)
 app = create_api_fastapi_app()
 
 if __name__ == "__main__":
