@@ -46,7 +46,7 @@ def get_agent(
         debug_mode=debug_mode,
         instruction_user=instruction_user,
         description_user=description_user,
-        tools=tools
+        tools_input=tools
         # file_name=file_name,
         # file_content=file_content
     )
