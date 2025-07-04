@@ -1,0 +1,21 @@
+# Core dependencies
+fastapi
+uvicorn[standard]
+pydantic
+
+# AWS and agno
+boto3
+agno
+
+# File processing
+PyMuPDF
+python-docx
+Pillow
+pytesseract
+
+# Utilities
+python-dotenv
+mangum
+
+# Testing (optional)
+requests
