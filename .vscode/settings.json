@@ -1,0 +1,19 @@
+{
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.pylintArgs": [
+        "--disable=import-error",
+        "--disable=unused-import",
+        "--disable=no-name-in-module",
+        "--disable=import-outside-toplevel"
+    ],
+    "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.autoImportCompletions": false,
+    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.autoSearchPaths": false,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingImports": "none",
+        "reportMissingTypeStubs": "none",
+        "reportUnusedImport": "none"
+    }
+} 

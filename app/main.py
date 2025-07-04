@@ -18,22 +18,27 @@ from agents.agent_selector import get_agent, AgentType
 from dotenv import load_dotenv
 import logging
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 # PARA OBTENER SECRETS MANAGER DE AWS
 load_aws_secrets()
 # # PARA OBTENER VATRIABLES DE ENTORNO DE .env
-# load_dotenv() 
+# load_dotenv()
 
 MODELS = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
+
 class InstructionItem(BaseModel):
-    instruction: str  
+    instruction: str
     description: Optional[str] = None
 
+
 class FileItem(BaseModel):
-    file: str         # base64
+    file: str  # base64
     fileName: str
+
 
 class QuestionsRequest(BaseModel):
     question: str
@@ -44,17 +49,20 @@ class QuestionsRequest(BaseModel):
     instructions: Optional[List[InstructionItem]] = None
     files: Optional[List[FileItem]] = None
 
+
 def agente_generico(model_id: str) -> Agent:
+    """Crea un agente genérico con el modelo especificado."""
     return Agent(
         name="Claude Agent",
         model=Claude(id=model_id),
         show_tool_calls=True,
         markdown=True,
         debug_mode=True,
-        #fileName=None,
-        #file=None
+        # fileName=None,
+        # file=None
     )
-    
+
+
 # Crea el prompt para la pregunta
 def build_prompt(request: QuestionsRequest) -> str:
     # Archivos
@@ -67,15 +75,17 @@ def build_prompt(request: QuestionsRequest) -> str:
                 file_content = extractFileFromBytes(file_bytes, f.fileName)
                 file_texts.append(f"--- Archivo: {f.fileName} ---\n{file_content}")
             except Exception:
-                file_texts.append(f"--- Archivo: {f.fileName} ---\n[Contenido binario no mostrado]")
+                file_texts.append(
+                    f"--- Archivo: {f.fileName} ---\n[Contenido binario no mostrado]"
+                )
         files_block = "ARCHIVOS ADJUNTOS:\n" + "\n\n".join(file_texts)
-
     # Solo archivos + pregunta
     return f"""{files_block}
 
 PREGUNTA:
 {request.question.strip()}
 """
+
 
 def safe_serialize(obj: Any):
     if isinstance(obj, (str, int, float, bool)) or obj is None:
@@ -88,37 +98,51 @@ def safe_serialize(obj: Any):
         return safe_serialize(vars(obj))
     else:
         return str(obj)
-    
+
+
 def extractFileFromBytes(file_byts: bytes, file_name: str) -> str:
     mime_type, _ = mimetypes.guess_type(file_name)
-    if mime_type == 'application/pdf':
-        with fitz.open(stream=file_byts, file_name='pdf') as doc:
+    if mime_type == "application/pdf":
+        with fitz.open(stream=file_byts, file_name="pdf") as doc:
             return "\n".join(page.get_text() for page in doc)
-        
-    elif mime_type in ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword']:
+
+    elif mime_type in [
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/msword",
+    ]:
         # with open("temp.docx", "wb") as temp:
         #     temp.write(file_byts)
         doc = docx.Document(io.BytesIO(file_byts))
         return "\n".join(p.text for p in doc.paragraphs)
 
-    elif mime_type and mime_type.startswith('image/'):
+    elif mime_type and mime_type.startswith("image/"):
         image = Image.open(io.BytesIO(file_byts))
         return pytesseract.image_to_string(image)
-    return  ValueError("Tipo de archivo no soportado")
+    raise ValueError("Tipo de archivo no soportado")
 
 
 def create_api_fastapi_app() -> FastAPI:
-    app = FastAPI()
-    @app.post("/task")
+    fastapi_app = FastAPI()
+
+    @fastapi_app.post("/task")
     async def ask_question(request: QuestionsRequest):
         try:
-            logging.info(f"Received request for agent={request.agent_id}, model={request.model}, question={request.question[:50]}, instructions={request.instructions}")
+            logging.info(
+                "Received request for agent=%s, model=%s, question=%s,\
+                instructions=%s",
+                request.agent_id,
+                request.model,
+                request.question[:50],
+                request.instructions,
+            )
             instructions_user = None
             description_user = None
             if request.instructions:
                 lines = []
                 for i in request.instructions:
-                    inst = getattr(i, "instruction", None) or getattr(i, "intruction", None) # revisar como se envían los datos para hacer el cambio de intructon a instruction
+                    inst = getattr(i, "instruction", None) or getattr(
+                        i, "intruction", None
+                    )
                     if inst:
                         line = f"- {inst}"
                         if i.description:
@@ -133,8 +157,8 @@ def create_api_fastapi_app() -> FastAPI:
                 user_id=request.user_id,
                 session_id=request.session_id,
                 debug_mode=True,
-                instruction_user = instructions_user,
-                description_user = description_user
+                instruction_user=instructions_user,
+                description_user=description_user,
             )
             inputPrompt = build_prompt(request)
             response = agent.run(inputPrompt)
@@ -144,8 +168,9 @@ def create_api_fastapi_app() -> FastAPI:
             raise HTTPException(status_code=400, detail=str(ve))
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
-    
-    return app
+
+    return fastapi_app
+
 
 # agent = agente_generico(MODELS)
 app = create_api_fastapi_app()

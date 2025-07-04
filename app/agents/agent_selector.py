@@ -5,7 +5,6 @@ from agents.agno_assist import get_agno_assist_simple
 from agents.finance_agent import get_finance_agent
 from agents.claude_agent import get_claud_agent
 
-
 # Diccionario para mapear y construit cada tipo de agente
 AGENT_MAP: dict[AgentType, Callable] = {
     AgentType.WEB_AGENT: get_web_agent_simple,
@@ -21,22 +20,19 @@ def get_agent(
     session_id: Optional[str] = None,
     debug_mode: bool = True,
     instruction_user: Optional[str] = None,
-    description_user: Optional[str] = None
-    
+    description_user: Optional[str] = None,
+    tools: Optional[bool] = None
     # file_name: Optional[str] = None,
     # file_content: Optional[str] = None
-    
 ):
     if agent_id is None:
         raise ValueError("Agent ID must be provided")
-
     # Si viene como string, conviértelo al enum AgentType
     if isinstance(agent_id, str):
         try:
             agent_id = AgentType(agent_id)
         except ValueError:
             raise ValueError(f"Unknown agent ID: {agent_id}")
-
     # Seleccion de función desde el diccionario
     constructor = AGENT_MAP.get(agent_id)
     if constructor is None:
@@ -49,7 +45,8 @@ def get_agent(
         session_id=session_id,
         debug_mode=debug_mode,
         instruction_user=instruction_user,
-        description_user=description_user
+        description_user=description_user,
+        tools=tools
         # file_name=file_name,
         # file_content=file_content
     )
