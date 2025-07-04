@@ -17,6 +17,7 @@ from typing import Any, Optional, List
 from agents.agent_selector import get_agent, AgentType
 from dotenv import load_dotenv
 import logging
+import traceback
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -168,6 +169,7 @@ def create_api_fastapi_app() -> FastAPI:
         except ValueError as ve:
             raise HTTPException(status_code=400, detail=str(ve))
         except Exception as e:
+            logging.error("Unhandled Exception:\n%s", traceback.format_exc())
             raise HTTPException(status_code=500, detail=str(e))
 
     return fastapi_app
