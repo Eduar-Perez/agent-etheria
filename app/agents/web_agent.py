@@ -13,15 +13,15 @@ def get_web_agent_simple(
     debug_mode: bool = True,
     instruction_user: Optional[str] = None,
     description_user: Optional[str] = None,
-    tools: Optional[bool] = None
+    tools_input: Optional[bool] = None
 ) -> Agent:
 
-    instructions_hardcode = open_prompt("./prompt/web_agent.txt")
+    instructions_hardcode = open_prompt("./prompts/web_agent.txt")
     instructions_hardcode = instructions_hardcode.format(current_user_id=user_id)
     instructions_end = dedent(instruction_user) if instruction_user else instructions_hardcode
-    descriptions_hardcode = open_prompt("./prompt/web_agent_description.txt")
+    descriptions_hardcode = open_prompt("./prompts/web_agent_description.txt")
     description_end = dedent(description_user) if description_user else descriptions_hardcode
-    tools = [DuckDuckGoTools()] if tools else []
+    tools = [DuckDuckGoTools()] if tools_input else []
     return Agent(
         name="Web Search Agent",
         agent_id="web_search_agent",
