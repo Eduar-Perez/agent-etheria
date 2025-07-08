@@ -150,9 +150,7 @@ def create_api_fastapi_app() -> FastAPI:
             if request.instructions:
                 lines = []
                 for i in request.instructions:
-                    inst = getattr(i, "instruction", None) or getattr(
-                        i, "intruction", None
-                    )
+                    inst = getattr(i, "intruction", None)
                     if inst:
                         line = f"- {inst}"
                         if i.description:
