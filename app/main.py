@@ -171,9 +171,6 @@ def create_api_fastapi_app() -> FastAPI:
         except Exception as e:
             logging.error("Unhandled Exception:\n%s", traceback.format_exc())
             raise HTTPException(status_code=500, detail=str(e))
-        except Exception as e:
-            logging.error("Unhandled Exception:\n%s", traceback.format_exc())
-            raise HTTPException(status_code=442, detail=str(e))
 
     return fastapi_app
 
