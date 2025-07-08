@@ -166,7 +166,9 @@ def create_api_fastapi_app() -> FastAPI:
             input_prompt = build_prompt(request)
             response = agent.run(input_prompt)
             response_dict = safe_serialize(response)
-            return JSONResponse(content={"response": response_dict})
+            final_response = JSONResponse(content={"response": response_dict})
+            logging.info(f"Final response: {final_response}")
+            return final_response
         except ValueError as ve:
             raise HTTPException(status_code=400, detail=str(ve))
         except Exception as e:
