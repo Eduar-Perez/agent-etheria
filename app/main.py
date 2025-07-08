@@ -18,7 +18,7 @@ from agents.agent_selector import get_agent, AgentType
 from dotenv import load_dotenv
 import logging
 import traceback
-
+from fastapi import Request
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
@@ -124,7 +124,15 @@ def extractFileFromBytes(file_byts: bytes, file_name: str) -> str:
 
 def create_api_fastapi_app() -> FastAPI:
     fastapi_app = FastAPI()
-
+    @fastapi_app.middleware("http")
+    async def log_raw_request(request: Request, call_next):
+        try:
+            body = await request.body()
+            logging.info("Raw incoming request body:\n%s", body.decode("utf-8"))
+        except Exception as e:
+            logging.error("Failed to read request body: %s", str(e))
+        response = await call_next(request)
+        return response
     @fastapi_app.post("/task")
     async def ask_question(request: QuestionsRequest):
         logging.info(f"Received request: {request}")
