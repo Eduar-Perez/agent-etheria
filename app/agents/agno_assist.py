@@ -11,7 +11,7 @@ def get_agno_assist_simple(
     debug_mode: bool = True,
     instruction_user: Optional[str] = None,
     description_user: Optional[str] = None,
-    tools: Optional[bool] = None
+    tools_input: Optional[bool] = None
 ) -> Agent:
     instructions_hardcode = dedent(f"""\                
             🟢 IMPORTANTE:

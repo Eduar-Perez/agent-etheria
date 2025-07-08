@@ -21,7 +21,7 @@ def get_agent(
     debug_mode: bool = True,
     instruction_user: Optional[str] = None,
     description_user: Optional[str] = None,
-    tools: Optional[bool] = None
+    tools_input: Optional[bool] = None
     # file_name: Optional[str] = None,
     # file_content: Optional[str] = None
 ):
@@ -46,7 +46,7 @@ def get_agent(
         debug_mode=debug_mode,
         instruction_user=instruction_user,
         description_user=description_user,
-        tools_input=tools
+        tools_input=tools_input
         # file_name=file_name,
         # file_content=file_content
     )

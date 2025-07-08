@@ -127,6 +127,7 @@ def create_api_fastapi_app() -> FastAPI:
 
     @fastapi_app.post("/task")
     async def ask_question(request: QuestionsRequest):
+        logging.info(f"Received request: {request}")
         try:
             logging.info(
                 "Received request for agent=%s, model=%s, question=%s,\
@@ -160,7 +161,7 @@ def create_api_fastapi_app() -> FastAPI:
                 debug_mode=True,
                 instruction_user=instructions_user,
                 description_user=description_user,
-                tools=False,
+                tools_input=False,
             )
             input_prompt = build_prompt(request)
             response = agent.run(input_prompt)
