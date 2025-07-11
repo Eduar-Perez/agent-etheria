@@ -6,6 +6,7 @@ from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.yfinance import YFinanceTools
 from utilities.get_prompts import open_prompt
 
+
 def get_finance_agent(
     model_id: str = "gpt-4.1",
     user_id: Optional[str] = None,
@@ -13,17 +14,19 @@ def get_finance_agent(
     debug_mode: bool = False,
     instruction_user: Optional[str] = None,
     description_user: Optional[str] = None,
-    tools_input: Optional[bool] = None
+    tools_input: Optional[bool] = None,
 ) -> Agent:
     """
     Crea y devuelve el agente financiero configurado.
     """
     instructions_hardcode = open_prompt("./agents/prompts/finance_agent.txt")
-    instructions_hardcode = instructions_hardcode.format(current_user_id=user_id)
+    instructions_hardcode = instructions_hardcode.format(user_id=user_id)
     instructions_end = (
         dedent(instruction_user) if instruction_user else instructions_hardcode
     )
-    descriptions_hardcode = open_prompt("./agents/prompts/finance_agent_description.txt")
+    descriptions_hardcode = open_prompt(
+        "./agents/prompts/finance_agent_description.txt"
+    )
     description_end = (
         dedent(description_user) if description_user else descriptions_hardcode
     )

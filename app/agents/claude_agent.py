@@ -16,13 +16,14 @@ def get_claud_agent(
    tools_input: Optional[bool] = None
 ) -> Agent:
    instructions_hardcode = open_prompt("./agents/prompts/claude_agent.txt")
+   instructions_hardcode = instructions_hardcode.format(user_id=user_id)
    instructions_end = (
-        dedent(instruction_user) if instruction_user else instructions_hardcode
-    )
-    descriptions_hardcode = open_prompt("./agents/prompts/claude_agent_description.txt")
-    description_end = (
-        dedent(description_user) if description_user else descriptions_hardcode
-    )
+      dedent(instruction_user) if instruction_user else instructions_hardcode
+   )
+   descriptions_hardcode = open_prompt("./agents/prompts/claude_agent_description.txt")
+   description_end = (
+      dedent(description_user) if description_user else descriptions_hardcode
+   )
    description_end = dedent(description_user) if description_user else descriptions_hardcode
    return Agent(
       name="Claud Agent",

@@ -18,7 +18,7 @@ def get_web_agent_simple(
 ) -> Agent:
 
     instructions_hardcode = open_prompt("./agents/prompts/web_agent.txt")
-    instructions_hardcode = instructions_hardcode.format(current_user_id=user_id)
+    instructions_hardcode = instructions_hardcode.format(user_id=user_id)
     instructions_end = (
         dedent(instruction_user) if instruction_user else instructions_hardcode
     )
