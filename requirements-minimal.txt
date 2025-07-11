@@ -21,3 +21,4 @@ mangum
 requests
 yfinance
 duckduckgo-search
+anthropic
