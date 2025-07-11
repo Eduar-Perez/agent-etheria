@@ -41,4 +41,4 @@ Objetivo: Proporcionar respuestas precisas y bien fundamentadas a partir de bús
 - Anima al usuario a seguir explorando o preguntar más.
 
 Nota adicional:
-Estás interactuando con el usuario_id: {current_user_id}. Si el usuario comparte su nombre, puedes preguntarle si deseas guardarlo para futuras interacciones.
+Estás interactuando con el usuario_id: {user_id}. Si el usuario comparte su nombre, puedes preguntarle si deseas guardarlo para futuras interacciones.

@@ -2,8 +2,8 @@ from typing import Optional, List
 from textwrap import dedent
 from agno.agent import Agent
 from agno.models.aws import Claude
-from utilities.get_prompts import open_prompt
 from agno.tools.duckduckgo import DuckDuckGoTools
+from utilities.get_prompts import open_prompt
 
 class BaseAgentFactory:
     def __init__(
@@ -36,14 +36,22 @@ class BaseAgentFactory:
         description_user: Optional[str] = None,
         tools_input: Optional[bool] = None,
     ) -> Agent:
-        prompt_text = open_prompt(self.prompt_file).format(current_user_id=user_id)
-        instructions = dedent(instruction_user) if instruction_user else prompt_text
+        # Cargar instrucciones
+        instructions_base = open_prompt(self.prompt_file)
+        instructions_base = instructions_base.format(user_id=user_id)
+        instructions_final = (
+            dedent(instruction_user) if instruction_user else instructions_base
+        )
 
-        description_text = open_prompt(self.description_file)
-        description = dedent(description_user) if description_user else description_text
+        # Cargar descripción
+        description_base = open_prompt(self.description_file)
+        description_final = (
+            dedent(description_user) if description_user else description_base
+        )
 
+        # Herramientas
         tools = [DuckDuckGoTools()] if tools_input else []
-        tools += self.extra_tools
+        tools.extend(self.extra_tools)
 
         return Agent(
             name=self.name,
@@ -52,8 +60,8 @@ class BaseAgentFactory:
             session_id=session_id,
             model=Claude(id=model_id or self.default_model),
             tools=tools,
-            instructions=instructions,
-            description=description,
+            instructions=instructions_final,
+            description=description_final,
             storage=None,
             add_state_in_messages=self.state_enabled,
             add_history_to_messages=False,

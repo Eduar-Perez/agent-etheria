@@ -5,3 +5,4 @@ class AgentType(Enum):
     AGNO_ASSIST = "agno_assist"
     FINANCE_AGENT = "finance_agent"
     CLAUD_AGENT = "claud_agent"
+    CODE_AGENT = "code_agent"

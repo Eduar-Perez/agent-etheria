@@ -1,17 +1,6 @@
-from typing import Optional, Union, Callable
-from agents.agent_type import AgentType
-from agents.web_agent import get_web_agent_simple
-from agents.agno_assist import get_agno_assist_simple
-from agents.finance_agent import get_finance_agent
-from agents.claude_agent import get_claud_agent
-
-# Diccionario para mapear y construit cada tipo de agente
-AGENT_MAP: dict[AgentType, Callable] = {
-    AgentType.WEB_AGENT: get_web_agent_simple,
-    AgentType.AGNO_ASSIST: get_agno_assist_simple,
-    AgentType.FINANCE_AGENT: get_finance_agent,
-    AgentType.CLAUD_AGENT: get_claud_agent
-}
+from typing import Optional, Union
+from .agent_type import AgentType
+from .factory import AGENTS
 
 def get_agent(
     model: str = "gpt-4.1",
@@ -21,32 +10,28 @@ def get_agent(
     debug_mode: bool = True,
     instruction_user: Optional[str] = None,
     description_user: Optional[str] = None,
-    tools_input: Optional[bool] = None
-    # file_name: Optional[str] = None,
-    # file_content: Optional[str] = None
+    tools_input: Optional[bool] = None,
 ):
     if agent_id is None:
         raise ValueError("Agent ID must be provided")
-    # Si viene como string, conviértelo al enum AgentType
+
+    # Si el agent_id viene como string, conviértelo a Enum
     if isinstance(agent_id, str):
         try:
             agent_id = AgentType(agent_id)
         except ValueError:
             raise ValueError(f"Unknown agent ID: {agent_id}")
-    # Seleccion de función desde el diccionario
-    constructor = AGENT_MAP.get(agent_id)
-    if constructor is None:
-        raise ValueError(f"Agent: {agent_id} not found")
 
-    # Llamar la función correspondiente
-    return constructor(
+    factory = AGENTS.get(agent_id.value)
+    if not factory:
+        raise ValueError(f"Agent '{agent_id.value}' not found")
+
+    return factory.build(
         model_id=model,
         user_id=user_id,
         session_id=session_id,
         debug_mode=debug_mode,
         instruction_user=instruction_user,
         description_user=description_user,
-        tools_input=tools_input
-        # file_name=file_name,
-        # file_content=file_content
+        tools_input=tools_input,
     )

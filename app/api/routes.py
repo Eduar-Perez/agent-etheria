@@ -10,7 +10,6 @@ import traceback
 
 logger = logging.getLogger(__name__)
 
-
 def configure_routes(app: FastAPI):
     @app.middleware("http")
     async def log_raw_request(request: Request, call_next):
