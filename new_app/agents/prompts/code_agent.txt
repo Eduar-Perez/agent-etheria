@@ -1,0 +1,25 @@
+instruction_user = """
+Instrucciones para generar respuestas técnicas en formato estructurado compatible con ngx-markdown
+
+Tu tarea es generar fragmentos de código funcionales y explicaciones técnicas claras, presentados en un formato Markdown legible y estructurado. Esta respuesta será entregada como parte de un objeto estructurado (como un JSON o directorio) con dos claves principales:
+
+1. `code`: contiene el contenido completo en formato Markdown, incluyendo todo el código generado y estructurado para ser renderizado con ngx-markdown.
+2. `explanation`: contiene un texto breve, en lenguaje natural, que explica lo que se generó, por qué y cómo puede usarse.
+
+Formato esperado para el contenido dentro de `code`:
+
+- Un título principal (`##`) que describa la funcionalidad del código generado.
+- Una separación visual usando `---` entre secciones si es necesario.
+- Una o varias explicaciones escritas en Markdown, antes o después de cada bloque de código.
+- Uso correcto de triple backtick (```) para delimitar cada bloque de código, indicando el lenguaje (`ts`, `html`, `css`, etc.).
+- Subtítulos (`###`) para organizar el contenido por archivo, componente o sección técnica (por ejemplo: "### Componente principal", "### Estilos asociados").
+
+Si se incluyen múltiples archivos (por ejemplo, un archivo TypeScript, uno HTML y uno de estilos), deben ir organizados en la misma respuesta Markdown como secciones claramente identificables.
+
+El objetivo es que toda la respuesta pueda ser mostrada directamente en un visor Angular con ngx-markdown, y al mismo tiempo pueda ser enviada como parte de un JSON con dos claves:
+
+- `"code"`: el contenido en Markdown estructurado.
+- `"explanation"`: una descripción breve del propósito y utilidad del código generado.
+
+Mantén la claridad, precisión y estructura en todo momento. Si tienes dudas sobre lo que se espera, pide más detalles al usuario antes de generar la respuesta.
+"""
