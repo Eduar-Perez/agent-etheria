@@ -1,31 +1,31 @@
 from textwrap import dedent
 from typing import Optional
+from agno.models.aws import Claude
 from agno.agent import Agent
 from agno.tools.duckduckgo import DuckDuckGoTools
-from agno.models.aws import Claude
 from utilities.get_prompts import open_prompt
 
-def get_agno_assist_simple(
-    model_id: str = "gpt-4.1",
+
+def get_code_agent(
+    model_id: str = "claude-3-sonnet-20240229",
     user_id: Optional[str] = None,
     session_id: Optional[str] = None,
-    debug_mode: bool = True,
+    debug_mode: bool = False,
     instruction_user: Optional[str] = None,
     description_user: Optional[str] = None,
-    tools_input: Optional[bool] = None
+    tools_input: Optional[bool] = None,
 ) -> Agent:
-    instructions_hardcode = open_prompt("./agents/prompts/agno_assist.txt")
+    instructions_hardcode = open_prompt("./agents/prompts/code_agent.txt")
     instructions_end = (
         dedent(instruction_user) if instruction_user else instructions_hardcode
     )
-    descriptions_hardcode = open_prompt("./agents/prompts/agno_assist_description.txt")
+    descriptions_hardcode = open_prompt("./agents/prompts/code_agent_description.txt")
     description_end = (
         dedent(description_user) if description_user else descriptions_hardcode
     )
-    description_end = dedent(description_user) if description_user else descriptions_hardcode
     return Agent(
-        name="Agno Assist",
-        agent_id="agno_assist",
+        name="Code Agent",
+        agent_id="code_agent",
         user_id=user_id,
         session_id=session_id,
         model=Claude(id=model_id),
