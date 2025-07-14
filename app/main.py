@@ -24,7 +24,7 @@ logging.basicConfig(
 )
 
 # PARA OBTENER SECRETS MANAGER DE AWS
-load_aws_secrets()
+# load_aws_secrets()
 # # PARA OBTENER VATRIABLES DE ENTORNO DE .env
 # load_dotenv()
 
