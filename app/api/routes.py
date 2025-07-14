@@ -38,9 +38,9 @@ def configure_routes(app: FastAPI):
             agent = get_agent(
                 model=request.model,
                 agent_id=agent_enum,
-                user_id=request.user_id,
-                session_id=request.session_id,
-                debug_mode=True,
+                user_id=request.user_id if request.user_id else "default_user",
+                session_id=request.session_id if request.session_id else "default_session",
+                debug_mode=False,
                 instruction_user=instructions_user,
                 description_user=description_user,
                 tools_input=False,
