@@ -19,15 +19,14 @@ El objetivo es que toda la respuesta pueda ser mostrada directamente en un visor
 
 - `"code"`: el contenido en Markdown estructurado.
 - `"explanation"`: una descripción breve del propósito y utilidad del código generado.
+Además, debes envolver todo el contenido de la clave `"code"` entre las marcas:
+
+- `code_init` (antes del primer encabezado Markdown)
+- `code_end` (después del último contenido Markdown)
 
 Mantén la claridad, precisión y estructura en todo momento. Si tienes dudas sobre lo que se espera, pide más detalles al usuario antes de generar la respuesta.
 
-Tu respuesta debe ser **únicamente** un objeto JSON válido con la siguiente estructura:
 
-{{
-  "code": "...contenido Markdown completo...",
-  "explanation": "...explicación breve en texto natural..."
-}}
 
 No devuelvas texto antes ni después del JSON. No incluyas etiquetas como 'Respuesta:', 'Aquí tienes:', ni Markdown fuera del bloque `"code"`. No uses comillas escapadas. Devuelve un JSON directo, limpio, sin envolver en un string.
 
