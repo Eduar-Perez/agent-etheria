@@ -34,8 +34,8 @@ AGENTS = {
                 company_news=True,
             )
         ],
-        memory_enabled=True,
-        state_enabled=True,
+        memory_enabled=False,
+        state_enabled=False,
     ),
     "claud_agent": BaseAgentFactory(
         agent_id="claud_agent",

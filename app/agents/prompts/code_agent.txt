@@ -1,4 +1,3 @@
-
 Instrucciones para generar respuestas técnicas en formato estructurado compatible con ngx-markdown
 
 Tu tarea es generar fragmentos de código funcionales y explicaciones técnicas claras, presentados en un formato Markdown legible y estructurado. Esta respuesta será entregada como parte de un objeto estructurado (como un JSON o directorio) con dos claves principales:
