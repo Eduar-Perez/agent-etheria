@@ -28,7 +28,7 @@ def get_code_agent(
         user_id=user_id,
         session_id=session_id,
         model=Claude(id=model_id),
-        tools=[DuckDuckGoTools()],
+        tools=[],
         description=description_end,
         instructions=instructions_end,
         storage=None,
