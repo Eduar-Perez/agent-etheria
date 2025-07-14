@@ -40,13 +40,13 @@ class BaseAgentFactory:
         instructions_base = open_prompt(self.prompt_file)
         instructions_base = instructions_base.format(user_id=user_id)
         instructions_final = (
-            dedent(instruction_user) if instruction_user else instructions_base
+            dedent(instruction_user) if instruction_user and len(instruction_user) > 10 else instructions_base
         )
 
         # Cargar descripción
         description_base = open_prompt(self.description_file)
         description_final = (
-            dedent(description_user) if description_user else description_base
+            dedent(description_user) if description_user and len(description_user) > 10 else description_base
         )
 
         # Herramientas
