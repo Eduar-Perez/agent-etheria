@@ -17,3 +17,4 @@ class QuestionsRequest(BaseModel):
     session_id: Optional[str] = None
     instructions: Optional[List[InstructionItem]] = None
     files: Optional[List[FileItem]] = None
+    tools: Optional[[bool]] = None

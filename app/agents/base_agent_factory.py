@@ -50,7 +50,7 @@ class BaseAgentFactory:
         )
 
         # Herramientas
-        tools = [DuckDuckGoTools()] if tools_input else []
+        tools = [DuckDuckGoTools()] if tools_input else [] 
         tools.extend(self.extra_tools)
 
         return Agent(

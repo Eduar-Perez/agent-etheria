@@ -44,7 +44,7 @@ def configure_routes(app: FastAPI):
                 debug_mode=False,
                 instruction_user=instructions_user,
                 description_user=description_user,
-                tools_input=False,
+                tools_input=True,
             )
             input_prompt = build_prompt(request)
             response = agent.run(input_prompt)
