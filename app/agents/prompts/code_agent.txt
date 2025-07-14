@@ -37,4 +37,3 @@ Restricciones importantes:
 
 Recomendación final:
 Genera código claro, limpio y reutilizable. Organiza la información como si fuese parte de un documento técnico o documentación oficial que se mostrará directamente en un visor `ngx-markdown`.
-
