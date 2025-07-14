@@ -24,10 +24,10 @@ Mantén la claridad, precisión y estructura en todo momento. Si tienes dudas so
 
 Tu respuesta debe ser **únicamente** un objeto JSON válido con la siguiente estructura:
 
-{
+{{
   "code": "...contenido Markdown completo...",
   "explanation": "...explicación breve en texto natural..."
-}
+}}
 
 No devuelvas texto antes ni después del JSON. No incluyas etiquetas como 'Respuesta:', 'Aquí tienes:', ni Markdown fuera del bloque `"code"`. No uses comillas escapadas. Devuelve un JSON directo, limpio, sin envolver en un string.
 
