@@ -1,10 +1,6 @@
 from fastapi import FastAPI
 from mangum import Mangum
-from utilities.secrets_loader import load_aws_secrets
 from api.routes import configure_routes
-
-load_aws_secrets()
-
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
