@@ -5,7 +5,6 @@ from agno.agent import Agent
 from agno.tools.duckduckgo import DuckDuckGoTools
 from utilities.get_prompts import open_prompt
 
-
 def get_code_agent(
     model_id: str = "claude-3-sonnet-20240229",
     user_id: Optional[str] = None,

@@ -4,13 +4,15 @@ from agents.web_agent import get_web_agent_simple
 from agents.agno_assist import get_agno_assist_simple
 from agents.finance_agent import get_finance_agent
 from agents.claude_agent import get_claud_agent
+from agents.code_agent import get_code_agent
 
 # Diccionario para mapear y construit cada tipo de agente
 AGENT_MAP: dict[AgentType, Callable] = {
     AgentType.WEB_AGENT: get_web_agent_simple,
     AgentType.AGNO_ASSIST: get_agno_assist_simple,
     AgentType.FINANCE_AGENT: get_finance_agent,
-    AgentType.CLAUD_AGENT: get_claud_agent
+    AgentType.CLAUD_AGENT: get_claud_agent,
+    AgentType.CODE_AGENT: get_code_agent
 }
 
 def get_agent(
@@ -18,7 +20,7 @@ def get_agent(
     agent_id: Optional[Union[AgentType, str]] = None,
     user_id: Optional[str] = None,
     session_id: Optional[str] = None,
-    debug_mode: bool = True,
+    debug_mode: bool = False,
     instruction_user: Optional[str] = None,
     description_user: Optional[str] = None,
     tools_input: Optional[bool] = None
