@@ -164,7 +164,7 @@ def create_api_fastapi_app() -> FastAPI:
                 agent_id=agent_enum,
                 user_id=request.user_id,
                 session_id=request.session_id,
-                debug_mode=True,
+                debug_mode=False,
                 instruction_user=instructions_user,
                 description_user=description_user,
                 tools_input=False,
