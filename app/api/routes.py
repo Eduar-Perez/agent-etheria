@@ -41,16 +41,16 @@ def configure_routes(app: FastAPI):
                 agent_id=agent_enum,
                 user_id=request.user_id if request.user_id else "default_user",
                 session_id=request.session_id if request.session_id else "default_session", 
-                debug_mode=True,
+                debug_mode=False,
                 instruction_user=instructions_user,
                 description_user=description_user,
                 tools_input=False,
             )
             input_prompt = build_prompt(request)
             response = agent.run(input_prompt)
-            response_json = json.loads(response)
-            logger.info("Respuesta directa desde el agente: %s", response_json["content"])
-            return JSONResponse(content={"response": safe_serialize(response)})
+            response_json = json.loads(response.content)
+            logger.info("Respuesta directa desde el agente: %s",response_json)
+            return JSONResponse(content={"response": safe_serialize(response.content)})
         except ValueError as ve:
             raise HTTPException(status_code=400, detail=str(ve)) from ve
         except Exception as e:
