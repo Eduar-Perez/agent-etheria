@@ -49,8 +49,7 @@ def configure_routes(app: FastAPI):
             input_prompt = build_prompt(request)
             response = agent.run(input_prompt)
             response_json = json.loads(response.content)
-            logger.info("Respuesta directa desde el agente: %s",response_json)
-            return JSONResponse(content={"response": safe_serialize(response.content)})
+            return JSONResponse(content={"response": safe_serialize(response_json)})
         except ValueError as ve:
             raise HTTPException(status_code=400, detail=str(ve)) from ve
         except Exception as e:
