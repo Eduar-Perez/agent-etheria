@@ -21,33 +21,37 @@ def configure_routes(app: FastAPI):
     @app.post("/task")
     async def ask_question(request: QuestionsRequest):
         try:
-            instructions_user = None
-            description_user = None
-            if request.instructions:
-                lines = [
-                    (
-                        f"- {i.intruction} ({i.description})"
-                        if i.description
-                        else f"- {i.intruction}"
-                    )
-                    for i in request.instructions
-                ]
-                instructions_user = "\n".join(lines)
-                description_user = request.instructions[0].description
+            type_agent = request.agent_id
+            if type_agent[:5] == "team_":
+                response = "Team agent"
+            else:
+                instructions_user = None
+                description_user = None
+                if request.instructions:
+                    lines = [
+                        (
+                            f"- {i.intruction} ({i.description})"
+                            if i.description
+                            else f"- {i.intruction}"
+                        )
+                        for i in request.instructions
+                    ]
+                    instructions_user = "\n".join(lines)
+                    description_user = request.instructions[0].description
 
-            agent_enum = AgentType(request.agent_id)
-            agent = get_agent(
-                model=request.model,
-                agent_id=agent_enum,
-                user_id=request.user_id if request.user_id else "default_user",
-                session_id=request.session_id if request.session_id else "default_session", 
-                debug_mode=False,
-                instruction_user=instructions_user,
-                description_user=description_user,
-                tools_input=request.tool if request.tool is not None else False,
-            )
-            input_prompt = build_prompt(request)
-            response = agent.run(input_prompt)
+                agent_enum = AgentType(request.agent_id)
+                agent = get_agent(
+                    model=request.model,
+                    agent_id=agent_enum,
+                    user_id=request.user_id if request.user_id else "default_user",
+                    session_id=request.session_id if request.session_id else "default_session", 
+                    debug_mode=False,
+                    instruction_user=instructions_user,
+                    description_user=description_user,
+                    tools_input=request.tool if request.tool is not None else False,
+                )
+                input_prompt = build_prompt(request)
+                response = agent.run(input_prompt)
             return JSONResponse(content={"response": safe_serialize(response.content)})
         except ValueError as ve:
             raise HTTPException(status_code=400, detail=str(ve)) from ve

@@ -6,3 +6,5 @@ class AgentType(Enum):
     FINANCE_AGENT = "finance_agent"
     CLAUDE_AGENT = "claude_agent"
     CODE_AGENT = "code_agent"
+    TEAM_JOIN_SQL = "team_join_sql"
+    TEAM_ODI_MIGRATION = "team_odi_migration"
