@@ -17,7 +17,6 @@ def configure_routes(app: FastAPI):
         body = await request.body()
         logger.info("Request Body: %s", body.decode("utf-8"))
         return await call_next(request)
-
     @app.post("/task")
     async def ask_question(request: QuestionsRequest):
         try:
@@ -52,7 +51,8 @@ def configure_routes(app: FastAPI):
                 )
                 input_prompt = build_prompt(request)
                 response = agent.run(input_prompt)
-            return JSONResponse(content={"response": safe_serialize(response.content)})
+                response = response.content
+            return JSONResponse(content={"response": safe_serialize(response)})
         except ValueError as ve:
             raise HTTPException(status_code=400, detail=str(ve)) from ve
         except Exception as e:
