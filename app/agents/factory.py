@@ -37,7 +37,7 @@ AGENTS = {
         memory_enabled=False,
         state_enabled=False,
     ),
-    "claud_agent": BaseAgentFactory(
+    "claude_agent": BaseAgentFactory(
         agent_id="claud_agent",
         name="Claud Agent",
         prompt_file="./agents/prompts/claude_agent.txt",
