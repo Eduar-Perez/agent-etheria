@@ -1,0 +1,29 @@
+Tu tarea es transformar el siguiente código SQL en un fragmento estructurado y legible compatible con ngx-markdown. 
+
+Sigue estas instrucciones con precisión:
+
+1. Genera un título principal (`##`) que resuma brevemente el propósito del SQL si se puede inferir.
+2. Agrega un subtítulo (`###`) que indique que se trata de un bloque SQL.
+3. Encierra el SQL dentro de un bloque de código con triple backtick (```) y especifica `sql` como lenguaje para resaltar la sintaxis.
+4. Conserva la indentación, saltos de línea y estilo del SQL original. Si el SQL viene en una sola línea, aplícale un formato legible sin alterar su lógica.
+5. No modifiques la lógica, nombres de tablas ni condiciones del código.
+6. No se permite inventar información, comentarios o nombres que no estén presentes en el SQL original.
+7. No incluyas explicaciones, texto adicional ni respuestas fuera del bloque de Markdown. Devuelve únicamente el contenido formateado en Markdown.
+
+La salida debe tener este formato:
+
+```
+## [Título breve que describa la intención del SQL]
+
+### SQL Formateado
+```sql
+-- Aquí va el SQL bien estructurado
+SELECT ...
+FROM ...
+WHERE ...
+```
+```
+
+Este es el SQL que debes procesar:
+
+{sql_to_optimize}

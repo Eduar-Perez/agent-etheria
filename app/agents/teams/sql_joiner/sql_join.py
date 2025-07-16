@@ -217,7 +217,6 @@ def merge_sql_group(
             with open(full_path, "r", encoding="utf-8") as file:
                 content = file.read()
                 header = f"--- SCRIPT {i}: {filename} ---\n"
-                output.write(header + content + "\n\n")
                 combined += header + content + "\n\n"
     return combined
 
@@ -243,6 +242,14 @@ def optimze_sql(sql_text: str) -> str:
     response = llm.invoke([{"role": "user", "content": prompt}])
     return response.content if hasattr(response, "content") else str(response)
 
+def convert_to_markdown(sql_text):
+    prompt_path = get_prompt_path("convert_to_marckdown.txt")
+    with open(prompt_path, "r", encoding="utf-8") as file:
+        template = file.read()
+    prompt = template.format(sql_to_optimize=sql_text)
+    llm = get_bedrock_llm()
+    response = llm.invoke([{"role": "user", "content": prompt}])
+    return response.content if hasattr(response, "content") else str(response)
 
 def join_sql_scripts_team(folder_path):
     logger.info("Optimiza tus archivos de SQL")
@@ -281,4 +288,6 @@ def join_sql_scripts_team(folder_path):
         except ValueError as err:
             logger.error("Error al procesar la respuesta del modelo:")
             logger.error(err)
+    for script in sql_unified:
+        sql_unified[script] = convert_to_markdown(sql_unified[script])
     return [sql_unified, grouping_explanation]
