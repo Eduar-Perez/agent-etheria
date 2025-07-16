@@ -1,0 +1,48 @@
+Tienes múltiples scripts SQL que han sido previamente agrupados porque comparten estructuras similares. Tu tarea es UNIFICARLOS en una sola consulta SQL que pueda ejecutarse directamente en ODI, siguiendo los lineamientos detallados a continuación:
+
+1. La consulta resultante debe cumplir lo siguiente:
+   - Un único SELECT
+   - Un único FROM
+   - JOINs claros, utilizando claves reales (NO uses ON 1=1)
+   - LEFT JOINs solo si:
+     - Existen llaves claras de unión
+     - Se necesitan para campos seleccionados o filtros de algún reporte
+     - Están correctamente condicionados con :filtro_nuevo = '...' o su valor equivalente
+
+2. Construcción del SELECT:
+   - Si un campo aparece en todos los scripts y no varía según el reporte, inclúyelo directamente (sin CASE)
+   - Si un campo cambia o solo aplica a un reporte, usa:
+     CASE WHEN :filtro_nuevo = X THEN campo ELSE NULL END
+   - Usa siempre ELSE NULL en todos los CASE WHEN, incluso si solo hay un WHEN. Esto evita errores de sintaxis en motores estrictos
+   - Utiliza nombres de columnas claros y consistentes
+   - Evita repetir expresiones CASE en el GROUP BY; si es necesario, simplifica con alias o CTE
+
+3. Cláusula WHERE:
+   - Agrupa las condiciones por cada valor de :filtro_nuevo
+   - Replica exactamente la lógica original de cada script
+   - Para filtros opcionales como :P_OFICINA, :P_REGION, :P_FECHA_DESDE, etc., usa:
+     - (:P_PARAMETRO IS NULL OR columna = :P_PARAMETRO)
+     - (:P_PARAMETRO IS NULL OR columna IN (:P_PARAMETRO))
+   - Si un reporte tiene condiciones complejas, encapsúlalas bajo el bloque correspondiente a su :filtro_nuevo
+
+4. GROUP BY (solo si hay funciones de agregación como MAX, SUM, etc.):
+   - Incluye todas las columnas del SELECT que no estén dentro de funciones agregadas
+   - Asegúrate de que el GROUP BY refleje exactamente el nivel de detalle de cada reporte
+   - No repitas expresiones CASE complejas dentro del GROUP BY. Si es necesario, utiliza un alias definido en una subconsulta o una CTE (si el motor lo permite)
+
+5. Orden y estructura:
+   - Utiliza una sola cláusula ORDER BY al final, preferiblemente por claves lógicas como número de cheque u oficina
+   - Uniformiza el uso de alias de tablas (CHEQUE GERENCIA, OFICINA, etc.)
+   - Cuida el espaciado de los parámetros (WHEN :filtro_nuevo = ..., no WHEN:filtro_nuevo=...)
+   - Asegúrate de que todos los CASE WHEN tengan ELSE NULL END
+
+Importante:
+   - NO devuelvas explicaciones, comentarios, ni envoltorios.  
+   - NO uses formato markdown.  
+   - Devuelve únicamente el SQL final y completo, listo para ejecutarse en ODI.
+   - No uses TIMESTAMPDIFF(...): esta función no es compatible con Oracle. Usa TRUNC(SYSDATE) - TRUNC(fecha) en su lugar para calcular diferencias en días.
+
+---
+
+CONTENIDO DE LOS ARCHIVOS (no lo modifiques, solo analiza y unifica):
+{sql_join}

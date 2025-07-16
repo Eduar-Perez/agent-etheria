@@ -1,3 +1,4 @@
+import os
 import json
 from fastapi import Request, HTTPException, FastAPI
 from fastapi.responses import JSONResponse
@@ -5,9 +6,11 @@ from models.request_models import QuestionsRequest
 from agents.agent_selector import get_agent
 from agents.agent_type import AgentType
 from core.prompt_builder import build_prompt, safe_serialize
+from utilities.team_manager import team_manager
 import base64
 import logging
 import traceback
+
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +25,7 @@ def configure_routes(app: FastAPI):
         try:
             type_agent = request.agent_id
             if type_agent[:5] == "team_":
-                response = "Team agent"
+                response = team_manager(request)
             else:
                 instructions_user = None
                 description_user = None

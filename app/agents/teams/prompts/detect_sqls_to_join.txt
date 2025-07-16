@@ -1,0 +1,74 @@
+Tienes un archivo que contiene varios scripts SQL separados así:
+
+--- SCRIPT n: <nombre.sql> ---
+
+TU TAREA (paso a paso)
+
+1. Agrupar
+- Agrupa reportes que:
+   • Usan la misma base de datos o esquema principal
+   • Comparten al menos una tabla clave o conjunto estable de tablas en la cláusula FROM
+   • Tienen intenciones complementarias (por ejemplo: estados diferentes, períodos distintos o variantes sobre el mismo objeto de negocio como "cheque", "transacción", "cliente")
+
+2. Criterios técnicos para agrupar
+- Prioriza la compatibilidad de las cláusulas FROM por encima de otros factores.
+- Considera que dos scripts tienen un FROM compatible si:
+   • Usan las mismas tablas principales (aunque tengan más joins o filtros)
+   • Se pueden unir usando un solo FROM y un solo SELECT con condiciones CASE WHEN
+   • La granularidad no cambia radicalmente (por ejemplo, siguen trabajando sobre el mismo nivel como un número de cheque)
+
+- Permite que haya diferencias en:
+   • SELECT (columnas adicionales o nombres diferentes)
+   • JOINs adicionales
+   • Filtros distintos en WHERE
+   • Uso de funciones o agregaciones como MAX(), GROUP BY, COUNT, etc.
+Siempre que las tablas clave en el FROM sean iguales o compatibles.
+
+3. No agrupar si:
+   – Usan esquemas totalmente distintos sin relación clara
+   – Su FROM no comparte ni una tabla principal
+   – Contienen subconsultas internas que cambian completamente la lógica de agregación
+   – La granularidad cambia por joins que multiplican filas sin poder controlarse por condiciones
+
+IMPORTANTE:
+- NO penalices diferencias como GROUP BY o agregaciones si el enfoque sigue siendo sobre el mismo objeto principal (por ejemplo, número de cheque).
+- NO agrupes por “intención” (por ejemplo: “histórico” vs “bloqueado”) si las tablas clave coinciden.
+- El objetivo es facilitar una posterior consolidación en un solo SELECT con lógica CASE WHEN.
+- Sé inclusivo: si las estructuras base permiten encapsular cada script como un CTE, agrúpalos.
+
+REGLAS DE SALIDA:
+- Devuelve solo el JSON válido, sin markdown, encabezados ni explicaciones adicionales.
+- No formatees como ```json.
+- Mantén los nombres exactos de los scripts como están escritos en el encabezado "--- SCRIPT n: ... ---", incluyendo mayúsculas, espacios, tildes y signos.
+- Si un script no puede agruparse con ningún otro, colócalo en "no_agrupados".
+
+SALIDA (JSON puro):
+
+{{
+  "explicacion": "<explicación clara del análisis>",
+
+  "grupos": [
+    {{
+      "nombre_grupo": "<nombre representativo del grupo>",
+      "scripts": [
+        "<nombre exacto del script 1>",
+        "<nombre exacto del script 2>",
+        ...
+      ],
+      "explicacion_union": "<explcia de forma clara y corta porqué se unieron los scripts>"
+    }}
+  ],
+
+  "no_agrupados": [
+    {{
+      "script": "<nombre exacto del script no agrupado>",
+      "razon": "<explicación breve de por qué no puede agruparse>"
+    }}
+  ]
+}}
+
+Los nombres de los scripts deben conservarse exactamente como aparecen entre los delimitadores "--- SCRIPT n: <nombre.sql> ---", incluyendo espacios, mayúsculas, tildes y símbolos. No los transformes, modifiques ni normalices.
+
+
+CONTENIDO DEL ARCHIVO (no lo cambies, solo analiza y agrupa):
+{sql_join}
