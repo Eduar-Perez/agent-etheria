@@ -57,7 +57,7 @@ def join_sql_scripts(folder_path, output_filename="join_sql_files_no_errors.txt"
 
 def request_grouping(sql_text: str) -> str:
     """Envía los scripts SQL unidos al modelo para que agrupe por compatibilidad."""
-    prompt_path = os.path.join("prompts", "detect_sqls_to_join.txt")
+    prompt_path = os.path.join("..", "prompts", "detect_sqls_to_join.txt")
     with open(prompt_path, "r", encoding="utf-8") as file:
         template = file.read()
     prompt = template.format(sql_join=sql_text)
@@ -221,7 +221,7 @@ def merge_sql_group(
 
 def unify_sqls_with_model(sql_block: str) -> str:
     """Envía los scripts agrupados al modelo para que los combine en uno solo."""
-    prompt_path = os.path.join("prompts", "join_sqls.txt")
+    prompt_path = os.path.join("..", "prompts", "join_sqls.txt")
     with open(prompt_path, "r", encoding="utf-8") as file:
         template = file.read()
     prompt = template.format(sql_join=sql_block)
@@ -232,7 +232,7 @@ def unify_sqls_with_model(sql_block: str) -> str:
 
 def optimze_sql(sql_text: str) -> str:
     """Optimiza el SQL unificado enviándolo al modelo."""
-    prompt_path = os.path.join("prompts", "optimize_sql.txt")
+    prompt_path = os.path.join("..", "prompts", "optimize_sql.txt")
     with open(prompt_path, "r", encoding="utf-8") as file:
         template = file.read()
     prompt = template.format(sql_to_optimize=sql_text)
