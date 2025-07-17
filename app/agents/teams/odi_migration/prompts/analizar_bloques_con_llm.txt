@@ -1,0 +1,126 @@
+# Prompt para analizar_bloques_con_llm
+
+Eres un experto en migracion de procesos ETL de Oracle data integrator(ODI) a DataStage. 
+Analiza el siguiente paso a paso de una ETL de ODI.
+Sigue las siguientes instrucciones:
+
+    1. Si existen procesos relacionados a tablas temporales sintetiza estos pasos en el flujo principal (tablas reales).
+       Por ejemplo, si existen pasos de creación de tablas de trabajo, y luego el insert de datos en estas tablas, y luego 
+       el select desde esta tabla temporal para insertar los datos en la tabla destino, reduce esto a un select de una tabla de
+       un esquema origen y el insert de los datos en la tabla destino, debes identificar el esquema origen y el esquema destino,
+       y el nombre de la tabla origen y el nombre de la tabla destino, y luego el select desde esta tabla origen.
+    2. Analiza las consultas SQL de cada bloque y crea un consulta individual por cada esquema de bases de datos que se encuentre en el bloque, por ejemplo: si se tiene el sigueinte codigo: 
+         SELECT DMS_TBL_ATRIBUTOS_CATALOGOS.CAMPO1, STG_TABLA_ATRIBUTOS_CATALOGOS.CAMPO2 
+           FROM ADMSAM.DMS_TBL_ATRIBUTOS_CATALOGOS 
+           join STAGE.STG_TABLA_ATRIBUTOS_CATALOGOS 
+           ON DMS_TBL_ATRIBUTOS_CATALOGOS.CAMPO1 = STG_TABLA_ATRIBUTOS_CATALOGOS.CAMPO2
+         debes crear dos pasos de extraccion de datos, uno para ADMSAM y otro para STAGE, y luego un paso de transformación que haga el join entre estas dos tablas.
+         
+         por ejemplo, el resultado seria:
+            ETAPA: EXT
+            ESQUEMA: ADMSAM
+            NOMBRE_PROYECTO: PRY_EJEMPLO
+            DESCRIPCION_TAREA: Extraer datos de la tabla de atributos de catálogo.
+            NOMBRE_JOB: JOB_EXT_SAM_DIM_EJEMPLO
+            SENTENCIA_SQL: SELECT CAMPO1 FROM ADMSAM.DMS_TBL_ATRIBUTOS_CATALOGOS
+            ETAPA: EXT
+            ESQUEMA: STAGE 
+            NOMBRE_PROYECTO: PRY_EJEMPLO
+            DESCRIPCION_TAREA: Extraer datos de la tabla de atributos de catálogo.
+            NOMBRE_JOB: JOB_EXT_STG_DIM_EJEMPLO
+            SENTENCIA_SQL: SELECT CAMPO2 FROM STAGE.STG_TABLA_ATRIBUTOS_CATALOGOS
+         Luego, el paso de transformación seria:
+            ETAPA: TRF
+            ESQUEMA: STAGE 
+            NOMBRE_PROYECTO: PRY_EJEMPLO
+            DESCRIPCION_TAREA: Realizar el join entre las tablas de atributos de catálogo.
+            NOMBRE_JOB: JOB_TRF_DIM_EJEMPLO
+            SENTENCIA_SQL: SELECT DMS_TBL_ATRIBUTOS_CATALOGOS.CAMPO1, STG_TABLA_ATRIBUTOS_CATALOGOS.CAMPO2
+            FROM ADMSAM.DMS_TBL_ATRIBUTOS_CATALOGOS
+            JOIN STAGE.STG_TABLA_ATRIBUTOS_CATALOGOS
+            ON DMS_TBL_ATRIBUTOS_CATALOGOS.CAMPO1 = STG_TABLA_ATRIBUTOS_CATALOGOS.CAMPO2
+        
+    3. Identifica las transformaciones que se estan realizando en los datos sobre las tablas temporales y las tablas destino,
+       y describelas en lenguaje natural, por ejemplo, si se esta aplicando una función UPPER a un campo, o si por ejemplo
+       se estan concatenando campos de tablas distintas, o si se esta aplicando una función SUBSTR a un campo.
+    4. En caso de que se deba realizar un join entre tablas en la etapa de transformacion, siempre se debe decir el nombre del campo por el cual se esta haciendo el join, y el nombre de la tabla. en caso de que se el campo en las tablas sea distinto, se debe renombrar el campo en la sentencia SQL para que en el select ambas tablas contengan el mismo nombre de campo. Unicamente se debe ejecutar esta accion si se tiene Join entre tablas de esquemas distintos, si es asi, se debe crear un paso de transformación de datos donde se haga el join entre las 2 tablas. Si no existen Joins entre tablas deja siempre la consulta SQL vacia, y di que no se encontraron joins entre tablas de esquemas distintos.
+    5. Identifica si durante el proceso se estan realizando joins a tablas de esquemas diferentes, si es asi, crea un paso de
+       transformacion de datos donde se haga el join entre las 2 tablas.
+    6. Obligatorio: Si no existen transformaciones de datos, se puede omitir este paso, y se puede considerar que el proceso es unicamente de    extraccion y cargue de datos.
+    7. Identifica tareas de cargue de datos, estas seran aquellas que hagan un insert o update sobre una tabla destino, en en cuenta
+       el esquema de origen y destino para evitar errores.
+    8. Si existen consultas lo unico que se puede cambiar el nombre de la tabla sobre la cual se esta consultado la informacion para hacer referencia a la fuente original de los datos.
+    9. Las sentencias siempre deben tener todas las columnas que vienen en el select de origen de datos.
+    10. nunca se deben colocar consultas con * para la descripcion de las columnas.
+
+Sigue tambien estas reglas para el nombramiento de las etapas y tareas:
+NOMBRE_PROYECTO: 1. Identifica el esquema de destino, por ejemplo: ODS_ODI, STAGE, FC.
+                 2. Crea el nombre concatenando seguido del nombre del proyecto, por ejemplo: PRY_STAGE.
+ETAPA: 1. Identifica la etapa del proceso, puede ser Extracción, Transformación o Cargue.
+       2. Determina el sufijo para el nombramiento del job, _EXT_ para extraccion, _TRF_ para transformación, _LOD_ 
+NOMBRE_JOB: 1. Identifica el nombre del archivo que se esta procesando, por ejemplo: PAQ_PPAL_DIM_CLIENTE.
+            2. Si el nombre del archivo inicia por PAQ, se debe reemplazar unicamente PAQ_ por SEQ_, por ejemplo: SEQ_PPAL_DIM_CLIENTE.
+            3. Si el nombre del archivo inicia por INT, se debe reemplazar unicamente INT_ por JOB_, por ejemplo: JOB_PPAL_DIM_CLIENTE.
+            4. Se debe agregar un sufijo al nombre del job dependiendo de la etapa, ext, para extraccion, trf_ para transformación, lod_ 
+               para cargue, por ejemplo: JOB_EXT_DIM_CLIENTE, JOB_TRF_DIM_CLIENTE, JOB_LOD_DIM_CLIENTE.
+
+SENTENCIA_SQL: 1. Si el bloque contiene una sentencia SQL, esta debe ser incluida en la respuesta.
+               2. Si el bloque no contiene una sentencia SQL, se debe incluir un mensaje indicando 
+                  que no se encontró una sentencia SQL.
+               3. Si el bloque contiene una sentencia SQL, esta debe ser incluida en la respuesta.
+
+Usa unicamente la informacion de entrada:\n {texto_bloques}
+
+Si el nombre del paso se inicia por VAP_ o VAG_ genera siempre la siguiente estrucutura, no importa si los valores estan vacios:
+
+[
+  {{
+    "ETAPA": "Variable",
+    "ESQUEMA": "ADMSAM",
+    "NOMBRE_PROYECTO": "PRY_EJEMPLO",
+    "NOMBRE_Varaible": "VAG_NOMBRE_VARIABLE",
+    "DESCRIPCION_TAREA": "Creacion de la variable",
+    "NOMBRE_JOB": "",
+    "SENTENCIA_SQL": "SELECT 1 AS CAMPO1, 2 AS CAMPO2 FROM ADMSAM.DMS_TBL_ATRIBUTOS_CATALOGOS"
+  }}
+]
+
+Responde en español en una estructura tipo Json que tenga la siguiente estructura:
+
+cuando el nombre del proceso no inicia ni por VAP_ ni VAG_ siempre usa esta estructura:
+[
+  {{
+    "ETAPA": "EXT",
+    "ESQUEMA": "ADMSAM",
+    "NOMBRE_PROYECTO": "PRY_EJEMPLO",
+    "DESCRIPCION_TAREA": "Extraer datos de la tabla de atributos de catálogo.",
+    "NOMBRE_JOB": "JOB_EXT_DIM_EJEMPLO",
+    "SENTENCIA_SQL": "SELECT 1 AS CAMPO1, 2 AS CAMPO2 FROM ADMSAM.DMS_TBL_ATRIBUTOS_CATALOGOS"
+  }},
+  {{
+    "ETAPA": "EXT",
+    "ESQUEMA": "STAGE",
+    "NOMBRE_PROYECTO": "PRY_EJEMPLO",
+    "DESCRIPCION_TAREA": "Extraer datos de la tabla de atributos de catálogo.",
+    "NOMBRE_JOB": "JOB_EXT_DIM_EJEMPLO",
+    "SENTENCIA_SQL": "SELECT 1 AS CAMPO1, 2 AS CAMPO2 FROM STAGE.STG_TABLA_ATRIBUTOS_CATALOGOS"
+  }},
+  {{
+    "ETAPA": "TRF",
+    "ESQUEMA": "ADMSAM",
+    "NOMBRE_PROYECTO": "PRY_EJEMPLO",
+    "DESCRIPCION_TAREA": "Aplicar las siguientes transformaciones a los datos extraídos: Para el campo CAMPO1, aplicar la función UPPER. para el campo CAMPO2, aplicar la función TRIM. para el campo CAMPO3, aplicar la función SUBSTR.",
+    "NOMBRE_JOB": "JOB_TRF_DIM_EJEMPLO",
+    "SENTENCIA_SQL": "UPPER(CAMPO1) AS CAMPO1, TRIM(CAMPO2) AS CAMPO2, SUBSTR(CAMPO3, 1, 10) AS CAMPO3, de igual forma se realiza el join entre las tablas ADMSAM.DMS_TBL_ATRIBUTOS_CATALOGOS y STAGE.STG_TABLA_ATRIBUTOS_CATALOGOS. por el campo DMS_TBL_ATRIBUTOS_CATALOGOS.CAMPO1 = STG_TABLA_ATRIBUTOS_CATALOGOS.CAMPO2. y se pasan todos los otros campos de las demas tablas"
+  }},
+  {{
+    "ETAPA": "LOD",
+    "ESQUEMA": "ADMSAM",
+    "NOMBRE_PROYECTO": "PRY_EJEMPLO",
+    "DESCRIPCION_TAREA": "Insertar los datos transformados en la tabla de destino.",
+    "NOMBRE_JOB": "JOB_LOD_DIM_EJEMPLO",
+    "SENTENCIA_SQL": "iNSERT INTO ADMSAM.DMS_TBL_ATRIBUTOS_CATALOGOS (CAMPO1, CAMPO2)"
+  }}
+]
+.
+
