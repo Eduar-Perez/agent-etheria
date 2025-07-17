@@ -8,13 +8,11 @@ from typing import List
 def save_base64_files(file_items: List[dict], upload_dir: str) -> List[str]:
     os.makedirs(upload_dir, exist_ok=True)
     for item in file_items:
-        print(item.file)
         file_content = base64.b64decode(item.file)
         filename = item.fileName
         file_path = os.path.join(upload_dir, filename)
         with open(file_path, "wb") as f:
             f.write(file_content)
-
 
 def team_manager(request):
     team_id = request.agent_id
@@ -22,7 +20,6 @@ def team_manager(request):
         upload_dir = "./tmp/sql_inputs"
         save_base64_files(request.files, upload_dir)
         return join_sql_scripts_team(upload_dir)
-        # return "team_join_sqlaaaa aaaaadd"
     
     elif team_id == "team_odi_migration":
         upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "odi_inputs")
