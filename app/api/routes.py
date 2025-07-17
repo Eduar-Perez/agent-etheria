@@ -24,10 +24,11 @@ def configure_routes(app: FastAPI):
     async def ask_question(request: QuestionsRequest):
         try:
             type_agent = request.agent_id
+            print("type_agent", type_agent)
             if type_agent[:5] == "team_":
-                print("type_agent", type_agent)
                 response = team_manager(request)
             else:
+                
                 instructions_user = None
                 description_user = None
                 if request.instructions:
