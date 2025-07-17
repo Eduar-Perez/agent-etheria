@@ -25,6 +25,7 @@ def configure_routes(app: FastAPI):
         try:
             type_agent = request.agent_id
             if type_agent[:5] == "team_":
+                print("type_agent", type_agent)
                 response = team_manager(request)
             else:
                 instructions_user = None
