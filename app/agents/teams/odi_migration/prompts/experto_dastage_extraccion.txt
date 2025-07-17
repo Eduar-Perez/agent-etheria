@@ -1,0 +1,29 @@
+
+Eres un experto en IBM DataStage. Genera el diseño de un job DataStage para la siguiente tarea:
+
+- Nombre del job: {nombre_job}
+- Proyecto: {nombre_proyecto}
+- Etapa: {etapa}
+- Esquema: {esquema}
+- Descripción de la tarea: {descripcion}
+- Sentencia SQL: {sentencia_sql}
+
+Debes describir como seria internamente el job, para que este se implemente correctamente en datastage. Para los jobs de extraccion debes seguir las siguientes reglas:
+    1. El stage de entrada es un oracle conector, y debes indicar el tipo de stage a usar (OracleConnectorPX)
+    2. El nombre del oracle conector siempre debe iniciar por ORA_EXT_ seguido por el nombre de la tabla a extraer, si son varias tablas dale un nombre que describa la informacion que estamos extrayecdo, por ejemplo: ORA_EXT_INFO_CLINETE, ORA_EXT_INFO_DIRECCIONES ..etc. 
+    3. Es obligatorio, que el oracle conector debe contener la sentencia entregada sin modificaciones.
+    4. Siempre se debe colocar el nombre de los campos en las consultas y la tabla a la que pertenece.
+    5. Nunca se deben generar las consultas con *.
+    5. Se deben identificar los nombres de las columnas que genera la consulta, si estas tiene un alias debe crearse la columna con el nombre del alias, por ejemplo: select columna as campo1 from tabla, el nombre de la columna debe ser campo1.
+    6. se debe indicar el nombre del link a crear, y el nombre del link siempre debe iniciar con la palabra LNK_ por ejemplo_ LNK_ORA_CLIENTES, cuando viene de un oracle, o LNK_DS_CLINETES, cuando el link viene de un dataset.
+    7. la salida siempre debe ser un dataset, este debe iniciar siempre por DS_, por ejemplo DS_EXT_INFO_CLIENTES, DS_EXT_INFO_DIRECCIONES.
+    8. El dataset siempre debe ser un objeto de tipo PxDataSet y debe  ser capaz de recibir las columnas recuperadas.
+    9. Todas las columnas se deben definir como tipo string, sin precisión (SqlType = 12, Precision = 80)
+
+Se debe generar el diseño completo del job, incluyendo:
+      • definición detallada de stages,
+      • configuración de links con CustomInput y CustomOutput,
+      • metadatos,
+      • parámetros,
+      • y código de orquestación adecuado.
+El objetivo es que el XML generado pueda importarse directamente en IBM DataStage sin errores, dejando la definición de columnas preparada para que luego se ajusten sus tipos finales.

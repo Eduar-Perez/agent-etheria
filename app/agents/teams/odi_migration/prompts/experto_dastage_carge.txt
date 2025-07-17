@@ -1,0 +1,27 @@
+
+Eres un experto en IBM DataStage. Genera el diseño de un job DataStage para la siguiente tarea:
+
+- Nombre del job: {nombre_job}
+- Proyecto: {nombre_proyecto}
+- Etapa: {etapa}
+- Esquema: {esquema}
+- Descripción de la tarea: {descripcion}
+- Sentencia SQL: {sentencia_sql}
+
+Debes describir como seria internamente el job, para que este se implemente correctamente en datastage. Para los jobs de cargue debes seguir las siguientes reglas:
+    1. El stage de entrada siempre es un dataset, y debes indicar el tipo de stage a usar (PxDataSet)
+    2. El nombre del dataset, siempre sera el nombre del dataset final de la etapa de transaformación.
+    3. Debe tener todas las columnas generadas en la transformación con el mismo nombre y tipo de dato.
+    4. El destino siempre sera un oracle conector, este se debe llamar ORA_LOD_, y agrega el nombre de la tabla sobre la cual se esta ingresando informacion.
+    5. Se debe generar el link que conecta el dataset con sus columnas al Oracle.
+    6. se debe indicar el nombre del link a crear, y el nombre del link siempre debe iniciar con la palabra LNK_ por ejemplo_ LNK_DS_ORA_CLIENTES, LNK_DS_CLIENTES, cuando el link viene de datasets.
+    7. la salida siempre debe ser un Oracle Conector (OracleConnectorPX), este debe iniciar siempre por ORA_LOD_, por ejemplo ORA_LOD_INFO_CLIENTES, ORA_LOD_INFO_DIRECCIONES.
+    8. Todas las columnas se deben definir como tipo string, sin precisión (SqlType = 12, Precision = 80)
+
+Se debe generar el diseño completo del job, incluyendo:
+      • definición detallada de stages,
+      • configuración de links con CustomInput y CustomOutput,
+      • metadatos,
+      • parámetros,
+      • y código de orquestación adecuado.
+El objetivo es que el XML generado pueda importarse directamente en IBM DataStage sin errores, dejando la definición de columnas preparada para que luego se ajusten sus tipos finales.

@@ -3,7 +3,7 @@ import json
 from langchain_aws import ChatBedrock
 from .utilities.xml_to_json import convert_all_xml_to_json
 from .utilities.dtsge_agent_analyzer import ejecutar_grafo
-
+from .utilities.dtsge_agent_descripcion_tarea import describir_etl_desde_proceso
 # from python.DataStageAgentAnalisisJSON import ejecutar_grafo
 # from python.DataStageAgentDescripcionTarea import describir_etl_desde_proceso
 import logging
@@ -127,7 +127,7 @@ def odi_migration_team(xml_input_folder):
         print(f"\n Estamos traduciendo el proceso: '{nombre_proceso}' ...\n")
         ejecutar_grafo(ruta_json)
         print("Creando descripción tecnica del proceso ...\n")
-        # describir_etl_desde_proceso(json_filename[:-5])
+        describir_etl_desde_proceso(json_filename[:-5])
         # # Generar y mostrar explicación
         # tecnical_explanation = load_process(json_filename[:-5])  # Elimina '.json' del final
         # # print("esta es la explciación tecnica",tecnical_explanation)

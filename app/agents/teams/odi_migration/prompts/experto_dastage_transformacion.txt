@@ -1,0 +1,41 @@
+
+Eres un experto en IBM DataStage. Genera el diseño de un job DataStage para la siguiente tarea:
+
+- Nombre del job: {nombre_job}
+- Proyecto: {nombre_proyecto}
+- Etapa: TRF
+- Esquema: {esquema}
+- Descripción de la tarea: {descripcion}
+- Sentencia SQL: {sentencia_sql}
+
+Si son Joins las transformaciones:
+
+Debes describir como seria internamente el job, para que este se implemente correctamente en datastage. Para los jobs de extraccion debes seguir las siguientes reglas:
+    1. Los stages de entrada siempre seran un dataset, y debes indicar el tipo de stage a usar (PxDataSet)
+    2. El nombre del dataset, siempre sera el nombre del dataset en el cual se almaceno la informacion en la etapa de extraccion.
+    3. Debe tener todas las columnas generadas en las extracciones con el mismo nombre y tipo de dato.
+    4. se debe indicar la columna por la cual se va a realizar el join.
+    5. Se debe generar el link que conecta el dataset con el stage Join.
+    6. se debe indicar el nombre del link a crear, y el nombre del link siempre debe iniciar con la palabra LNK_ por ejemplo_ LNK_DS_ORA_CLIENTES, LNK_DS_CLIENTES, cuando el link viene de datasets.
+    7. la salida siempre debe ser dataset con el resultado del join entre las 2 tablas, por ejemplo DS_JN_INFO_CLIENTES, DS_JN_INFO_DIRECCIONES.
+    8. El stage de JOIN debera ser nombrado iniciando por JN_, por ejemplo: JN_INFO_CLIENTES_TELEFONOS, JN_INFO_CLIENTES_DIRECCIONES.
+
+Si es un transformer:
+
+Debes describir como seria internamente el job, para que este se implemente correctamente en datastage. Para los jobs de extraccion debes seguir las siguientes reglas:
+    1. Los stages de entrada siempre seran un dataset, y debes indicar el tipo de stage a usar (PxDataSet)
+    2. El nombre del dataset, siempre sera el nombre del dataset en el cual se almaceno la informacion en la etapa de extraccion.
+    3. Debe tener todas las columnas generadas en las extracciones con el mismo nombre y tipo de dato.
+    4. Se deben pasar todas las columnas de la entrada a la salida.
+    5. Se debe generar el link que conecta el dataset con el stage transformer.
+    6. se debe indicar el nombre del link a crear, y el nombre del link siempre debe iniciar con la palabra LNK_ por ejemplo_ LNK_DS_ORA_CLIENTES, LNK_DS_CLIENTES, cuando el link viene de datasets.
+    7. la salida siempre debe ser dataset con el resultado de las transformaciones, por ejemplo DS_TRF_INFO_CLIENTES, DS_TRF_INFO_DIRECCIONES.
+    8. El stage de tranformer debera ser nombrado iniciando por TRF_, por ejemplo: TRF_INFO_CLIENTES_TELEFONOS, TRF_INFO_CLIENTES_DIRECCIONES.
+
+Se debe generar el diseño completo del job, incluyendo:
+      • definición detallada de stages,
+      • configuración de links con CustomInput y CustomOutput,
+      • metadatos,
+      • parámetros,
+      • y código de orquestación adecuado.
+El objetivo es que el XML generado pueda importarse directamente en IBM DataStage sin errores, dejando la definición de columnas preparada para que luego se ajusten sus tipos finales.

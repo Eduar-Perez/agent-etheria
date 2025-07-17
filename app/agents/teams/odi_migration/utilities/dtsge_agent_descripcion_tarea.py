@@ -19,7 +19,7 @@ def get_bedrock_llm():
         config=Config(read_timeout=300, connect_timeout=60)
     )
     return ChatBedrock(
-        model_id=MODEL,
+        model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
         model_kwargs={
             "max_tokens": 4096,
             "temperature": 0,
