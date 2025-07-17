@@ -75,7 +75,7 @@ def definir_promts_pasos_job(state: DescripcionState) -> DescripcionState:
             sentencia_sql = bloque.get("SENTENCIA_SQL", "")
             nombre_proyecto = bloque.get("NOMBRE_PROYECTO", "")
             # Leer el prompt desde el archivo de carge
-            prompt_path =  os.path.abspath(os.path.join(os.path.dirname(__file__),'..', 'prompts', 'experto_dastage_extraccion.txt'))
+            prompt_path =  os.path.abspath(os.path.join(os.path.dirname(__file__), 'prompts', 'experto_dastage_extraccion.txt'))
             with open(prompt_path, 'r', encoding='utf-8') as f:
                 prompt_template = f.read()
             prompt_ext = prompt_template.format(nombre_job=nombre_job,
@@ -86,7 +86,7 @@ def definir_promts_pasos_job(state: DescripcionState) -> DescripcionState:
                         nombre_proyecto=nombre_proyecto)
             
             # Leer el prompt desde el archivo de transformaciones
-            prompt_path =  os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'prompts', 'experto_dastage_transformacion.txt'))
+            prompt_path =  os.path.abspath(os.path.join(os.path.dirname(__file__), 'prompts', 'experto_dastage_transformacion.txt'))
             with open(prompt_path, 'r', encoding='utf-8') as f:
                 prompt_template = f.read()
             prompt_trf = prompt_template.format(nombre_job=nombre_job,
@@ -97,7 +97,7 @@ def definir_promts_pasos_job(state: DescripcionState) -> DescripcionState:
                         nombre_proyecto=nombre_proyecto)
             
             # Leer el prompt desde el archivo de transformaciones
-            prompt_path =  os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'prompts', 'experto_dastage_carge.txt'))
+            prompt_path =  os.path.abspath(os.path.join(os.path.dirname(__file__), 'prompts', 'experto_dastage_carge.txt'))
             with open(prompt_path, 'r', encoding='utf-8') as f:
                 prompt_template = f.read()
             prompt_lod = prompt_template.format(nombre_job=nombre_job,

@@ -136,8 +136,6 @@ def odi_migration_team(xml_input_folder):
         print(user_explanation_text)
         print("=========================================")
         return user_explanation_text
-        # print("\n¿Apruebas esta migración? Si no estás de acuerdo, escribe tus comentarios")
-        # respuesta = input("> ").strip().lower()
         # if respuesta == "si":
         #     print("\n Listo! empezamos la traducción ...\n")
         #     # resultado = run_pipeline(ruta_json, nombre_proceso)
