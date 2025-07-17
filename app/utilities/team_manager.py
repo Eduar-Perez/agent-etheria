@@ -16,7 +16,6 @@ def save_base64_files(file_items: List[dict], upload_dir: str) -> List[str]:
 
 def team_manager(request):
     team_id = request.agent_id
-    print(team_id)
     if team_id == "team_join_sql":
         upload_dir = "./tmp/sql_inputs"
         save_base64_files(request.files, upload_dir)

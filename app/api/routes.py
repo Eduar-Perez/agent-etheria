@@ -20,12 +20,12 @@ def configure_routes(app: FastAPI):
     async def log_raw_request(request: Request, call_next):
         body = await request.body()
         logger.info("Request Body: %s", body.decode("utf-8"))
+        print("body", body)
         return await call_next(request)
     @app.post("/task")
     async def ask_question(request: QuestionsRequest):
         try:
             type_agent = request.agent_id
-            print("type_agent", type_agent)
             if type_agent[:5] == "team_":
                 response = team_manager(request)
             else:
