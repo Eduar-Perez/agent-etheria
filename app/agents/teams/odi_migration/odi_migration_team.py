@@ -67,7 +67,7 @@ def get_bedrock_llm():
 def user_explanation(technical_explanation: str) -> str:
     # Lee el prompt amigable
     # prompt_path = os.path.join('prompts', 'user_experto_with_multiple_task.txt')
-    prompt_path =  os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'prompts', 'experto_dastage_extraccion.txt'))
+    prompt_path =  os.path.abspath(os.path.join(os.path.dirname(__file__), '.', 'prompts', 'user_experto_3.txt'))
     with open(prompt_path, "r", encoding="utf-8") as f:
         prompt_template = f.read()
     # prompt = prompt_template.format(technical_explanation=technical_explanation, nombre_proceso_ppal=nombre_proceso_ppal)
@@ -136,6 +136,7 @@ def odi_migration_team(xml_input_folder):
         print(user_explanation_text)
         print("=========================================")
         return user_explanation_text
+
         # if respuesta == "si":
         #     print("\n Listo! empezamos la traducción ...\n")
         #     # resultado = run_pipeline(ruta_json, nombre_proceso)
