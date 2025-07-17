@@ -115,6 +115,8 @@ def odi_migration_team(xml_input_folder):
         os.path.dirname(__file__), "..", "..", "tmp", "odi_interpeted_json"
     )
     xml_inputs = [f for f in os.listdir(xml_input_folder) if f.endswith(".xml")]
+    if len(xml_inputs) < 1:
+        return "No se encontraron archivos .xml en la carpeta proporcionada"
     for xml_input in xml_inputs:
         nombre_proceso = xml_input.split(".")[0]
         json_filename = convert_all_xml_to_json(
