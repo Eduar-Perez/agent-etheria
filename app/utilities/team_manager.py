@@ -16,12 +16,17 @@ def save_base64_files(file_items: List[dict], upload_dir: str) -> List[str]:
 
 def team_manager(request):
     team_id = request.agent_id
+
     if team_id == "team_join_sql":
+        if request.files is None:
+            return "Para hacer este procesamiento, necesito que cargues los archivos de sql que deseas unificar"
         upload_dir = "./tmp/sql_inputs"
         save_base64_files(request.files, upload_dir)
         return join_sql_scripts_team(upload_dir)
     
     elif team_id == "team_odi_migration":
+        if request.files is None:
+            return "Para hacer este analisis se necesito que cargues el archivo .XML que deseas migrar"
         upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "odi_inputs")
         save_base64_files(request.files, upload_dir)
         return odi_migration_team(upload_dir)

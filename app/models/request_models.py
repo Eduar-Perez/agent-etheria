@@ -11,7 +11,7 @@ class FileItem(BaseModel):
 
 class QuestionsRequest(BaseModel):
     question: str
-    model: str
+    model: Optional[str] = None
     agent_id: str
     user_id: Optional[str] = None
     session_id: Optional[str] = None
