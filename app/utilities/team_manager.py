@@ -7,6 +7,8 @@ from typing import List
 
 def save_base64_files(file_items: List[dict], upload_dir: str) -> List[str]:
     os.makedirs(upload_dir, exist_ok=True)
+    if len(file_items) < 1:
+        return "No se encontraron archivos en la carpeta proporcionada"
     for item in file_items:
         file_content = base64.b64decode(item.file)
         filename = item.fileName
