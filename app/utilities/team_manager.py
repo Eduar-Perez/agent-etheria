@@ -8,7 +8,6 @@ from typing import List
 def save_base64_files(file_items: List[dict], upload_dir: str) -> List[str]:
     os.makedirs(upload_dir, exist_ok=True)
     for item in file_items:
-        print(item.file)
         file_content = base64.b64decode(item.file)
         filename = item.fileName
         file_path = os.path.join(upload_dir, filename)
