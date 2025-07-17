@@ -60,6 +60,7 @@ def configure_routes(app: FastAPI):
                 response = response.content
             return JSONResponse(content={"response": safe_serialize(response)})
         except RequestValidationError as rve:
+            print("rve", rve)
             raise HTTPException(status_code=422, detail=rve.errors()) from rve
         except ValueError as ve:
             raise HTTPException(status_code=400, detail=str(ve)) from ve
