@@ -2,7 +2,6 @@ import os
 import boto3
 import re
 import json
-from dotenv import load_dotenv
 from typing import TypedDict
 from botocore.config import Config
 from langgraph.graph import END, StateGraph
@@ -10,9 +9,6 @@ from langchain_core.messages import HumanMessage
 from langchain_aws import ChatBedrock
 from typing import TypedDict
 
-# Cargar variables de entorno
-def cargar_entorno():
-    load_dotenv()
 
 class GrafoState(TypedDict):
     ruta_json: str
@@ -33,6 +29,8 @@ def leer_json_desde_archivo(path: str) -> dict:
     with open(path, 'r', encoding='utf-8') as f:
         return json.load(f)
 # --- Utilidad para limpiar bloques vacíos de tipo SERIAL y guardar el resultado ---
+
+
 def eliminar_bloques_serial_vacios(data):
     """
     Elimina de forma recursiva los objetos donde COL_TXT y DEF_TXT estén vacíos.
@@ -60,6 +58,7 @@ def eliminar_bloques_serial_vacios(data):
     else:
         return data
 
+
 # --- Guardar el JSON limpio en la carpeta 'clean' con sufijo _clean ---
 def guardar_json_limpio(json_limpio, ruta_original):
     nombre_archivo = os.path.basename(ruta_original)
@@ -73,6 +72,7 @@ def guardar_json_limpio(json_limpio, ruta_original):
         json.dump(json_limpio, f, ensure_ascii=False, indent=2)
     print(f"✅ Archivo limpio guardado en: {ruta_clean}")
     return ruta_clean  
+
 
 def exportar_steps_por_proceso(json_path):
     with open(json_path, 'r', encoding='utf-8') as f:
@@ -94,6 +94,7 @@ def exportar_steps_por_proceso(json_path):
         archivos_generados.append(ruta_archivo)
     print(f"✅ Archivos generados en: {carpeta_base}")
     return archivos_generados
+
 
 def describir_bloques_json_a_txt(json_path):
     with open(json_path, 'r', encoding='utf-8') as f:
@@ -189,7 +190,7 @@ def get_bedrock_llm():
         config=Config(read_timeout=300, connect_timeout=60)
     )
     return ChatBedrock(
-        model_id=MODEL_ID,
+        model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
         model_kwargs={
             "max_tokens": 4096,
             "temperature": 0,
@@ -248,6 +249,7 @@ def analizar_bloques_con_llm(ruta_bloques):
         print(f"❌ La respuesta no cumple con la estructura esperada. Error guardado en: {ruta_error}")
         return None
 
+
 # Paso 1: Leer JSON original
 def nodo_leer_json(state: GrafoState) -> GrafoState:
     ruta_json = state["ruta_json"]
@@ -255,11 +257,13 @@ def nodo_leer_json(state: GrafoState) -> GrafoState:
     state["json_data"] = json_data
     return state
 
+
 # Paso 2: Limpiar bloques SERIAL vacíos
 def nodo_limpiar_serial(state: GrafoState) -> GrafoState:
     json_limpio = eliminar_bloques_serial_vacios(state["json_data"])
     state["json_limpio"] = json_limpio
     return state
+
 
 # Paso 3: Guardar JSON limpio
 def nodo_guardar_limpio(state: GrafoState) -> GrafoState:
