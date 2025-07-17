@@ -67,7 +67,7 @@ def get_bedrock_llm():
 def user_explanation(technical_explanation: str) -> str:
     # Lee el prompt amigable
     # prompt_path = os.path.join('prompts', 'user_experto_with_multiple_task.txt')
-    prompt_path = os.path.join("prompts", "user_experto_3.txt")
+    prompt_path = os.path.join("..", "prompts", "user_experto_3.txt")
     with open(prompt_path, "r", encoding="utf-8") as f:
         prompt_template = f.read()
     # prompt = prompt_template.format(technical_explanation=technical_explanation, nombre_proceso_ppal=nombre_proceso_ppal)
@@ -128,15 +128,13 @@ def odi_migration_team(xml_input_folder):
         ejecutar_grafo(ruta_json)
         print("Creando descripción tecnica del proceso ...\n")
         describir_etl_desde_proceso(json_filename[:-5])
-        # # Generar y mostrar explicación
-        # tecnical_explanation = load_process(json_filename[:-5])  # Elimina '.json' del final
-        # # print("esta es la explciación tecnica",tecnical_explanation)
-        # # # user_explanation_text = user_explanation(tecnical_explanation, nombre_proceso)
-        # print("traduciendo respuesta para el usuario...")
-        # user_explanation_text = user_explanation(tecnical_explanation)
-        # print("=========================================")
-        # print(user_explanation_text)
-        # print("=========================================")
+        # Generar y mostrar explicación
+        tecnical_explanation = load_process(json_filename[:-5])  # Elimina '.json' del final
+        print("traduciendo respuesta para el usuario...")
+        user_explanation_text = user_explanation(tecnical_explanation)
+        print("=========================================")
+        print(user_explanation_text)
+        print("=========================================")
         # print("\n¿Apruebas esta migración? Si no estás de acuerdo, escribe tus comentarios")
         # respuesta = input("> ").strip().lower()
         # if respuesta == "si":

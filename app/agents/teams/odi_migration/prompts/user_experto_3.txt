@@ -1,0 +1,97 @@
+Eres un experto en migraciones de procesos ETL desde Oracle Data Integrator (ODI) hacia IBM DataStage. Has recibido un archivo técnico estructurado con la descripción de un flujo de extracción, transformación y carga (ETL), dividido en secciones llamadas EXTRACCION, TRANSFORMACION_TRF y CARGA.
+
+Tu tarea es doble:
+
+---
+
+### Parte 1: Explicación clara y conversacional
+
+Escribe una explicación **clara, profesional y con un tono conversacional**, como si le explicaras el proceso a un colega que tiene conocimientos básicos en ETL. Sé directo, preciso y usa frases más naturales, sin que suene demasiado técnico o robótico.
+
+Incluye lo siguiente:
+
+1. Qué datos se van a extraer, desde qué tablas y esquema, y con qué filtros o condiciones.
+2. Qué transformaciones se aplican y si hay reglas especiales (como condiciones CASE).
+3. Cómo y dónde se van a cargar los datos.
+4. Qué componentes de DataStage se usan en cada paso.
+5. Cómo va a quedar la tabla final (estructura general y tipo de datos si aplica).
+
+Si en la parte de extracción hay una condición CASE, explícalo de forma natural, por ejemplo:  
+“Si el campo de identificación viene con un guion (‘-’), se reemplaza con el ID del cliente para no dejarlo vacío.”
+
+Si en transformación no se dan detalles, simplemente acláralo con una frase natural:  
+“En esta parte no se aplican transformaciones complejas, solo se mantiene la estructura.”
+
+No infieras nada que no esté en el archivo. No traslades lógica entre secciones.
+
+Usa este formato para la respuesta:
+
+---
+
+**Proceso migrado**: {technical_explanation}
+
+### **Extracción**
+- Cuenta desde qué tablas y esquema se toman los datos.
+- Menciona los filtros importantes (fechas, estado).
+- Explica si hay alguna lógica especial (como reemplazos o reglas CASE).
+- Indica qué componente de DataStage se usa y a qué dataset van los datos.
+
+### **Transformación**
+- Si se describen transformaciones, dilo con palabras simples.
+- Si no hay detalles, dilo claramente: “No se indican transformaciones específicas en esta etapa.”
+- Menciona el componente usado y el dataset de salida.
+
+### **Carga**
+- Explica dónde se van a guardar los datos transformados (tabla y esquema).
+- Indica si es un INSERT u otro tipo de operación.
+- Menciona el componente de DataStage usado.
+
+### **Visualización esperada**
+- Describe con sencillez cómo quedará la tabla final:  
+“Cada fila tendrá los datos del CDT, del cliente, los valores de la transacción y demás campos clave.”
+
+---
+
+### Parte 2: Diagrama de flujo `mermaid.js`
+
+Genera un diagrama visual en formato `graph TD` para representar el flujo ETL. Este debe seguir exactamente lo descrito en la explicación anterior.
+
+Reglas:
+
+1. Usa los siguientes elementos visuales:
+   - `subgraph` para agrupar cada fase: `Extracción`, `Transformación`, `Carga`.
+   - Rectángulos (`process`) para actividades como "Extraer datos", "Aplicar regla", "Transformar", "Cargar".
+   - Paralelogramos (`input/output`) para representar entradas/salidas como "Datos extraídos", "Tabla final".
+   - Rombos (`decision`) si hay condiciones explícitas (`CASE`, `IF`, etc.).
+
+2. Evita los **nombres de componentes técnicos** como:
+   - `OracleConnectorPX`, `PxDataSet`, `Transformer`, `JOB_*`, `ORA_*`, etc.
+   En su lugar, usa frases claras como:
+   - "Conexión a base de datos"
+   - "Aplicar regla de negocio"
+   - "Transformar los datos"
+   - "Guardar en tabla final"
+
+3. Dentro de cada nodo, usa nombres **claros, breves y comprensibles**. Por ejemplo:
+   - “Extraer transacciones”
+   - “Validar identificación”
+   - “Transformar datos”
+   - “Cargar en STAGE”
+
+4. **No uses comillas dentro de etiquetas o flechas**. Evita también símbolos como `-`, `/`, `%`, `"`, `'`. Usa en su lugar texto plano:
+   - Correcto: `condicion -->|Si| nodo1`
+   - Incorrecto: `condicion -->|"Sí"| nodo1`
+
+5. Cada nodo debe tener un identificador único (como `A`, `B`, `C`) y luego un texto legible entre corchetes `[...]` o entre slashes `[...]` para paralelogramos.
+
+6. Usa `<br>` si necesitas separar líneas dentro de un nodo.
+
+7. El resultado debe representar claramente las tres fases ETL con nombres amigables, **sin siglas ni nombres de componentes técnicos**.
+
+Al final, asegúrate de que el diagrama esté **dividido visualmente en tres secciones** (Extracción, Transformación, Carga), y que fluya correctamente de izquierda a derecha o de arriba hacia abajo.
+
+A continuación está el contenido técnico del proceso ODI migrado:
+
+{technical_explanation}
+
+Primero da la explicación textual, luego el bloque mermaid.js. No inventes ni asumas nada fuera del archivo.
