@@ -1,12 +1,14 @@
 import os
 import json
+import logging
 from langchain_aws import ChatBedrock
 from .utilities.xml_to_json import convert_all_xml_to_json
 from .utilities.dtsge_agent_analyzer import ejecutar_grafo
 from .utilities.dtsge_agent_descripcion_tarea import describir_etl_desde_proceso
-# from python.DataStageAgentAnalisisJSON import ejecutar_grafo
-# from python.DataStageAgentDescripcionTarea import describir_etl_desde_proceso
-import logging
+from .utilities.DataStageAgentExtraccion import run as run_extraccion
+from .utilities.DataStageAgentTransform import run as run_transform
+from .utilities.DataStageAgentJoin import run as run_join
+from .utilities.DatastageAgentInsert import run as run_insert
 
 MODEL = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 logger = logging.getLogger(__name__)
@@ -19,36 +21,15 @@ def get_prompt_path(filename):
     return os.path.join(base_dir, "prompts", filename)
 
 
-def run_notebook(notebook_name, nombre_proceso=None):
-    logger.info(f"Ejecutando: {notebook_name}")
-    if not os.path.exists(notebook_name):
-        logger.error(f"No se encontró el archivo: {notebook_name}")
-        return
-    try:
-        with open(notebook_name, "r", encoding="utf-8") as f:
-            nb = json.load(f)
-        code_cells = [
-            cell for cell in nb.get("cells", []) if cell.get("cell_type") == "code"
-        ]
-        code = ""
-        for cell in code_cells:
-            code += "".join(cell.get("source", [])) + "\n"
-        exec_globals = {}
-        if nombre_proceso:
-            exec_globals["nombre_proceso_ppal"] = nombre_proceso
-        exec(code, exec_globals)
-    except Exception as e:
-        logger.error(f"Error ejecutando {notebook_name}: {e}")
-
 
 def run_pipeline(ruta_json, nombre_proceso):
     """
     Ejecuta el pipeline completo: análisis y agentes/notebooks.
     """
-    run_notebook("DataStageAgentExtraccion.ipynb", nombre_proceso=nombre_proceso)
-    run_notebook("DataStageAgentTransform.ipynb", nombre_proceso=nombre_proceso)
-    run_notebook("DataStageAgentJoin.ipynb", nombre_proceso=nombre_proceso)
-    run_notebook("DatastageAgentInsert.ipynb", nombre_proceso=nombre_proceso)
+    run_extraccion(nombre_proceso)
+    run_transform(nombre_proceso)
+    run_join(nombre_proceso)
+    run_insert(nombre_proceso)
     return "Traducción completa ejecutada para el proceso."
 
 
@@ -137,12 +118,11 @@ def odi_migration_team(xml_input_folder):
         print("=========================================")
         print(user_explanation_text)
         print("=========================================")
-        return user_explanation_text
+        # return user_explanation_text
 
-        # if respuesta == "si":
-        #     print("\n Listo! empezamos la traducción ...\n")
-        #     # resultado = run_pipeline(ruta_json, nombre_proceso)
-        #     # print(resultado)
-        #     print("\n Proceso finalizado. Puedes revisar los resultados.")
-        # else:
-        #     print("\n Entendido... Vamos a volver a procesar tu información.")
+        print("\n Listo! empezamos la traducción ...\n")
+        resultado = run_pipeline(ruta_json, nombre_proceso)
+        print(resultado)
+        print("\n Proceso finalizado. Puedes revisar los resultados.")
+
+
