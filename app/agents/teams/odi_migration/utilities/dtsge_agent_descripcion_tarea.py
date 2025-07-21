@@ -199,7 +199,7 @@ Aplica este prompt a cada uno de los pasos del proceso de DataStage en:
 def leer_contenido_analisis(state: DescripcionState) -> DescripcionState:
 
     ruta_dir = state["ruta_analisis"]
-    archivos = glob.glob(os.path.join(ruta_dir, "analisis_*.txt"))
+    archivos = glob.glob(os.path.join(ruta_dir, "analisis_*_json.txt"), recursive=True)
     contenidos = []
     for archivo in archivos:
         with open(archivo, "r", encoding="utf-8") as f:
