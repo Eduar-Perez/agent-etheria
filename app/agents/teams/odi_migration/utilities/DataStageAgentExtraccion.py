@@ -696,9 +696,10 @@ def actualizar_input_request_desde_archivos(ruta_prompts: str):
 
             print(f"✅ Extracción creada exitosamente para el archivo: {archivo}")
 
-def guardar_xml(xml_content, ruta_directorio="./output", nombre_archivo=None):
-    if not os.path.exists(ruta_directorio):
-        os.makedirs(ruta_directorio)
+def guardar_xml(xml_content, ruta_directorio=None, nombre_archivo=None):
+    if ruta_directorio is None:
+        ruta_directorio = os.path.join(os.path.dirname(__file__), "..", "tmp", "output")
+    os.makedirs(ruta_directorio, exist_ok=True)
     if nombre_archivo is None:
         fecha_hora = datetime.now().strftime("%Y%m%d_%H%M")
         nombre_archivo = f"JOB_EXT_AGENTE_{fecha_hora}.xml"

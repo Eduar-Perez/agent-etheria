@@ -204,7 +204,9 @@ def describir_tarea_datastage(state: DescripcionState) -> DescripcionState:
 
 def exportar_por_llave_descripcion_state(state: DescripcionState) -> DescripcionState:
     nombre_proceso_ppal = state["nombre_proceso_ppal"]
-    ruta = os.path.join("prompts_datastage", nombre_proceso_ppal)
+    # ruta = os.path.join("prompts_datastage", nombre_proceso_ppal)
+    base_dir = os.path.dirname(__file__)
+    ruta = os.path.join(base_dir, "tmp", "prompts_datastage", nombre_proceso_ppal)
     if not os.path.exists(ruta):
         os.makedirs(ruta, exist_ok=True)
     archivos = [f for f in os.listdir(ruta) if f.endswith(".json")]

@@ -92,9 +92,9 @@ def load_process(nombre_proceso_ppal):
 
 
 def odi_migration_team(xml_input_folder):
-    json_odi_interpeted = os.path.join(
-        os.path.dirname(__file__), "..", "..", "tmp", "odi_interpeted_json"
-    )
+    json_odi_interpeted = os.path.join(os.path.dirname(__file__), "tmp", "odi_interpeted_json")
+    os.makedirs(json_odi_interpeted, exist_ok=True)
+
     xml_inputs = [f for f in os.listdir(xml_input_folder) if f.endswith(".xml")]
     if len(xml_inputs) < 1:
         return "No se encontraron archivos .xml en la carpeta proporcionada"
@@ -124,5 +124,4 @@ def odi_migration_team(xml_input_folder):
         resultado = run_pipeline(ruta_json, nombre_proceso)
         print(resultado)
         print("\n Proceso finalizado. Puedes revisar los resultados.")
-
-
+        return
