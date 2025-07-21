@@ -285,11 +285,15 @@ def exportar_por_llave_descripcion_state(state: DescripcionState) -> Descripcion
         os.makedirs(ruta, exist_ok=True)
     archivos = [f for f in os.listdir(ruta) if f.endswith(".json")]
     archivos_generados = []
+    print("Archivos generados:")
     for archivo in archivos:
+        print(f" \n- {archivo}")
         ruta_archivo = os.path.join(ruta, archivo)
         with open(ruta_archivo, "r", encoding="utf-8") as f:
             data = json.load(f)
-        nombre_job = archivo.replace("descripcion_", "").replace("_json.json", "")
+        # nombre_job = archivo.replace("descripcion_", "").replace("_json.json", "")
+        nombre_job = os.path.splitext(archivo.replace("descripcion_", ""))[0]
+
         for llave, contenido in data.items():
             if llave == "EXTRACCION":
                 nombre_salida = f"EXT_{nombre_job}.txt"
