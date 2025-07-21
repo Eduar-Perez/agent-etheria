@@ -74,10 +74,6 @@ def correct_prompt_datastage(answer: str) -> str:
 
 
 def load_process(nombre_proceso_ppal):
-def load_process(nombre_proceso_ppal):
-    import json
-    import os
-
     base_tmp = os.path.abspath(os.path.join(os.path.dirname(__file__), "tmp"))
     ruta = os.path.join(base_tmp, "prompts_datastage", nombre_proceso_ppal)
 
