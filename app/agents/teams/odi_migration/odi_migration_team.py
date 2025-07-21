@@ -118,7 +118,6 @@ def odi_migration_team(xml_input_folder):
         print(f"\n Estamos traduciendo el proceso: '{nombre_proceso}' ...\n")
         ejecutar_grafo(ruta_json)
         print("Creando descripción tecnica del proceso ...\n")
-        print("json_file", json_filename)
         describir_etl_desde_proceso(json_filename[:-5])
         # Generar y mostrar explicación
         tecnical_explanation = load_process(json_filename[:-5])  # Elimina '.json' del final

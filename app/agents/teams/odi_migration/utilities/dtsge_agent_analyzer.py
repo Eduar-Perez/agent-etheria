@@ -64,8 +64,9 @@ def guardar_json_limpio(json_limpio, ruta_original):
     nombre_archivo = os.path.basename(ruta_original)
     nombre_sin_ext, ext = os.path.splitext(nombre_archivo)
     nombre_clean = f"{nombre_sin_ext}_clean{ext}"
-    carpeta_clean = os.path.join(os.path.dirname(ruta_original), '..', 'clean')
-    carpeta_clean = os.path.abspath(carpeta_clean)
+    base_tmp = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tmp"))
+    carpeta_clean = os.path.join(base_tmp, "clean")
+
     os.makedirs(carpeta_clean, exist_ok=True)
     ruta_clean = os.path.join(carpeta_clean, nombre_clean)
     with open(ruta_clean, 'w', encoding='utf-8') as f:
@@ -80,7 +81,8 @@ def exportar_steps_por_proceso(json_path):
     scen_name = data.get('SCEN_NAME', 'proceso_desconocido')
     detalles = data.get('details', [])
     # Crear carpeta clean/SCEN_NAME
-    carpeta_base = os.path.join('clean', scen_name)
+    base_tmp = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tmp"))
+    carpeta_base = os.path.join(base_tmp, "clean", scen_name)
     os.makedirs(carpeta_base, exist_ok=True)
     archivos_generados = []
     for bloque in detalles:
