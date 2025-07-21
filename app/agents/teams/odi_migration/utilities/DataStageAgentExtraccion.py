@@ -721,11 +721,11 @@ def run(nombre_proceso_ppal: str):
         # Si no se pasa como variable global, usar valor por defecto o lanzar error
         nombre_proceso_ppal = "PAQ_PPAL_DIM_CLIENTE"  # Valor por defecto o puedes lanzar una excepción
 
-    ruta= f"./prompts_datastage/{nombre_proceso_ppal}"
+    base_dir = os.path.dirname(__file__)
+    ruta = os.path.join(base_dir, "..", "tmp", "prompts_datastage", nombre_proceso_ppal)
     input_request = {
     "natural_language_request": "quiero que me haga una extración de datos de la tabla cliente, con las columnas id_cliente, nombre, apellido y fecha_registro. La consulta SQL debe ser: SELECT id_cliente, nombre, apellido, fecha_registro FROM cliente WHERE activo = 1;"
     }
-    ruta = f"./prompts_datastage/{nombre_proceso_ppal}"
     archivo_prompt = os.path.join(ruta, f"EXT_{nombre_proceso_ppal}.txt")
 
     if not os.path.exists(archivo_prompt):

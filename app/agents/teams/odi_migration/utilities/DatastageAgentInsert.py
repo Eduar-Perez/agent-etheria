@@ -432,7 +432,9 @@ def run(nombre_proceso_ppal: str):
     builder.add_edge("interpretar_y_generar_insert_xml", END)
     graph = builder.compile()
 
-    ruta = f"./prompts_datastage/{nombre_proceso_ppal}"
+    base_dir = os.path.dirname(__file__)
+    ruta = os.path.join(base_dir, "..", "tmp", "prompts_datastage", nombre_proceso_ppal)
+
     archivo_prompt = os.path.join(ruta, f"LOD_{nombre_proceso_ppal}.txt")
 
     if not os.path.exists(archivo_prompt):

@@ -973,7 +973,8 @@ def run(nombre_proceso_ppal: str):
     builder.set_entry_point("interpretar_y_generar_xml")
     builder.add_edge("interpretar_y_generar_xml", END)
     graph = builder.compile()
-    ruta = f"./prompts_datastage/{nombre_proceso_ppal}"
+    base_dir = os.path.dirname(__file__)
+    ruta = os.path.join(base_dir, "..", "tmp", "prompts_datastage", nombre_proceso_ppal)
     archivo_prompt = os.path.join(ruta, f"TRF_{nombre_proceso_ppal}.txt")
     if not os.path.exists(archivo_prompt):
         print(f"No se encontró el archivo: {archivo_prompt}")
