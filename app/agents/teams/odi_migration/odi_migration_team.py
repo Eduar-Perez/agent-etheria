@@ -74,21 +74,33 @@ def correct_prompt_datastage(answer: str) -> str:
 
 
 def load_process(nombre_proceso_ppal):
-    ruta = os.path.join("prompts_datastage", nombre_proceso_ppal)
-    # Busca todos los archivos de descripción generados
+def load_process(nombre_proceso_ppal):
+    import json
+    import os
+
+    base_tmp = os.path.abspath(os.path.join(os.path.dirname(__file__), "tmp"))
+    ruta = os.path.join(base_tmp, "prompts_datastage", nombre_proceso_ppal)
+
+    if not os.path.exists(ruta):
+        raise FileNotFoundError(f"No se encontró la ruta esperada: {ruta}")
+
     archivos = [
-        f
-        for f in os.listdir(ruta)
+        f for f in os.listdir(ruta)
         if f.startswith("descripcion_") and f.endswith(".json")
     ]
+
+    if not archivos:
+        raise FileNotFoundError(f"No se encontraron archivos de descripción en: {ruta}")
+
     explicaciones = {}
     for archivo in archivos:
         ruta_archivo = os.path.join(ruta, archivo)
         with open(ruta_archivo, "r", encoding="utf-8") as f:
             data = json.load(f)
         explicaciones[archivo] = data
-        break  # eliminar para tomar todas las tareas
+        break  # ❗ Eliminar si quieres procesar todos los archivos
     return explicaciones
+
 
 
 def odi_migration_team(xml_input_folder):
