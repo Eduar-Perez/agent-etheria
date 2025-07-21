@@ -716,7 +716,6 @@ def run(nombre_proceso_ppal: str):
     builder.add_node("Leer prompts", lambda state: actualizar_input_request_desde_archivos("./prompts"))
     builder.add_edge("interpretar_y_generar_xml", END)
     graph = builder.compile()
-    nombre_proceso_ppal = globals().get('nombre_proceso_ppal', None)
     if nombre_proceso_ppal is None:
         # Si no se pasa como variable global, usar valor por defecto o lanzar error
         nombre_proceso_ppal = "PAQ_PPAL_DIM_CLIENTE"  # Valor por defecto o puedes lanzar una excepción

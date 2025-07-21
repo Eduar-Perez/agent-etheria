@@ -118,9 +118,16 @@ def odi_migration_team(xml_input_folder):
         print(f"\n Estamos traduciendo el proceso: '{nombre_proceso}' ...\n")
         ejecutar_grafo(ruta_json)
         print("Creando descripción tecnica del proceso ...\n")
-        describir_etl_desde_proceso(json_filename[:-5])
+        with open(ruta_json, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        nombre_proceso_ppal = data.get("SCEN_NAME")
+
+        # describir_etl_desde_proceso(json_filename[:-5])
+        describir_etl_desde_proceso(nombre_proceso_ppal)
+        
         # Generar y mostrar explicación
-        tecnical_explanation = load_process(json_filename[:-5])  # Elimina '.json' del final
+        tecnical_explanation = load_process(nombre_proceso_ppal)
+        # tecnical_explanation = load_process(json_filename[:-5])  # Elimina '.json' del final
         print("traduciendo respuesta para el usuario...")
         user_explanation_text = user_explanation(tecnical_explanation)
         print("=========================================")
@@ -129,7 +136,7 @@ def odi_migration_team(xml_input_folder):
         # return user_explanation_text
 
         print("\n Listo! empezamos la traducción ...\n")
-        resultado = run_pipeline(ruta_json, nombre_proceso)
+        resultado = run_pipeline(ruta_json, nombre_proceso_ppal)
         print(resultado)
         print("\n Proceso finalizado. Puedes revisar los resultados.")
         return
