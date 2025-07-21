@@ -10,13 +10,14 @@ import glob
 
 MODEL = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
+
 # Configuración del modelo Claude 3 Sonnet en AWS Bedrock
 def get_bedrock_llm():
     """Inicializa el cliente de Bedrock y devuelve el modelo de lenguaje."""
     client = boto3.client(
         service_name="bedrock-runtime",
         region_name="us-east-1",
-        config=Config(read_timeout=300, connect_timeout=60)
+        config=Config(read_timeout=300, connect_timeout=60),
     )
     return ChatBedrock(
         model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
@@ -28,38 +29,62 @@ def get_bedrock_llm():
         client=client,
     )
 
+
 # Definición de los datos de entrada y salida del grafo
 class DescripcionState(TypedDict):
     ruta_analisis: str
     contenido_analisis: str
     descripcion_tarea: str
-    nombre_proceso_ppal: str      # <-- nuevo campo
-    nombre_archivo: str  
+    nombre_proceso_ppal: str  # <-- nuevo campo
+    nombre_archivo: str
+
 
 # Buscar archivos analisis_*
-def buscar_archivos_analisis(state: DescripcionState, directorio="clean") -> DescripcionState:
-    archivos = glob.glob(os.path.join(directorio, state["nombre_proceso_ppal"], "analisis_*.txt"), recursive=True)
+def buscar_archivos_analisis(
+    state: DescripcionState, directorio="clean"
+) -> DescripcionState:
+    base_tmp = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tmp"))
+    directorio = os.path.join(base_tmp, "clean")
+    archivos = glob.glob(
+        os.path.join(directorio, state["nombre_proceso_ppal"], "analisis_*.txt"),
+        recursive=True,
+    )
     # Excluir archivos que inician con analisis_VAP_ o analisis_VAG_
-    archivos = [a for a in archivos if not (os.path.basename(a).startswith("analisis_VAP_") or os.path.basename(a).startswith("analisis_VAG_"))]
+    archivos = [
+        a
+        for a in archivos
+        if not (
+            os.path.basename(a).startswith("analisis_VAP_")
+            or os.path.basename(a).startswith("analisis_VAG_")
+        )
+    ]
     state["archivos_analisis"] = archivos
     return state
+
 
 def definir_promts_pasos_job(state: DescripcionState) -> DescripcionState:
     """
     Divide el contenido del análisis en pasos individuales.
     """
-    # Crear carpeta de salida si no existe
-    ruta = os.path.join("prompts_datastage", state["nombre_proceso_ppal"]) 
-    # print(f"Creando carpeta de salida: {ruta}")
-    os.makedirs(ruta, exist_ok=True) 
-    prompt_dir = os.path.join("prompt_clean", state["nombre_proceso_ppal"])
-    os.makedirs(prompt_dir, exist_ok=True) 
+    base_tmp = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tmp"))
+    ruta = os.path.join(base_tmp, "prompts_datastage", state["nombre_proceso_ppal"])
+    prompt_dir = os.path.join(base_tmp, "prompt_clean", state["nombre_proceso_ppal"])
+    os.makedirs(prompt_dir, exist_ok=True)
     # print(f"Creando carpeta de salida: {prompt_dir}")
     # Buscar todos los archivos de análisis
-    archivos = glob.glob(os.path.join("clean", state["nombre_proceso_ppal"], "analisis_*.txt"), recursive=True)
-    archivos = [a for a in archivos if not (os.path.basename(a).startswith("analisis_VAP_") or os.path.basename(a).startswith("analisis_VAG_"))]
+    clean_dir = os.path.join(base_tmp, "clean", state["nombre_proceso_ppal"])
+    archivos = glob.glob(os.path.join(clean_dir, "analisis_*.txt"), recursive=True)
+
+    archivos = [
+        a
+        for a in archivos
+        if not (
+            os.path.basename(a).startswith("analisis_VAP_")
+            or os.path.basename(a).startswith("analisis_VAG_")
+        )
+    ]
     # print(f"Archivos encontrados: {archivos}")
-    
+
     for archivo in archivos:
         with open(archivo, "r", encoding="utf-8") as f:
             try:
@@ -75,38 +100,65 @@ def definir_promts_pasos_job(state: DescripcionState) -> DescripcionState:
             sentencia_sql = bloque.get("SENTENCIA_SQL", "")
             nombre_proyecto = bloque.get("NOMBRE_PROYECTO", "")
             # Leer el prompt desde el archivo de carge
-            prompt_path =  os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'prompts', 'experto_dastage_extraccion.txt'))
-            with open(prompt_path, 'r', encoding='utf-8') as f:
+            prompt_path = os.path.abspath(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    "..",
+                    "prompts",
+                    "experto_dastage_extraccion.txt",
+                )
+            )
+            with open(prompt_path, "r", encoding="utf-8") as f:
                 prompt_template = f.read()
-            prompt_ext = prompt_template.format(nombre_job=nombre_job,
-                        descripcion=descripcion,
-                        etapa=etapa,
-                        esquema=esquema,
-                        sentencia_sql=sentencia_sql,
-                        nombre_proyecto=nombre_proyecto)
-            
+            prompt_ext = prompt_template.format(
+                nombre_job=nombre_job,
+                descripcion=descripcion,
+                etapa=etapa,
+                esquema=esquema,
+                sentencia_sql=sentencia_sql,
+                nombre_proyecto=nombre_proyecto,
+            )
+
             # Leer el prompt desde el archivo de transformaciones
-            prompt_path =  os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'prompts', 'experto_dastage_transformacion.txt'))
-            with open(prompt_path, 'r', encoding='utf-8') as f:
+            prompt_path = os.path.abspath(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    "..",
+                    "prompts",
+                    "experto_dastage_transformacion.txt",
+                )
+            )
+            with open(prompt_path, "r", encoding="utf-8") as f:
                 prompt_template = f.read()
-            prompt_trf = prompt_template.format(nombre_job=nombre_job,
-                        descripcion=descripcion,
-                        etapa=etapa,
-                        esquema=esquema,
-                        sentencia_sql=sentencia_sql,
-                        nombre_proyecto=nombre_proyecto)
-            
+            prompt_trf = prompt_template.format(
+                nombre_job=nombre_job,
+                descripcion=descripcion,
+                etapa=etapa,
+                esquema=esquema,
+                sentencia_sql=sentencia_sql,
+                nombre_proyecto=nombre_proyecto,
+            )
+
             # Leer el prompt desde el archivo de transformaciones
-            prompt_path =  os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'prompts', 'experto_dastage_carge.txt'))
-            with open(prompt_path, 'r', encoding='utf-8') as f:
+            prompt_path = os.path.abspath(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    "..",
+                    "prompts",
+                    "experto_dastage_carge.txt",
+                )
+            )
+            with open(prompt_path, "r", encoding="utf-8") as f:
                 prompt_template = f.read()
-            prompt_lod = prompt_template.format(nombre_job=nombre_job,
-                        descripcion=descripcion,
-                        etapa=etapa,
-                        esquema=esquema,
-                        sentencia_sql=sentencia_sql,
-                        nombre_proyecto=nombre_proyecto)
-            
+            prompt_lod = prompt_template.format(
+                nombre_job=nombre_job,
+                descripcion=descripcion,
+                etapa=etapa,
+                esquema=esquema,
+                sentencia_sql=sentencia_sql,
+                nombre_proyecto=nombre_proyecto,
+            )
+
             prompt = f"""Usa las sigueintes reglas para generar un prompt de experto en DataStage:
 - Para las extracciones, usa el prompt de extracciones.
     {prompt_ext}   
@@ -132,13 +184,17 @@ Solamente debes escribir la estructura json, nada mas, no debes escribir ningun 
 Aplica este prompt a cada uno de los pasos del proceso de DataStage en:
 
 {{contenido_analisis}}
-                    """   
+                    """
             # Guardar el prompt en un archivo individual
-            ruta_salida = str.replace(f"prompt_{archivo}","analisis","prompts_datastage")
+            nombre_archivo = os.path.basename(archivo).replace("analisis_", "prompts_datastage_")
+            ruta_salida = os.path.join(prompt_dir, nombre_archivo)
+
+
             with open(ruta_salida, "w", encoding="utf-8") as fout:
                 fout.write(prompt)
     state["mensaje"] = f"Archivos generados en {ruta}"
     return state
+
 
 def leer_contenido_analisis(state: DescripcionState) -> DescripcionState:
 
@@ -152,14 +208,23 @@ def leer_contenido_analisis(state: DescripcionState) -> DescripcionState:
     state["contenido_analisis"] = "\n".join(contenidos)
     return state
 
+
 def describir_tarea_datastage(state: DescripcionState) -> DescripcionState:
     llm = get_bedrock_llm()
-    prompt_dir = os.path.join("prompt_clean", state["nombre_proceso_ppal"])
+    base_tmp = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tmp"))
+    prompt_dir = os.path.join(base_tmp, "prompt_clean", state["nombre_proceso_ppal"])
     os.makedirs(prompt_dir, exist_ok=True)
     # print(f"Directorio {prompt_dir} creado.")
     archivos = glob.glob(os.path.join(prompt_dir, "prompts_datastage_*.txt"))
     # Excluir archivos que inician con analisis_VAP_ o analisis_VAG_
-    archivos = [a for a in archivos if not (os.path.basename(a).startswith("analisis_VAP_") or os.path.basename(a).startswith("analisis_VAG_"))]
+    archivos = [
+        a
+        for a in archivos
+        if not (
+            os.path.basename(a).startswith("analisis_VAP_")
+            or os.path.basename(a).startswith("analisis_VAG_")
+        )
+    ]
     descripciones = {}
     for archivo in archivos:
         with open(archivo, "r", encoding="utf-8") as f:
@@ -167,13 +232,13 @@ def describir_tarea_datastage(state: DescripcionState) -> DescripcionState:
         if not prompt_template:
             print(f"Archivo vacío: {archivo}, se omite.")
             continue
-        prompt = prompt_template.replace("{contenido_analisis}", state["contenido_analisis"])
+        prompt = prompt_template.replace(
+            "{contenido_analisis}", state["contenido_analisis"]
+        )
         if not prompt.strip():
             print(f"Prompt vacío para {archivo}, se omite.")
             continue
-        messages = [
-            {"role": "user", "content": prompt}
-        ]
+        messages = [{"role": "user", "content": prompt}]
         respuesta = llm.invoke(messages)
         if hasattr(respuesta, "content"):
             descripcion = respuesta.content
@@ -184,12 +249,18 @@ def describir_tarea_datastage(state: DescripcionState) -> DescripcionState:
         try:
             descripcion_json = json.loads(descripcion)
         except Exception:
-            descripcion_json = descripcion  # Si no es JSON válido, guarda como texto plano
-        nombre_archivo = os.path.basename(archivo).replace("prompts_datastage_", "descripcion_")
+            descripcion_json = (
+                descripcion  # Si no es JSON válido, guarda como texto plano
+            )
+        nombre_archivo = os.path.basename(archivo).replace(
+            "prompts_datastage_", "descripcion_"
+        )
         # Cambia la extensión a .json si es un dict (JSON válido)
         if isinstance(descripcion_json, dict):
             nombre_archivo = os.path.splitext(nombre_archivo)[0] + ".json"
-        ruta_salida = os.path.join("prompts_datastage", state["nombre_proceso_ppal"], nombre_archivo)
+        ruta_salida = os.path.join(
+            base_tmp, "prompts_datastage", state["nombre_proceso_ppal"], nombre_archivo
+        )
         os.makedirs(os.path.dirname(ruta_salida), exist_ok=True)
         with open(ruta_salida, "w", encoding="utf-8") as fout:
             if isinstance(descripcion_json, dict):
@@ -198,9 +269,12 @@ def describir_tarea_datastage(state: DescripcionState) -> DescripcionState:
                 fout.write(descripcion)
         descripciones[nombre_archivo] = descripcion_json
     state["descripcion_tarea"] = descripciones
-    state["mensaje"] = f"Descripciones generadas para {len(descripciones)} archivos en prompts_datastage/{state['nombre_proceso_ppal']}/"
+    state["mensaje"] = (
+        f"Descripciones generadas para {len(descripciones)} archivos en prompts_datastage/{state['nombre_proceso_ppal']}/"
+    )
     print(state["mensaje"])
     return state
+
 
 def exportar_por_llave_descripcion_state(state: DescripcionState) -> DescripcionState:
     nombre_proceso_ppal = state["nombre_proceso_ppal"]
@@ -234,30 +308,11 @@ def exportar_por_llave_descripcion_state(state: DescripcionState) -> Descripcion
                 fout.write(contenido)
             archivos_generados.append(ruta_salida)
     state["archivos_exportados"] = archivos_generados
-    state["mensaje_exportar"] = f"Archivos individuales generados en {ruta}: {len(archivos_generados)}"
+    state["mensaje_exportar"] = (
+        f"Archivos individuales generados en {ruta}: {len(archivos_generados)}"
+    )
     return state
 
-# Ejemplo de ejecución del grafo LangGraph para un archivo de análisis
-
-# Parámetros de entrada
-# nombre_proceso_ppal = globals().get('nombre_proceso_ppal', None)
-# if nombre_proceso_ppal is None:
-#     # Si no se pasa como variable global, usar valor por defecto o lanzar error
-#     nombre_proceso_ppal = "PAQ_PPAL_DIM_CLIENTE"  # Valor por defecto o puedes lanzar una excepción
-
-# nombre_archivo = f"prompt_{nombre_proceso_ppal}.txt"
-# ruta_analisis = f"clean/{nombre_proceso_ppal}/"
-
-# estado_inicial = {
-#     "ruta_analisis": ruta_analisis,
-#     "contenido_analisis": "",
-#     "descripcion_tarea": "",
-#     "nombre_proceso_ppal": nombre_proceso_ppal,
-#     "nombre_archivo": nombre_archivo
-# }
-
-# # Ejecutar el grafo
-# resultado = grafo.invoke(estado_inicial)
 
 def describir_etl_desde_proceso(nombre_proceso_ppal: str) -> dict:
     """
@@ -271,22 +326,24 @@ def describir_etl_desde_proceso(nombre_proceso_ppal: str) -> dict:
     sg.add_node("describir_tarea", describir_tarea_datastage)
     sg.add_node("exportar_por_llave", exportar_por_llave_descripcion_state)
 
-    sg.set_entry_point("buscar_archivos_analisis") 
+    sg.set_entry_point("buscar_archivos_analisis")
     sg.add_edge("buscar_archivos_analisis", "leer_analisis")
-    sg.add_edge("leer_analisis","definir_prompts")
+    sg.add_edge("leer_analisis", "definir_prompts")
     sg.add_edge("definir_prompts", "describir_tarea")
     sg.add_edge("describir_tarea", "exportar_por_llave")
     sg.add_edge("exportar_por_llave", END)
 
     grafo = sg.compile()
-    
+
     nombre_archivo = f"prompt_{nombre_proceso_ppal}.txt"
-    ruta_analisis = f"clean/{nombre_proceso_ppal}/"
+    base_tmp = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tmp"))
+    ruta_analisis = os.path.join(base_tmp, "clean", nombre_proceso_ppal)
+
     estado_inicial = {
         "ruta_analisis": ruta_analisis,
         "contenido_analisis": "",
         "descripcion_tarea": "",
         "nombre_proceso_ppal": nombre_proceso_ppal,
-        "nombre_archivo": nombre_archivo
+        "nombre_archivo": nombre_archivo,
     }
     grafo.invoke(estado_inicial)
