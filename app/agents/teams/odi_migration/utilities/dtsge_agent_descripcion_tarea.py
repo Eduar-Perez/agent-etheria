@@ -292,7 +292,8 @@ def exportar_por_llave_descripcion_state(state: DescripcionState) -> Descripcion
         with open(ruta_archivo, "r", encoding="utf-8") as f:
             data = json.load(f)
         # nombre_job = archivo.replace("descripcion_", "").replace("_json.json", "")
-        nombre_job = os.path.splitext(archivo.replace("descripcion_", ""))[0]
+        # nombre_job = os.path.splitext(archivo.replace("descripcion_", ""))[0]
+        nombre_job = nombre_proceso_ppal
 
         for llave, contenido in data.items():
             if llave == "EXTRACCION":
