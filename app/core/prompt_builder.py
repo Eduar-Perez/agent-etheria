@@ -4,7 +4,7 @@ import base64
 import mimetypes
 import io
 from typing import Any
-
+import json
 from PIL import Image
 import pytesseract
 import fitz  # PyMuPDF
@@ -59,15 +59,23 @@ def extract_file_from_bytes(file_bytes: bytes, file_name: str) -> str:
     raise ValueError(f"Tipo de archivo no soportado: {mime_type or file_name}")
 
 
-def safe_serialize(obj: Any):
-    """Convierte cualquier objeto a un dict serializable por JSON"""
-    if isinstance(obj, (str, int, float, bool)) or obj is None:
-        return obj
-    elif isinstance(obj, dict):
-        return {k: safe_serialize(v) for k, v in obj.items()}
-    elif isinstance(obj, list):
-        return [safe_serialize(v) for v in obj]
-    elif hasattr(obj, "__dict__"):
-        return safe_serialize(vars(obj))
-    else:
+# def safe_serialize(obj: Any):
+#     """Convierte cualquier objeto a un dict serializable por JSON"""
+#     if isinstance(obj, (str, int, float, bool)) or obj is None:
+#         return obj
+#     elif isinstance(obj, dict):
+#         return {k: safe_serialize(v) for k, v in obj.items()}
+#     elif isinstance(obj, list):
+#         return [safe_serialize(v) for v in obj]
+#     elif hasattr(obj, "__dict__"):
+#         return safe_serialize(vars(obj))
+#     else:
+#         return str(obj)
+def safe_serialize(obj):
+    try:
+        if isinstance(obj, str):
+            return obj
+        return json.loads(json.dumps(obj, ensure_ascii=False))
+    except Exception as e:
+        print(f"⚠️ Error en safe_serialize: {e}")
         return str(obj)
