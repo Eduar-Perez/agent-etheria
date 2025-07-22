@@ -11,6 +11,7 @@ from langgraph.graph import END, StateGraph
 from langchain_core.messages import HumanMessage
 from langchain_aws import ChatBedrock
 from datetime import datetime
+from botocore.config import Config
 
 # Cargar variables de entorno desde .env
 # load_dotenv()
@@ -24,9 +25,12 @@ def get_bedrock_llm():
         model_kwargs={
             "max_tokens": 4096,
             "temperature": 0,
-            "anthropic_version": "bedrock-2023-05-31"
+            "anthropic_version": "bedrock-2023-05-31",
         },
-        region_name=os.getenv("AWS_REGION", "us-east-1")
+        client_kwargs={
+            "config": Config(read_timeout=180, connect_timeout=30)
+        },
+        region_name=os.getenv("AWS_REGION", "us-east-1"),
     )
 
 llm = get_bedrock_llm()

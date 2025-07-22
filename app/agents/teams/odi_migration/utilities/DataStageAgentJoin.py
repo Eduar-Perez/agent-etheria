@@ -8,22 +8,28 @@ from typing import TypedDict
 from langgraph.graph import END, StateGraph
 from langchain_core.messages import HumanMessage
 from langchain_aws import ChatBedrock
+from botocore.config import Config
 
 # Cargar variables de entorno desde .env
 # load_dotenv()
 MODEL = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
 # Configuración del modelo Claude 3 Sonnet en AWS Bedrock
+
 def get_bedrock_llm():
     return ChatBedrock(
         model_id=MODEL,
         model_kwargs={
             "max_tokens": 4096,
             "temperature": 0,
-            "anthropic_version": "bedrock-2023-05-31"
+            "anthropic_version": "bedrock-2023-05-31",
         },
-        region_name=os.getenv("AWS_REGION", "us-east-1")
+        client_kwargs={
+            "config": Config(read_timeout=180, connect_timeout=30)
+        },
+        region_name=os.getenv("AWS_REGION", "us-east-1"),
     )
+    
 llm = get_bedrock_llm()
 
 class AgentState(TypedDict):

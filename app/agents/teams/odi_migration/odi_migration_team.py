@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+from botocore.config import Config
 from langchain_aws import ChatBedrock
 from .utilities.xml_to_json import convert_all_xml_to_json
 from .utilities.dtsge_agent_analyzer import ejecutar_grafo
@@ -40,6 +41,9 @@ def get_bedrock_llm():
             "max_tokens": 4096,
             "temperature": 0,
             "anthropic_version": "bedrock-2023-05-31",
+        },
+        client_kwargs={
+            "config": Config(read_timeout=180, connect_timeout=30)
         },
         region_name=os.getenv("AWS_REGION", "us-east-1"),
     )

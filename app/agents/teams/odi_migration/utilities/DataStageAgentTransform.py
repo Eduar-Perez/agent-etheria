@@ -5,6 +5,7 @@ import re
 from dotenv import load_dotenv
 from datetime import datetime
 from typing import TypedDict
+from botocore.config import Config
 from langgraph.graph import END, StateGraph
 from langchain_core.messages import HumanMessage
 from langchain_aws import ChatBedrock
@@ -21,6 +22,9 @@ def get_bedrock_llm():
             "max_tokens": 4096,
             "temperature": 0,
             "anthropic_version": "bedrock-2023-05-31",
+        },
+        client_kwargs={
+            "config": Config(read_timeout=180, connect_timeout=30)
         },
         region_name=os.getenv("AWS_REGION", "us-east-1"),
     )
