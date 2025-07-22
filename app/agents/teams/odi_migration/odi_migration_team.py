@@ -106,6 +106,7 @@ def odi_migration_team(xml_input_folder):
     xml_inputs = [f for f in os.listdir(xml_input_folder) if f.endswith(".xml")]
     if len(xml_inputs) < 1:
         return "No se encontraron archivos .xml en la carpeta proporcionada"
+    response = []
     for xml_input in xml_inputs:
         nombre_proceso = xml_input.split(".")[0]
         json_filename = convert_all_xml_to_json(
@@ -130,13 +131,14 @@ def odi_migration_team(xml_input_folder):
         # tecnical_explanation = load_process(json_filename[:-5])  # Elimina '.json' del final
         print("traduciendo respuesta para el usuario...")
         user_explanation_text = user_explanation(tecnical_explanation)
-        print("=========================================")
-        print(user_explanation_text)
-        print("=========================================")
+        response.append(user_explanation_text)
+        # print("=========================================")
+        # print(user_explanation_text)
+        # print("=========================================")
         # return user_explanation_text
 
         print("\n Listo! empezamos la traducción ...\n")
         resultado = run_pipeline(ruta_json, nombre_proceso_ppal)
         print(resultado)
         print("\n Proceso finalizado. Puedes revisar los resultados.")
-    return user_explanation_text
+    return response
