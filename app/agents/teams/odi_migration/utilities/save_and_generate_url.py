@@ -11,9 +11,9 @@ REGION_NAME = "us-east-1"
 s3 = boto3.client("s3", region_name=REGION_NAME)
 
 
-def subir_a_s3_y_generar_url(xml_path: str, bucket_name, s3_key) -> str:
+def subir_a_s3_y_generar_url(file_path: str, bucket_name, s3_key) -> str:
     # Subir archivo al bucket
-    s3.upload_file(xml_path, bucket_name, s3_key)
+    s3.upload_file(file_path, bucket_name, s3_key)
     print(f"Archivo subido: s3://{bucket_name}/{s3_key}")
 
     # Crear URL prefirmada por 5 minutos
@@ -40,8 +40,7 @@ def eliminar_archivo_despues(key: str, delay_seconds: int, bucket_name):
 
 
 # USO EJEMPLO
-def save_and_generate_url_s3(bucket_name, s3_key):
+def save_and_generate_url_s3(bucket_name, s3_key, file_path):
     """Save a local XML file to S3 and generate a temporary download URL."""
-    xml_generado = "/ruta/local/archivo_transformado.xml"
-    url = subir_a_s3_y_generar_url(xml_generado, bucket_name, s3_key)
+    url = subir_a_s3_y_generar_url(file_path, bucket_name, s3_key)
     print(f"Enlace de descarga (válido 5 min): {url}")

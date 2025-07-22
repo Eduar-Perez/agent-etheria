@@ -141,7 +141,7 @@ def odi_migration_team(xml_input_folder):
         user_explanation_text = user_explanation(tecnical_explanation)
         response.append(user_explanation_text)
         # print("=========================================")
-        # print(user_explanation_text)
+        print("\EXPLICACION A USUARIOS\n", user_explanation_text)
         # print("=========================================")
         # return user_explanation_text
 
