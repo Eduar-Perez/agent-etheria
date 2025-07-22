@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import boto3
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from typing import TypedDict
@@ -17,17 +18,20 @@ MODEL = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
 # Configuración del modelo Claude 3 Sonnet en AWS Bedrock
 def get_bedrock_llm():
+    boto3_client = boto3.client(
+        service_name="bedrock-runtime",
+        region_name=os.getenv("AWS_REGION", "us-east-1"),
+        config=Config(read_timeout=180, connect_timeout=30)
+    )
+
     return ChatBedrock(
+        client=boto3_client,
         model_id=MODEL,
         model_kwargs={
             "max_tokens": 4096,
             "temperature": 0,
             "anthropic_version": "bedrock-2023-05-31",
-        },
-        client_kwargs={
-            "config": Config(read_timeout=180, connect_timeout=30)
-        },
-        region_name=os.getenv("AWS_REGION", "us-east-1"),
+        }
     )
 
 llm = get_bedrock_llm()

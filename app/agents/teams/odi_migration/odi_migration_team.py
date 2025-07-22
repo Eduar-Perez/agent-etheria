@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import boto3
 from botocore.config import Config
 from langchain_aws import ChatBedrock
 from .utilities.xml_to_json import convert_all_xml_to_json
@@ -35,17 +36,20 @@ def run_pipeline(ruta_json, nombre_proceso):
 
 
 def get_bedrock_llm():
+    boto3_client = boto3.client(
+        service_name="bedrock-runtime",
+        region_name=os.getenv("AWS_REGION", "us-east-1"),
+        config=Config(read_timeout=180, connect_timeout=30)
+    )
+
     return ChatBedrock(
+        client=boto3_client,
         model_id=MODEL,
         model_kwargs={
             "max_tokens": 4096,
             "temperature": 0,
             "anthropic_version": "bedrock-2023-05-31",
-        },
-        client_kwargs={
-            "config": Config(read_timeout=180, connect_timeout=30)
-        },
-        region_name=os.getenv("AWS_REGION", "us-east-1"),
+        }
     )
 
 
