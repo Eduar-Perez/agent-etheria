@@ -149,4 +149,4 @@ def odi_migration_team(xml_input_folder):
         resultado = run_pipeline(ruta_json, nombre_proceso_ppal)
         print(resultado)
         print("\n Proceso finalizado. Puedes revisar los resultados.")
-    return "\n\n".join(response)
+    return ["\n\n".join(response)]

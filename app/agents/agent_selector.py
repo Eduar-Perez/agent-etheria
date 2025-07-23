@@ -25,7 +25,6 @@ def get_agent(
     factory = AGENTS.get(agent_id.value)
     if not factory:
         raise ValueError(f"Agent '{agent_id.value}' not found")
-
     return factory.build(
         model_id=model,
         user_id=user_id,

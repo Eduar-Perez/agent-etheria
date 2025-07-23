@@ -43,4 +43,5 @@ def eliminar_archivo_despues(key: str, delay_seconds: int, bucket_name):
 def save_and_generate_url_s3(bucket_name, s3_key, file_path):
     """Save a local XML file to S3 and generate a temporary download URL."""
     url = subir_a_s3_y_generar_url(file_path, bucket_name, s3_key)
-    print(f"Enlace de descarga (válido 5 min): {url}")
+    # print(f"Enlace de descarga (válido 5 min): {url}")
+    return url
