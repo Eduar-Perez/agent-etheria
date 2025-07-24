@@ -715,18 +715,17 @@ def guardar_xml(xml_content, ruta_directorio=None, nombre_archivo=None):
         f.write(xml_content)
     print(f"✅ Archivo guardado exitosamente en: {ruta_completa}")
 
+builder = StateGraph(AgentState)
+builder.add_node("interpretar_y_generar_xml", interpretar_y_generar_xml)
+builder.set_entry_point("interpretar_y_generar_xml")
+builder.add_node("Leer prompts", lambda state: actualizar_input_request_desde_archivos("./prompts"))
+builder.add_edge("interpretar_y_generar_xml", END)
+graph = builder.compile()
 
 def run(nombre_proceso_ppal: str):
-    builder = StateGraph(AgentState)
-    builder.add_node("interpretar_y_generar_xml", interpretar_y_generar_xml)
-    builder.set_entry_point("interpretar_y_generar_xml")
-    builder.add_node("Leer prompts", lambda state: actualizar_input_request_desde_archivos("./prompts"))
-    builder.add_edge("interpretar_y_generar_xml", END)
-    graph = builder.compile()
     if nombre_proceso_ppal is None:
         # Si no se pasa como variable global, usar valor por defecto o lanzar error
         nombre_proceso_ppal = "PAQ_PPAL_DIM_CLIENTE"  # Valor por defecto o puedes lanzar una excepción
-
     base_dir = os.path.dirname(__file__)
     ruta = os.path.join(base_dir, "..", "tmp", "prompts_datastage", nombre_proceso_ppal)
     input_request = {

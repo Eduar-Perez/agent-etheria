@@ -11,6 +11,7 @@ from .utilities.DataStageAgentExtraccion import run as run_extraccion
 from .utilities.DataStageAgentTransform import run as run_transform
 from .utilities.DataStageAgentJoin import run as run_join
 from .utilities.DatastageAgentInsert import run as run_insert
+from ..utilities.save_and_generate_url import save_and_generate_url_s3
 
 MODEL = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 logger = logging.getLogger(__name__)
@@ -102,7 +103,7 @@ def load_process(nombre_proceso_ppal):
         with open(ruta_archivo, "r", encoding="utf-8") as f:
             data = json.load(f)
         explicaciones[archivo] = data
-        break  # ❗ Eliminar si quieres procesar todos los archivos
+        #break  #  Eliminar si quieres procesar todos los archivos
     return explicaciones
 
 
@@ -149,4 +150,5 @@ def odi_migration_team(xml_input_folder):
         resultado = run_pipeline(ruta_json, nombre_proceso_ppal)
         print(resultado)
         print("\n Proceso finalizado. Puedes revisar los resultados.")
+        break
     return ["\n\n".join(response)]

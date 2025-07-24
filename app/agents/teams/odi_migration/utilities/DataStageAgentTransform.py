@@ -963,26 +963,28 @@ def actualizar_input_request_desde_archivos(ruta_prompts: str):
 
 
 def guardar_xml(xml_content, ruta_directorio="./output", nombre_archivo=None):
-    if not os.path.exists(ruta_directorio):
-        os.makedirs(ruta_directorio)
+    if ruta_directorio is None:
+        ruta_directorio = os.path.join(os.path.dirname(__file__), "..", "tmp", "output")
+    os.makedirs(ruta_directorio, exist_ok=True)
     if nombre_archivo is None:
         fecha_hora = datetime.now().strftime("%Y%m%d_%H%M")
-        nombre_archivo = f"JOB_TRF_AGENTE_{fecha_hora}.xml"
+        nombre_archivo = f"JOB_TRF_TRF_AGENTE_{fecha_hora}.xml"
     ruta_completa = os.path.join(ruta_directorio, nombre_archivo)
     with open(ruta_completa, "w", encoding="utf-8") as f:
         f.write(xml_content)
     print(f"✅ Archivo guardado exitosamente en: {ruta_completa}")
-
+    
+builder = StateGraph(AgentState)
+builder.add_node("interpretar_y_generar_xml", interpretar_y_generar_xml)
+builder.set_entry_point("interpretar_y_generar_xml")
+builder.add_edge("interpretar_y_generar_xml", END)
+graph = builder.compile()
 
 def run(nombre_proceso_ppal: str):
-    builder = StateGraph(AgentState)
-    builder.add_node("interpretar_y_generar_xml", interpretar_y_generar_xml)
-    builder.set_entry_point("interpretar_y_generar_xml")
-    builder.add_edge("interpretar_y_generar_xml", END)
-    graph = builder.compile()
+
     base_dir = os.path.dirname(__file__)
     ruta = os.path.join(base_dir, "..", "tmp", "prompts_datastage", nombre_proceso_ppal)
-    archivo_prompt = os.path.join(ruta, f"TRF_{nombre_proceso_ppal}.txt")
+    archivo_prompt = os.path.join(ruta, f"TRF_TRF_{nombre_proceso_ppal}.txt")
     if not os.path.exists(archivo_prompt):
         print(f"No se encontró el archivo: {archivo_prompt}")
         return
