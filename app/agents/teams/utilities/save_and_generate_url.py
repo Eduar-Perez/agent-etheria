@@ -25,12 +25,12 @@ def subir_a_s3_y_generar_url(file_path: str, bucket_name, s3_key) -> str:
     print(f"URL temporal generado: {url}")
 
     # Crear hilo para borrar el archivo después de 5 minutos
-    threading.Thread(target=eliminar_archivo_despues, args=(s3_key, 300)).start()
+    threading.Thread(target=eliminar_archivo_temporal, args=(s3_key, 300)).start()
 
     return url
 
-
-def eliminar_archivo_despues(key: str, delay_seconds: int, bucket_name):
+def eliminar_archivo_temporal(key: str, delay_seconds: int):
+    bucket_name = "agents-temp-files"
     time.sleep(delay_seconds)
     try:
         s3.delete_object(Bucket=bucket_name, Key=key)
@@ -40,7 +40,7 @@ def eliminar_archivo_despues(key: str, delay_seconds: int, bucket_name):
 
 
 # USO EJEMPLO
-def save_and_generate_url_s3( s3_key, file_path):
+def save_and_generate_url_s3(s3_key, file_path):
     """Save a local XML file to S3 and generate a temporary download URL."""
     bucket_name="agents-temp-files"
     url = subir_a_s3_y_generar_url(file_path, bucket_name, s3_key)

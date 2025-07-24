@@ -4,7 +4,7 @@ import json
 import boto3
 import logging
 import textwrap
-from ..utilities.save_and_generate_url import save_and_generate_url_s3
+from ..utilities.save_and_generate_url import save_and_generate_url_s3, eliminar_archivo_temporal
 # from dotenv import load_dotenv
 from botocore.config import Config
 from langchain_aws import ChatBedrock
@@ -290,8 +290,8 @@ def join_sql_scripts_team(folder_path):
             logger.error("Error al procesar la respuesta del modelo:")
             logger.error(err)
     for script in sql_unified:
-        path = saved_paths[script]
-        logger.info(f"este es el path {path}")
-        # url_download[script] = save_and_generate_url_s3()
+        file_path  = saved_paths[script]
+        s3_key = f"sql-joiner/{os.path.basename(file_path)}" 
+        url_download[script] = save_and_generate_url_s3(s3_key, file_path)
         # sql_unified[script] = convert_to_markdown(sql_unified[script])
-    return [sql_unified, grouping_explanation]
+    return [sql_unified, grouping_explanation,url_download]
