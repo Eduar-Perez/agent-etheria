@@ -29,6 +29,8 @@ def team_manager(request):
             return "Para hacer este analisis se necesito que cargues el archivo .XML que deseas migrar"
         upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "odi_inputs")
         save_base64_files(request.files, upload_dir)
-        return odi_migration_team(upload_dir)
+        response = odi_migration_team(upload_dir)
+        print("Response from ODI migration team:", response)
+        return response
     else:
         raise ValueError(f"Invalid agent ID: {request.agent_id}")
