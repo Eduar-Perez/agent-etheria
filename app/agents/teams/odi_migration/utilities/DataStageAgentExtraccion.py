@@ -732,18 +732,14 @@ def run(nombre_proceso_ppal: str):
     "natural_language_request": "quiero que me haga una extración de datos de la tabla cliente, con las columnas id_cliente, nombre, apellido y fecha_registro. La consulta SQL debe ser: SELECT id_cliente, nombre, apellido, fecha_registro FROM cliente WHERE activo = 1;"
     }
     archivo_prompt = os.path.join(ruta, f"EXT_{nombre_proceso_ppal}.txt")
-
     if not os.path.exists(archivo_prompt):
         print(f"⚠️ No se encontró el archivo: {archivo_prompt}")
         return
-
     with open(archivo_prompt, "r", encoding="utf-8") as f:
         contenido_prompt = f.read()
-
     input_request = {
         "natural_language_request": contenido_prompt
     }
-
     try:
         result = graph.invoke(input_request)
         guardar_xml(result["generated_xml"])

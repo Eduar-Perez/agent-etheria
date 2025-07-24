@@ -84,7 +84,6 @@ def definir_promts_pasos_job(state: DescripcionState) -> DescripcionState:
         )
     ]
     # print(f"Archivos encontrados: {archivos}")
-
     for archivo in archivos:
         with open(archivo, "r", encoding="utf-8") as f:
             try:
@@ -309,6 +308,7 @@ def exportar_por_llave_descripcion_state(state: DescripcionState) -> Descripcion
             else:
                 continue  # omitir llaves desconocidas
             ruta_salida = os.path.join(ruta, nombre_salida)
+            print(f"===========\nGuardando archivo:\n{ruta_salida}\n===========\n" )
             with open(ruta_salida, "w", encoding="utf-8") as fout:
                 fout.write(contenido)
             archivos_generados.append(ruta_salida)

@@ -85,7 +85,6 @@ def correct_prompt_datastage(answer: str) -> str:
 def load_process(nombre_proceso_ppal):
     base_tmp = os.path.abspath(os.path.join(os.path.dirname(__file__), "tmp"))
     ruta = os.path.join(base_tmp, "prompts_datastage", nombre_proceso_ppal)
-
     if not os.path.exists(ruta):
         raise FileNotFoundError(f"No se encontró la ruta esperada: {ruta}")
 
@@ -93,7 +92,6 @@ def load_process(nombre_proceso_ppal):
         f for f in os.listdir(ruta)
         if f.startswith("descripcion_") and f.endswith(".json")
     ]
-
     if not archivos:
         raise FileNotFoundError(f"No se encontraron archivos de descripción en: {ruta}")
 
@@ -107,7 +105,6 @@ def load_process(nombre_proceso_ppal):
     return explicaciones
 
 
-
 def odi_migration_team(xml_input_folder):
     json_odi_interpeted = os.path.join(os.path.dirname(__file__), "tmp", "odi_interpeted_json")
     os.makedirs(json_odi_interpeted, exist_ok=True)
@@ -118,6 +115,7 @@ def odi_migration_team(xml_input_folder):
     response = []
     for xml_input in xml_inputs:
         nombre_proceso = xml_input.split(".")[0]
+        #Inteprretar XML y maperarlo en json
         json_filename = convert_all_xml_to_json(
             nombre_proceso, xml_input_folder, json_odi_interpeted
         )
@@ -126,6 +124,7 @@ def odi_migration_team(xml_input_folder):
             print(f"No se encontró el archivo: {ruta_json}")
             return
         print(f"\n Estamos traduciendo el proceso: '{nombre_proceso}' ...\n")
+        # Ejecutar el grafo de DataStage
         ejecutar_grafo(ruta_json)
         print("Creando descripción tecnica del proceso ...\n")
         with open(ruta_json, "r", encoding="utf-8") as f:
