@@ -26,7 +26,7 @@ def team_manager(request):
         return join_sql_scripts_team(upload_dir)
     elif team_id == "team_odi_migration":
         if len(request.files) < 1:
-            return "Para hacer este analisis se necesito que cargues el archivo .XML que deseas migrar"
+            return "Para hacer la migración a datastage se necesita que se cargue el archivo .XML que deseas migrar"
         upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "odi_inputs")
         save_base64_files(request.files, upload_dir)
         response = odi_migration_team(upload_dir)
