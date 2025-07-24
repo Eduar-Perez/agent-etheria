@@ -725,7 +725,7 @@ def actualizar_input_request_desde_archivos(ruta_prompts: str):
 
             print(f"✅ Extracción creada exitosamente para el archivo: {archivo}")
 
-def guardar_xml(xml_content, ruta_directorio="./output", nombre_archivo=None):
+def guardar_xml(xml_content, ruta_directorio=None, nombre_archivo=None):
     if ruta_directorio is None:
         ruta_directorio = os.path.join(os.path.dirname(__file__), "..", "tmp", "output")
     os.makedirs(ruta_directorio, exist_ok=True)
