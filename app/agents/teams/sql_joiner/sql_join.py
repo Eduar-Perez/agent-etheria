@@ -4,7 +4,7 @@ import json
 import boto3
 import logging
 import textwrap
-
+from ..utilities.save_and_generate_url import save_and_generate_url_s3
 # from dotenv import load_dotenv
 from botocore.config import Config
 from langchain_aws import ChatBedrock
@@ -99,7 +99,6 @@ def save_merged_sql(
     os.makedirs(folder_name, exist_ok=True)
     save_path = os.path.join(folder_name, subfolder)
     os.makedirs(save_path, exist_ok=True)
-
     safe_name = re.sub(r"\W+", "_", group_name)
     file_name = f"{group_number}_{safe_name}.sql"
     full_path = os.path.join(save_path, file_name)
@@ -108,7 +107,7 @@ def save_merged_sql(
         file.write(f"-- Grupo: {group_number}\n\n")
         file.write(sql_text)
 
-    return [full_path]
+    return full_path
 
 
 # las function: def show_grouping_explanation(data: dict):
@@ -261,6 +260,8 @@ def join_sql_scripts_team(folder_path):
     separated_folder = separate_sql_by_keyword(absolute_path)
     sql_unified = {}
     grouping_explanation = {}
+    saved_paths = {}
+    url_download = {}
     for category in os.listdir(separated_folder):
         category_path = os.path.join(separated_folder, category)
         sql_combined, file_list = join_sql_scripts(category_path)
@@ -281,7 +282,7 @@ def join_sql_scripts_team(folder_path):
                 merged_sql = merge_sql_group(category_path, group_scripts)
                 unified_sql = unify_sqls_with_model(merged_sql)
                 sql_unified[category] = unified_sql
-                # saved_paths = save_merged_sql(unified_sql, category, str(i), group["nombre_grupo"])
+                saved_paths[category] = save_merged_sql(unified_sql, category, str(i), group["nombre_grupo"])
         # print("\nLos archivos SQL unificados se guardaron en:")
         # for path in saved_paths:
         #     print(f" - {path}")
@@ -289,5 +290,8 @@ def join_sql_scripts_team(folder_path):
             logger.error("Error al procesar la respuesta del modelo:")
             logger.error(err)
     for script in sql_unified:
-        sql_unified[script] = convert_to_markdown(sql_unified[script])
+        path = saved_paths[script]
+        print("este es el path",path)
+        # url_download[script] = save_and_generate_url_s3()
+        # sql_unified[script] = convert_to_markdown(sql_unified[script])
     return [sql_unified, grouping_explanation]
