@@ -93,7 +93,7 @@ def save_merged_sql(
     subfolder: str,
     group_number: str,
     group_name: str,
-    folder_name="SQL_unificados",
+    folder_name="tmp/SQL_unificados",
 ):
     """Guarda el SQL unificado en una carpeta organizada por grupos."""
     os.makedirs(folder_name, exist_ok=True)
@@ -291,7 +291,7 @@ def join_sql_scripts_team(folder_path):
             logger.error(err)
     for script in sql_unified:
         path = saved_paths[script]
-        print("este es el path",path)
+        logger.info(f"este es el path {path}")
         # url_download[script] = save_and_generate_url_s3()
         # sql_unified[script] = convert_to_markdown(sql_unified[script])
     return [sql_unified, grouping_explanation]
