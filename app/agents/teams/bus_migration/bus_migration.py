@@ -1,9 +1,8 @@
 import os
-import logger as logging
+import logging
 from .utilities.migration import DummyJsonWorkflow
 
 logger = logging.getLogger(__name__)
-
 
 def bus_migration_team(input_path_file):
     files = os.listdir(input_path_file)
