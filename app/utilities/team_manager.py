@@ -37,7 +37,7 @@ def team_manager(request):
             return "Para hacer este procesamiento, necesito que cargues los archivos de esq y excel"
         upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "bus_migration_inputs")
         save_base64_files(request.files, upload_dir)
-        response = bus_migration_team(input_files=upload_dir)
+        response = bus_migration_team(upload_dir)
         
     else:
         raise ValueError(f"Invalid agent ID: {request.agent_id}")
