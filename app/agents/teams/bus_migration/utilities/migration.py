@@ -247,9 +247,9 @@ class DummyJsonWorkflow(Workflow):
                 output_path = os.path.join(output_path_base,file_name)
                 self.write_file(output_path, esql_code)
             return RunResponse(
-    content=json.dumps({
-        "content": screening_result.content,
-        "file_path": output_path
-    }, ensure_ascii=False)
-)
-            
+                content=json.dumps({
+                    **screening_result.model_dump(),  # convierte DummyJson a dict serializable
+                    "file_path": output_path
+                }, ensure_ascii=False)
+            )
+     
