@@ -255,5 +255,3 @@ class DummyJsonWorkflow(Workflow):
                     "file_path": output_path
                 }, ensure_ascii=False)
             )
-
-     
