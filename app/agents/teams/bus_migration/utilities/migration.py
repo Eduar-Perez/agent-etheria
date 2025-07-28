@@ -1,7 +1,6 @@
 import json
 from agno.workflow.workflow import Workflow
 from pydantic import BaseModel, Field
-from agno.models.openai.chat import OpenAIChat
 from agno.agent.agent import Agent
 from agno.run.response import RunResponse
 from agno.utils.log import logger
