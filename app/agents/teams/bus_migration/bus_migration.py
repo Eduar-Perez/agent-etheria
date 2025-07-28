@@ -2,7 +2,7 @@ import os
 import logging
 from .utilities.migration import DummyJsonWorkflow
 from ..utilities.save_and_generate_url import save_and_generate_url_s3, eliminar_archivo_temporal
-
+import json
 logger = logging.getLogger(__name__)
 
 def bus_migration_team(input_path_file):
@@ -25,8 +25,11 @@ def bus_migration_team(input_path_file):
             El flujo de origen es un flujo de Oracle Bus, archivo .esql, y el archivo de mapeo es un archivo Excel.
         """,
     )
-    print("Response from DummyJsonWorkflow:", response)
-    # s3_key = f"bus_migration/{os.path.basename(response['file_path'])}"
-    # url_download = save_and_generate_url_s3(s3_key, response['file_path'])
+    print("Response from DummyJsonWorkflow:", json.loads(response.content))
+    data = json.loads(response.content)
+    file_path = data["file_path"]
+    content = data["content"]
+    s3_key = f"bus_migration/{os.path.basename(file_path)}"
+    url_download = save_and_generate_url_s3(s3_key, file_path)
 
     return ["response['content']", "url_download"]

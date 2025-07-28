@@ -216,9 +216,12 @@ class DummyJsonWorkflow(Workflow):
             f.write(content)
             logger.info(f"Archivo {file_name} creado con éxito.")
 
-    def run(
-            self, excel_path,esql_path,output_path_base, action_description: str
-        ):
+    def run(self, **kwargs) -> RunResponse:
+            excel_path = kwargs.get("excel_path")
+            esql_path = kwargs.get("esql_path")
+            output_path_base = kwargs.get("output_path_base")
+            action_description = kwargs.get("action_description")
+
             
             if not esql_path:
                 raise Exception("archivos_esql cannot be empty")
@@ -248,8 +251,9 @@ class DummyJsonWorkflow(Workflow):
                 self.write_file(output_path, esql_code)
             return RunResponse(
                 content=json.dumps({
-                    **screening_result.model_dump(),  # convierte DummyJson a dict serializable
+                    **screening_result.content.model_dump(),
                     "file_path": output_path
                 }, ensure_ascii=False)
             )
+
      
