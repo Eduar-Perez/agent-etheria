@@ -16,9 +16,9 @@ def eliminar_carpeta_completa(path: str):
 def save_base64_files(file_items: List[dict], upload_dir: str) -> List[str]:
     os.makedirs(upload_dir, exist_ok=True)
     if len(file_items) < 1:
-        return "No se encontraron archivos en la carpeta proporcionada"
+        return "No se recibieron los archivos para procesar"
     for item in file_items:
-        file_content = base64.b64decode(item.file)
+        file_content = base64.b64decode(item.file.split(",")[1])
         filename = item.fileName
         file_path = os.path.join(upload_dir, filename)
         with open(file_path, "wb") as f:
