@@ -28,8 +28,7 @@ def bus_migration_team(input_path_file):
     print("Response from DummyJsonWorkflow:", json.loads(response.content))
     data = json.loads(response.content)
     file_path = data["file_path"]
-    content = data["content"]
     s3_key = f"bus_migration/{os.path.basename(file_path)}"
     url_download = save_and_generate_url_s3(s3_key, file_path)
 
-    return ["response['content']", "url_download"]
+    return ["response['content']", url_download]
