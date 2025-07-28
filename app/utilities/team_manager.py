@@ -1,9 +1,17 @@
-import base64
 import os
 import uuid
+import shutil
+import base64
+from typing import List
 from agents.teams import join_sql_scripts_team, odi_migration_team,bus_migration_team
 
-from typing import List
+
+def eliminar_carpeta_completa(path: str):
+    if os.path.exists(path) and os.path.isdir(path):
+        shutil.rmtree(path)
+        print(f"Carpeta eliminada: {path}")
+    else:
+        print(f"La ruta no existe o no es una carpeta: {path}")
 
 def save_base64_files(file_items: List[dict], upload_dir: str) -> List[str]:
     os.makedirs(upload_dir, exist_ok=True)
@@ -40,6 +48,7 @@ def team_manager(request):
         upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "bus_migration_inputs")
         save_base64_files(request.files, upload_dir)
         response = bus_migration_team(upload_dir)
+        eliminar_carpeta_completa(upload_dir)
         return response
     else:
         raise ValueError(f"Invalid agent ID: {request.agent_id}")
