@@ -246,6 +246,5 @@ class DummyJsonWorkflow(Workflow):
                 file_name = f"{esql_path.split('/')[-1].split('.')[0]}_salida.esql"
                 output_path = os.path.join(output_path_base,file_name)
                 self.write_file(output_path, esql_code)
-                logger.info(screening_result)
             return {"content":screening_result.content,"file_path": output_path}
             

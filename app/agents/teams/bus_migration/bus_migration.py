@@ -25,8 +25,8 @@ def bus_migration_team(input_path_file):
             El flujo de origen es un flujo de Oracle Bus, archivo .esql, y el archivo de mapeo es un archivo Excel.
         """,
     )
-    
-    s3_key = f"bus_migration/{os.path.basename(response['file_path'])}"
-    url_download = save_and_generate_url_s3(s3_key, response['file_path'])
+    print("Response from DummyJsonWorkflow:", response)
+    # s3_key = f"bus_migration/{os.path.basename(response['file_path'])}"
+    # url_download = save_and_generate_url_s3(s3_key, response['file_path'])
 
-    return [response['content'], url_download]
+    return ["response['content']", "url_download"]
