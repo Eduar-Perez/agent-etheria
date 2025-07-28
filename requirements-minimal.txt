@@ -24,3 +24,4 @@ duckduckgo-search
 anthropic
 langchain_aws
 langgraph
+openpyxl

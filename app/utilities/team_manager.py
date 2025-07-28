@@ -24,6 +24,7 @@ def team_manager(request):
         upload_dir = "./tmp/sql_inputs"
         save_base64_files(request.files, upload_dir)
         return join_sql_scripts_team(upload_dir)
+    
     elif team_id == "team_odi_migration":
         if len(request.files) < 1:
             return "Para hacer la migración a datastage se necesita que se cargue el archivo .XML que deseas migrar"
@@ -32,12 +33,13 @@ def team_manager(request):
         response = odi_migration_team(upload_dir)
         print("Response from ODI migration team:", response)
         return response
+    
     elif team_id == "team_bus_migration":
         if len(request.files) < 1:
             return "Para hacer este procesamiento, necesito que cargues los archivos de esq y excel"
         upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "bus_migration_inputs")
         save_base64_files(request.files, upload_dir)
         response = bus_migration_team(upload_dir)
-        
+        return response
     else:
         raise ValueError(f"Invalid agent ID: {request.agent_id}")

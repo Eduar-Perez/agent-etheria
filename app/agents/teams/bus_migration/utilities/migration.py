@@ -218,7 +218,7 @@ class DummyJsonWorkflow(Workflow):
 
     def run(
             self, excel_path,esql_path,output_path_base, action_description: str
-        ) -> RunResponse:
+        ):
             
             if not esql_path:
                 raise Exception("archivos_esql cannot be empty")
@@ -244,9 +244,8 @@ class DummyJsonWorkflow(Workflow):
                 input = f"Candidate Job description: {action_description}"
                 screening_result = self.screening_agent.run(input)
                 file_name = f"{esql_path.split('/')[-1].split('.')[0]}_salida.esql"
-                output_path = output_path_base+file_name ########### path de salida que hay que cambiar para evitar errores
+                output_path = os.path.join(output_path_base,file_name)
                 self.write_file(output_path, esql_code)
                 logger.info(screening_result)
-            return RunResponse(
-                content=screening_result.content,
-            )
+            return {"content":screening_result.content,"file_path": output_path}
+            
