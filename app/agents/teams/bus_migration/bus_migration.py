@@ -30,5 +30,14 @@ def bus_migration_team(input_path_file):
     file_path = data["file_path"]
     s3_key = f"bus_migration/{os.path.basename(file_path)}"
     url_download = save_and_generate_url_s3(s3_key, file_path)
-    user_response = f"Migración completada con éxito\nEl flujo ESQL fue transformado de formato XML a formato JSON utilizando el archivo de mapeo proporcionado. Durante la migración, se identificaron y ajustaron automáticamente los módulos `Request` y `Response`, aplicando los cambios necesarios en las estructuras de datos para que el flujo sea compatible con el nuevo esquema en JSON.\nEste proceso garantiza que las asignaciones y referencias dentro del código ESQL respeten la estructura de salida esperada, facilitando su integración con sistemas modernos basados en JSON.\nPuedes descargar el archivo migrado desde el siguiente enlace:\n{url_download}"
+    user_response = f'''
+    ## Migración completada con éxito
+
+El flujo ESQL fue transformado de formato XML a formato JSON utilizando el archivo de mapeo proporcionado. Durante la migración, se identificaron y ajustaron automáticamente los módulos `Request` y `Response`, aplicando los cambios necesarios en las estructuras de datos para que el flujo sea compatible con el nuevo esquema en JSON.
+
+Este proceso garantiza que las asignaciones y referencias dentro del código ESQL respeten la estructura de salida esperada, facilitando su integración con sistemas modernos basados en JSON.
+
+Puedes descargar el archivo migrado desde el siguiente enlace:  
+[descargar archivo]({url_download})'''
+
     return user_response
