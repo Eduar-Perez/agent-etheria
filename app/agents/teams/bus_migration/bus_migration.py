@@ -37,7 +37,8 @@ El flujo ESQL fue transformado de formato XML a formato JSON utilizando el archi
 
 Este proceso garantiza que las asignaciones y referencias dentro del código ESQL respeten la estructura de salida esperada, facilitando su integración con sistemas modernos basados en JSON.
 
-Puedes descargar el archivo migrado desde el siguiente enlace:  
-[descargar archivo]({url_download})'''
+Puedes descargar el archivo migrado desde el siguiente enlace:
+
+[Descargar archivo]({url_download})'''
 
     return user_response
