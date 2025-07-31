@@ -61,7 +61,7 @@ def extraer_jobs_con_queries(ruta_archivo,output_path):
         job["tipo_proceso"] = get_job_type(job["nombre"])
         jobs_info.append(job)
     os.makedirs(output_path, exist_ok=True)
-    output_path_write = os.join(output_path,"datastage_json.json")
+    output_path_write = os.path.join(output_path,"datastage_json.json")
     with open(output_path_write, "w", encoding="utf-8") as f:
         json.dump(jobs_info, f, ensure_ascii=False, indent=4)
     return
