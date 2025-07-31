@@ -26,6 +26,7 @@ SQL_TYPE_MAP = {
     "9": "DATE",  # según cómo lo interpreta tu XML
     "1111": "OTHER"
 }
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def sombreado(hex_color):
     """Devuelve un sombreado de fondo azul (hex) para una celda de tabla."""
@@ -62,13 +63,13 @@ def agregar_portada(doc, titulo, subtitulo, autor, fecha):
 
     # Insertar imagen en el párrafo
     run = paragraph.add_run()
-    run.add_picture('./input_data/banco_logo_portada.png', width=Inches(2))
+    image_path = os.path.join(BASE_DIR,'input_data', 'banco_logo_portada.png')
+    run.add_picture(image_path, width=Inches(2))
     # Autor
     autor_parrafo = doc.add_paragraph()
     autor_parrafo.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
     run = autor_parrafo.add_run(f"Autor: {autor}")
     run.font.size = Pt(12)
-    
     doc.add_paragraph("")
     doc.add_paragraph("")
     # Fecha
@@ -494,11 +495,12 @@ El flujo de procesamiento incluye secuencias (SEQ_LOD_EXCEL_TRASN_ICBS, SEQ_LOD_
         fecha=datetime.now().strftime("%Y-%m-%d")
     )
 
+    logo_izq_path = os.path.join(BASE_DIR,'input_data', 'periferia_logo.png')
     # Encabezado con logos
     agregar_encabezado_personalizado(
         doc,
-        logo_izq_path="./input_data/periferia_logo.png",
-        logo_der_path="./input_data/banco_logo.png",
+        logo_izq_path=logo_izq_path,
+        logo_der_path=logo_izq_path,
         titulo_encabezado= titulo_portada
     )
     
