@@ -293,5 +293,12 @@ def join_sql_scripts_team(folder_path):
         file_path  = saved_paths[script]
         s3_key = f"sql-joiner/{os.path.basename(file_path)}" 
         url_download[script] = save_and_generate_url_s3(s3_key, file_path)
-        # sql_unified[script] = convert_to_markdown(sql_unified[script])
-    return [sql_unified, grouping_explanation,url_download]
+    response = f'''
+    ##Se unificó correctamente los sql de l aiguiente forma:
+
+{grouping_explanation}
+Puedes descargar los sql en los siguientes links:
+
+[Descargar archivo]({url_download})'''
+        
+    return response
