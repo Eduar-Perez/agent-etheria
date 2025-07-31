@@ -16,11 +16,11 @@ import traceback
 logger = logging.getLogger(__name__)
 
 def configure_routes(app: FastAPI):
-    @app.middleware("http")
-    async def log_raw_request(request: Request, call_next):
-        body = await request.body()
-        logger.info("Request Body: %s", body.decode("utf-8"))
-        return await call_next(request)
+    # @app.middleware("http")
+    # async def log_raw_request(request: Request, call_next):
+    #     body = await request.body()
+    #     logger.info("Request Body: %s", body.decode("utf-8"))
+    #     return await call_next(request)
     @app.post("/task")
     async def ask_question(request: QuestionsRequest):
         try:
