@@ -1,7 +1,7 @@
 import logging
 from agents import AgentType
 from agents.agent_selector import get_agent
-from app.agents.teams.datastage_documentation.utilities.get_prompts import open_prompt
+from get_prompts import open_prompt
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
