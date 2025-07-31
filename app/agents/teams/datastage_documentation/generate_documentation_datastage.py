@@ -10,7 +10,7 @@ def generate_document_datastage(intpu_tmp_folder):
     for xmls_file in xmls_files:
         xml_path = os.path.join(intpu_tmp_folder, xmls_file)
         output_docx_path = os.path.join(intpu_tmp_folder,"..","output_documents", "datastage")
-        json_output = os.path.join(intpu_tmp_folder,".." "output_data", "datastage")
+        json_output = os.path.join(intpu_tmp_folder,"..", "output_data", "datastage")
         extraer_jobs_con_queries(xml_path, json_output)
         section_1 = get_info_section_1(xml_path,json_output)
         rutinas,comandos = extraer_rutinas_comandos(xml_path)
