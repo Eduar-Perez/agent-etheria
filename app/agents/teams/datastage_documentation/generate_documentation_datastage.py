@@ -16,7 +16,7 @@ def generate_document_datastage(intpu_tmp_folder):
         rutinas,comandos = extraer_rutinas_comandos(xml_path)
         path_docx = document_generator(json_output, output_docx_path,section_1,rutinas,comandos)
         s3_key = f"sql-joiner/{os.path.basename(path_docx)}" 
-        url_download = save_and_generate_url_s3(s3_key, s3_key)
+        url_download = save_and_generate_url_s3(s3_key, path_docx)
     response = f'''##Generación de Documento Exitosa
 
 El documento ha sido generado exitosamente.
