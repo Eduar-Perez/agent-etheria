@@ -175,13 +175,14 @@ def show_grouping_explanation(data: dict) -> str:
     return "\n".join(lines)
 
 
-def separate_sql_by_keyword(source_folder, output_folder="./tmp/SQL_separados"):
+def separate_sql_by_keyword(source_folder):
     """
     Separa los scripts SQL en carpetas organizadas por contenido:
     - "ADMODS" → ODS
     - "CHEQUES_GERENCIA" → CBS - CHEQUES_GERENCIA
     - Otro → CBS - PRODUCTOS PASIVAS
     """
+    output_folder = os.path.join(source_folder,"SQL_separados")
     for file in sorted(f for f in os.listdir(source_folder) if f.endswith(".sql")):
         full_path = os.path.join(source_folder, file)
         with open(full_path, "r", encoding="utf-8") as input_file:
@@ -252,10 +253,8 @@ def convert_to_markdown(sql_text):
 
 def join_sql_scripts_team(folder_path):
     logger.info("Optimiza tus archivos de SQL")
-    input_folder = folder_path
-    absolute_path = os.path.abspath(f"../app/{input_folder}")
-    if not os.path.exists(absolute_path):
-        logger.error(f"No se encontró la carpeta: {absolute_path}")
+    if not os.path.exists(folder_path):
+        logger.error(f"No se encontró la carpeta: {folder_path}")
         return
     separated_folder = separate_sql_by_keyword(folder_path)
     sql_unified = {}
