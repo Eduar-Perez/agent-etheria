@@ -32,7 +32,7 @@ def team_manager(request):
         upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "sql_inputs")
         save_base64_files(request.files, upload_dir)
         response = join_sql_scripts_team(upload_dir)
-        eliminar_carpeta_completa(upload_dir)
+        # eliminar_carpeta_completa(upload_dir)
         return response
     
     elif team_id == "team_odi_migration":
