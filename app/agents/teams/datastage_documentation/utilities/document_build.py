@@ -444,6 +444,9 @@ def agregar_tabla_comandos(doc, comandos):
     doc.add_paragraph("") 
 
 def document_generator(json_path, output_docx, parameters_ppal, rutinas,comandos):
+    
+    json_path = os.path.join(json_path, "datastage_json.json") #arreglar este remiendo urgente
+    
     with open(json_path, "r", encoding="utf-8") as f:
         jobs_data = json.load(f)
     #Rerte de json para generar introducción
