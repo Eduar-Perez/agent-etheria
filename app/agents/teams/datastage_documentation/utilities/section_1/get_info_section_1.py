@@ -1,3 +1,4 @@
+import os
 import re
 import html
 import json
@@ -58,6 +59,7 @@ def extraer_parametros_secuencia_ppal(xml_path):
     return json.dumps(parametros)
 
 def get_complements_tales(json_path):
+    json_path = os.path.join(json_path, "datastage_json.json")
     with open(json_path, "r", encoding="utf-8") as f:
         jobs = json.load(f)
 

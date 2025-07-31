@@ -64,4 +64,4 @@ def extraer_jobs_con_queries(ruta_archivo,output_path):
     output_path_write = os.path.join(output_path,"datastage_json.json")
     with open(output_path_write, "w", encoding="utf-8") as f:
         json.dump(jobs_info, f, ensure_ascii=False, indent=4)
-    return
+    return "datastage_json.json"
