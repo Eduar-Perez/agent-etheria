@@ -257,7 +257,7 @@ def join_sql_scripts_team(folder_path):
     if not os.path.exists(absolute_path):
         logger.error(f"No se encontró la carpeta: {absolute_path}")
         return
-    separated_folder = separate_sql_by_keyword(absolute_path)
+    separated_folder = separate_sql_by_keyword(folder_path)
     sql_unified = {}
     grouping_explanation = {}
     saved_paths = {}
