@@ -29,9 +29,11 @@ def team_manager(request):
     if team_id == "team_join_sql":
         if len(request.files) < 1:
             return "Para hacer este procesamiento, necesito que cargues los archivos de sql que deseas unificar"
-        upload_dir = "./tmp/sql_inputs"
+        upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "sql_inputs")
         save_base64_files(request.files, upload_dir)
-        return join_sql_scripts_team(upload_dir)
+        response = join_sql_scripts_team(upload_dir)
+        eliminar_carpeta_completa(upload_dir)
+        return response
     
     elif team_id == "team_odi_migration":
         if len(request.files) < 1:
@@ -39,6 +41,7 @@ def team_manager(request):
         upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "odi_inputs")
         save_base64_files(request.files, upload_dir)
         response = odi_migration_team(upload_dir)
+        eliminar_carpeta_completa(upload_dir)
         print("Response from ODI migration team:", response)
         return response
     
