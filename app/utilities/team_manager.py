@@ -53,7 +53,7 @@ def team_manager(request):
         return response
     elif team_id == "team_datastage_documentation": 
         if len(request.files) < 1:
-            return "Para hacer este procesamiento, necesito que cargues los archivos de esq y excel"
+            return "Para hacer este procesamiento, necesito que cargues el documento de XML del proceso de la ETL"
         upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "datastage_documentation_input")
         save_base64_files(request.files, upload_dir)
         response = generate_document_datastage(upload_dir)
