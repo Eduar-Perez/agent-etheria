@@ -1,0 +1,1 @@
+Redacta una introducción que explique de forma clara y no técnica cómo funciona la solución ETL implementada en IBM DataStage, basándote en los jobs y consultas SQL provistos en el JSON. Tu respuesta debe ser un solo párrafo sin usar Markdown ni encabezados, solo texto plano

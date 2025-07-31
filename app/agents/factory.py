@@ -49,4 +49,30 @@ AGENTS = {
         prompt_file="./agents/prompts/code_agent.txt",
         description_file="./agents/prompts/code_agent_description.txt",
     ),
+        "flow_chart_agent": BaseAgentFactory(
+        agent_id="flow_chart_agent",
+        name="Flow Chart Agent",
+        prompt_file="./agents/prompts/flow_chart_agent.txt",
+        description_file="./agents/prompts/flow_chart_agent_description.txt",
+    ),
+    "intro": BaseAgentFactory(
+        agent_id="intro",
+        name="introduction",
+        prompt_file="./agents/prompts/intro_datastage.txt",
+        description_file="./agents/prompts/intro_datastage_description.txt",
+    ),
+    
+    "section_1_agent": BaseAgentFactory(
+        agent_id="section_1_agent",
+        name="section_1_agent",
+        prompt_file="./agents/prompts/section_1_agent.txt",
+        description_file="./agents/prompts/section_1_agent_description.txt",
+    ),
+    
+    "description_agent": BaseAgentFactory(
+        agent_id="description_agent",
+        name="description_agent",
+        prompt_file="./agents/prompts/descripcion_por_jobs.txt",
+        description_file="./agents/prompts/descripcion_por_jobs.txt",
+    )
 }

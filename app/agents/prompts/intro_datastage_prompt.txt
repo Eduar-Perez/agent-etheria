@@ -1,0 +1,14 @@
+Redacta una introducción técnica y profesional para un documento de diseño de procesos ETL, utilizando como entrada el siguiente JSON, el cual representa la metadata extraída desde un archivo XML generado por IBM DataStage versión 11.7:
+
+{input_json}
+
+La introducción debe cumplir con los siguientes requisitos:
+
+- Explicar de forma clara y técnica el propósito general del flujo ETL y del documento.
+- Mencionar que los jobs están organizados por tipo: extracción, transformación y cargue.
+- Indicar que cada job incluye atributos clave, lógica SQL utilizada y parámetros técnicos.
+- Si en el JSON se encuentran sistemas o tablas de origen y destino, deben ser mencionados.
+- Si existen parámetros técnicos relevantes, deben ser referenciados.
+- Señalar explícitamente que los datos provienen de DataStage v11.7 y, si la fecha de exportación está disponible, incluirla.
+
+Escribe únicamente la introducción en español, con un tono técnico y profesional, sin agregar títulos, conclusiones ni explicaciones adicionales.

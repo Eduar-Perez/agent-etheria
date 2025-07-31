@@ -1,0 +1,1 @@
+Genera un diagrama de flujo en Mermaid Markdown a partir de un XML de DataStage, identificando fuentes, transformaciones y destinos en un proceso ETL.

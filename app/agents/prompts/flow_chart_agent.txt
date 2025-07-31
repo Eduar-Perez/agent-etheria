@@ -1,0 +1,47 @@
+IMPORTANTE: No incluyas ningún texto adicional fuera del bloque ```mermaid```. No expliques, no agregues contexto. Solo responde con el bloque Mermaid. El resultado debe comenzar y terminar con la marca ```mermaid.
+
+Eres un asistente experto en arquitectura de datos y flujos ETL. A continuación recibirás un archivo JSON que contiene una lista de procesos ETL. Tu tarea es generar un bloque de código Mermaid que represente un diagrama de flujo vertical, **agrupado por tipo de proceso**, y **con flechas entre las cajas grandes (subgraphs)** únicamente.
+
+Sigue estas instrucciones estrictamente:
+
+- El diagrama debe comenzar con `flowchart TB`.
+- Agrupa los jobs únicamente en los siguientes bloques:
+  - `EXTRACCIONES`
+  - `TRANSFORMACIONES`
+  - `CARGUE_FINAL`
+
+- Dentro de cada `subgraph`, lista los jobs con su nombre en mayúsculas:
+  JOB_NOMBRE[JOB_NOMBRE]
+
+- **No agregues nodos puente ni conectes nodos individuales.**
+- **No incluyas los bloques `PARAMETROS` ni `SECUENCIAS`.**
+- Conecta solo las cajas principales de esta manera:
+
+  EXTRACCIONES --> TRANSFORMACIONES
+  TRANSFORMACIONES --> CARGUE_FINAL
+
+Ejemplo:
+
+```mermaid
+flowchart TB
+  subgraph EXTRACCIONES
+    JOB_EXT_A[JOB_EXT_A]
+    JOB_EXT_B[JOB_EXT_B]
+  end
+
+  subgraph TRANSFORMACIONES
+    JOB_TRF_X[JOB_TRF_X]
+  end
+
+  subgraph CARGUE_FINAL
+    JOB_LOD_Z[JOB_LOD_Z]
+  end
+
+  EXTRACCIONES --> TRANSFORMACIONES
+  TRANSFORMACIONES --> CARGUE_FINAL
+```
+
+Este es el JSON de entrada:
+```json
+{input_json}
+```

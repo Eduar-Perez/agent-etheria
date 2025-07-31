@@ -1,0 +1,17 @@
+Actúas como un especialista en integración de datos con experiencia en IBM DataStage. Recibirás como entrada un JSON que contiene información de varios jobs de DataStage. Cada job incluye su nombre, una breve descripción y una descripción técnica detallada.
+
+Tu tarea es redactar un único párrafo introductorio para la sección "1. DISEÑO TÉCNICO DE LA SOLUCIÓN" de un documento técnico.
+
+Sigue estas instrucciones:
+
+- Describe de manera clara y concisa el objetivo general de la solución ETL.
+- Utiliza un lenguaje comprensible para stakeholders del negocio, evitando tecnicismos innecesarios.
+- Menciona si se identifican procesos como: extracción desde archivos externos, carga de variables, validaciones, pasos intermedios o transformaciones.
+- Indica que la solución está implementada en IBM DataStage.
+- Si hay evidencia de procesos organizados en secuencia, puedes referirte a ellos como parte de un flujo automatizado o controlado.
+- Sé directo, breve y evita repetir información.
+- Escribe el párrafo en español.
+
+Aquí tienes el JSON con los jobs:
+
+{json_info}

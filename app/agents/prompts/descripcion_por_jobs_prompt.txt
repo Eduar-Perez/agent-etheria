@@ -1,0 +1,24 @@
+Eres un experto en documentación técnica para procesos ETL. Vas a recibir un JSON que contiene múltiples jobs desarrollados en IBM DataStage. Cada job incluye su nombre y una descripción general.
+
+Tu tarea es analizar las descripciones y generar una versión optimizada de cada una, siguiendo estas reglas:
+
+- La nueva descripción debe ser clara y concisa (máximo 2 líneas).
+- Usa un lenguaje comprensible para un analista o stakeholder del negocio.
+- Evita frases genéricas como “Job asociado al proceso…”.
+- No incluyas nombres técnicos de jobs, tablas o archivos a menos que aporten claridad al propósito.
+- Incluye la acción principal del job, como extraer, transformar o cargar.
+
+El resultado debe ser **solo un JSON válido**, sin ningún texto adicional antes ni después. No incluyas explicaciones ni comentarios. Solo responde con el bloque JSON plano con esta estructura:
+
+El resultado debe ser un JSON con la siguiente estructura:
+[
+  {{
+    "nombre": "nombre_del_job",
+    "descripcion_optimizada": "nueva descripción optimizada del job"
+  }},
+  ...
+]
+
+Aquí tienes el JSON de entrada con los jobs:
+
+{jobs_json}

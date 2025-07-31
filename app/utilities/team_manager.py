@@ -3,9 +3,7 @@ import uuid
 import shutil
 import base64
 from typing import List
-from agents.teams import join_sql_scripts_team, odi_migration_team,bus_migration_team
-
-
+from agents.teams import join_sql_scripts_team, odi_migration_team,bus_migration_team, generate_documentation_datastage
 def eliminar_carpeta_completa(path: str):
     if os.path.exists(path) and os.path.isdir(path):
         shutil.rmtree(path)
@@ -51,6 +49,14 @@ def team_manager(request):
         upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "bus_migration_inputs")
         save_base64_files(request.files, upload_dir)
         response = bus_migration_team(upload_dir)
+        eliminar_carpeta_completa(upload_dir)
+        return response
+    elif team_id == "team_datastage_documentation":
+        if len(request.files) < 1:
+            return "Para hacer este procesamiento, necesito que cargues los archivos de esq y excel"
+        upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "datastage_documentation_input")
+        save_base64_files(request.files, upload_dir)
+        response = generate_documentation_datastage(upload_dir)
         eliminar_carpeta_completa(upload_dir)
         return response
     else:

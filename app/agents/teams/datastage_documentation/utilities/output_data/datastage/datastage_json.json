@@ -1,0 +1,1046 @@
+[
+    {
+        "nombre": "JOB_BORRA_DS_ICBS",
+        "descripcion": "Job asociado al proceso de cargue del archivo de transacciones masivas enviadas",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "JOB_BORRA_DS_ICBS: se encarga de eliminar los datasets que hacen parte del proceso de cargue del archivo de ARCHIVO_ICBS\n\nOrigen: JOB_BORRA_DS_ATH\nDestino: SF_BORRA_DS_ATH\nTipo de Proceso: Job de borrado datasets. \nRequerimiento: SBBO0303\n\nAutor                              Fecha de Creación         Versión                     Proveedor                              Observaciones \nYeneris Yepez                      13-10-2020           \t   1.0   \t                 SOPHOS SOLUTIONS   \\(20)",
+        "queries": [],
+        "atributos": [
+            {
+                "nombre": "NOMBRE_DATASETS_TMP",
+                "tipo_dato": "12",
+                "tamano": "400",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "OTRO"
+    },
+    {
+        "nombre": "JOB_EXT3_ACVW_ALL_AC_ENTRIES",
+        "descripcion": "Job asociado al proceso Compensacion electronica",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "DS_COMPENSACION_ELECTRONICA_3P.ds:Job encargado de EXTRAER LA TABLA ACVW_ALL_AC_ENTRIES\n\nOrigen:  ACVW_ALL_AC_ENTRIES\nDestino:  DS_ACVW_ALL_AC_ENTRIES.ds\nTipo de Proceso: Job de Extracción. \nRequerimiento:  \n\nAutor                             Fecha de Creación    Versión                     Proveedor                              Observaciones \nSEBASTIAN AMAYA            09/07/2021                1.0   \t       SOPHOS SOLUTIONS",
+        "queries": [
+            "select   \n\nACVW_ALL_AC_ENTRIES.TRN_REF_NO as STR_REFERENCIAFC ,\n \nACVW_ALL_AC_ENTRIES.AC_NO ,\nEVENT,\nSUBSTR(FCJADM_PR.PAQ_FC_UDF.FNC_OBTENERVALORUDF( TRN_REF_NO,  PRODUCT, 'UDFCLIENTEIDENTIFICACION', 'RT', 'S'), -15) as hora\n\nfrom   FCJADM.ACVW_ALL_AC_ENTRIES   ACVW_ALL_AC_ENTRIES \n where\nACVW_ALL_AC_ENTRIES.TRN_DT BETWEEN TO_DATE('#VAP_FECHA#','DDMMYYYY') AND TO_DATE('#VAP_FECHA#','DDMMYYYY') + 5\n--ACVW_ALL_AC_ENTRIES.TRN_DT >=  TO_DATE('#VAP_FECHA#','DDMMYYYY')"
+        ],
+        "atributos": [
+            {
+                "nombre": "STR_REFERENCIAFC",
+                "tipo_dato": "12",
+                "tamano": "16",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "AC_NO",
+                "tipo_dato": "12",
+                "tamano": "250",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "EVENT",
+                "tipo_dato": "12",
+                "tamano": "4",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "hora",
+                "tipo_dato": "12",
+                "tamano": "15",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "extracción"
+    },
+    {
+        "nombre": "JOB_EXT3_ADMODS",
+        "descripcion": "",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "",
+        "queries": [
+            "SELECT\n\tTRIM(SUBSTR(CPD.STR_CODIGO_TIPO_CUENTA,1,10)) STR_CODIGO_TIPO_CUENTA,\n\tTRIM(SUBSTR(CPD.STR_TIPO_CUENTA,1,50)) STR_TIPO_PRODUCTO,\n\tTRIM(SUBSTR(CPD.STR_DIM_CPA_NUM_CUENTA_NK,1,30)) NUM_NUMERO_PRODUCTO,\n\t TFA.DTM_DIM_TIE_DIA_NK DTM_FECHA_TRANSFERENCIA,\n\tTRIM(SUBSTR(DC.STR_DIM_CLI_NUM_CLIENTE_NK,1,50)) || TRIM(CASE WHEN DC.STR_DIM_CLI_TIPO_CLIENTE_NK = 'NT' THEN DC.STR_DIGITO_VERIFICACION ELSE ' ' END) ID_RECAUDADOR,\n\tSUBSTR(EXTRACTVALUE(XMLTYPE(DMP.CLB_XML_INFORMACION_ADICIONAL), '/PivotSet/item[column[1]=\"UDFDEBCTANUM\"]/column[2]'),5) as  NUM_PRODUCTO_ORIGINADOR,\n\tSUBSTR(TTP.STR_DIM_TTP_TIPO_TRANSA_PSV_NK,1,4) STR_DIM_TTP_TIPO_TRANSA_PSV_NK,\n\tSUBSTR(DTB.STR_DIM_TER_COD_BANCO_NK,1,4) STR_DIM_TER_COD_BANCO_NK,\n\tTRIM(SUBSTR(DTB.STR_BANCO,1,50)) STR_ENTIDAD_FINANCIERA,\n\t \n           \nTO_CHAR (DMP.NUM_VALOR_TRANSACCION , '99G999G999G999G999D99')  NUM_VALOR_TRANSACCION,\n\n\nSTR_NO_REF_FC as  STR_REFERENCIAFC\nFROM\tADMODS.FCT_DETALLE_MOVIMIENTO_PASIVO DMP, \n\t\tADMODS.DIM_TIPO_TRANSACCION_PASIVO TTP,\n\t\tADMODS.DIM_TIEMPO TFA, \n\t\tADMODS.DIM_MEDIO DM,\n\t\tADMODS.DIM_CUENTA_PASIVO CPD, \n\t\tADMODS.DIM_TERCERO DTB,\n\t\tADMODS.DIM_CLIENTE DC, \n\t\tADMODS.TBL_AGRUPACIONES TBL_AGRUPACIONES,\n\t\tADMODS.TBL_AGRUPACIONES_DETALLE TBL_AGRUPACIONES_DETALLE\nWHERE  (DMP.STR_TRANSACCION_PRINCIPAL = 'S')\n\tAND (DM.STR_DIM_MED_COD_MEDIO_PAGO_NK IN ('ACC','EAC'))\n\tAND (TFA.DTM_DIM_TIE_DIA_NK BETWEEN TO_DATE('#VAP_FEC_INI#','YYYYMMDD') AND TO_DATE('#VAP_FEC_FIN#','YYYYMMDD'))\n\tAND (CPD.STR_DIM_CPA_NUM_CUENTA_NK IN ('#VAP_ARR_NUM_CTA#'))\n\tAND (CPD.STR_CODIGO_TIPO_CUENTA IN ('#VAP_ARR_TIPO_CTA_DESTINO#'))\n\tAND (DTB.STR_DIM_TER_COD_TIPO_IDENT_NK = 'BANCO')\n\n\tAND (DTB.STR_DIM_TER_COD_BANCO_NK = NVL(TRIM(replace('#VAP_COD_ENTIDAD_ORIG#','TODOS','')) , DTB.STR_DIM_TER_COD_BANCO_NK))\n\n\tAND (LTRIM(SUBSTR(EXTRACTVALUE(XMLTYPE(DMP.CLB_XML_INFORMACION_ADICIONAL), '/PivotSet/item[column[1]=\"UDFDEBCTANUM\"]/column[2]'),5),'0') = NVL(LTRIM(TRIM('#VAP_NUM_CTA_ORIG#'),'0'), LTRIM(SUBSTR(EXTRACTVALUE(XMLTYPE(DMP.CLB_XML_INFORMACION_ADICIONAL), '/PivotSet/item[column[1]=\"UDFDEBCTANUM\"]/column[2]'),5),'0'))) \n\tAND (TBL_AGRUPACIONES.STR_NOMBRE = '179_PRODUCTOS_TRANSFERENCIAS_AVAL')\n\tAND (TTP.NUM_DIM_TIPO_TRANSA_PSV_SK=DMP.NUM_DIM_TIPO_TRANSA_PSV_SK)\n\tAND (DM.NUM_DIM_MEDIO_SK=DMP.NUM_DIM_MEDIO_PAGO_SK)\n\tAND (CPD.NUM_DIM_CUENTA_PASIVO_SK=DMP.NUM_DIM_CUENTA_PASIVO_ORGEN_SK)\n\tAND (DMP.NUM_DIM_TIEMPO_FECHA_APLICACIO=TFA.NUM_DIM_TIEMPO_SK)\n\tAND (DTB.STR_DIM_TER_COD_BANCO_NK = SUBSTR(EXTRACTVALUE(XMLTYPE(DMP.CLB_XML_INFORMACION_ADICIONAL),'/PivotSet/item[column[1]=\"UDFDEBCTANUM\"]/column[2]'), 1, 4))\n\tAND (DC.NUM_DIM_CLIENTE_SK=DMP.NUM_DIM_CLIENTE_SK)\n\tAND (TBL_AGRUPACIONES_DETALLE.NUM_ID_AGRUPACION=TBL_AGRUPACIONES.NUM_ID_AGRUPACION)\n\tAND (TBL_AGRUPACIONES_DETALLE.STR_ITEM_AGRUPACION=TTP.STR_DIM_TTP_TIPO_TRANSA_PSV_NK)"
+        ],
+        "atributos": [
+            {
+                "nombre": "STR_CODIGO_TIPO_CUENTA",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_TIPO_PRODUCTO",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_NUMERO_PRODUCTO",
+                "tipo_dato": "12",
+                "tamano": "30",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "DTM_FECHA_TRANSFERENCIA",
+                "tipo_dato": "9",
+                "tamano": "0",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "ID_RECAUDADOR",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_PRODUCTO_ORIGINADOR",
+                "tipo_dato": "12",
+                "tamano": "20",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_DIM_TTP_TIPO_TRANSA_PSV_NK",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_DIM_TER_COD_BANCO_NK",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_ENTIDAD_FINANCIERA",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_VALOR_TRANSACCION",
+                "tipo_dato": "12",
+                "tamano": "22",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_REFERENCIAFC",
+                "tipo_dato": "12",
+                "tamano": "16",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "extracción"
+    },
+    {
+        "nombre": "JOB_EXT3_ADMODS2",
+        "descripcion": "",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "",
+        "queries": [
+            "SELECT\n\tTRIM(SUBSTR(CPD.STR_CODIGO_TIPO_CUENTA,1,10)) STR_CODIGO_TIPO_CUENTA,   \n\tTRIM(SUBSTR(CPD.STR_TIPO_CUENTA,1,50)) STR_TIPO_PRODUCTO, \n\tTRIM(SUBSTR(CPD.STR_DIM_CPA_NUM_CUENTA_NK,1,30)) NUM_NUMERO_PRODUCTO,  \n\tTFA.DTM_DIM_TIE_DIA_NK DTM_FECHA_TRANSFERENCIA,\n\tTRIM(SUBSTR(DC.STR_DIM_CLI_NUM_CLIENTE_NK, 1, 50)) || TRIM(CASE WHEN DC.STR_DIM_CLI_TIPO_CLIENTE_NK = 'NT' THEN DC.STR_DIGITO_VERIFICACION ELSE ' ' END) ID_RECAUDADOR,\n\tCPO.STR_DIM_CPA_NUM_CUENTA_NK NUM_PRODUCTO_ORIGINADOR,\n\tSUBSTR(TTP.STR_DIM_TTP_TIPO_TRANSA_PSV_NK, 1, 4) STR_DIM_TTP_TIPO_TRANSA_PSV_NK,\n\t'0023' STR_DIM_TER_COD_BANCO_NK,\n\t'BANCO DE OCCIDENTE' STR_ENTIDAD_FINANCIERA,\n\n\tTO_CHAR (DMP.NUM_VALOR_TRANSACCION , '99G999G999G999G999D99')  NUM_VALOR_TRANSACCION,\n\n\nSTR_NO_REF_FC as  STR_REFERENCIAFC\nFROM\tADMODS.FCT_DETALLE_MOVIMIENTO_PASIVO DMP,\n\t\tADMODS.DIM_TIPO_TRANSACCION_PASIVO TTP,\n\t\tADMODS.DIM_TIEMPO TFA, \n\t\tADMODS.DIM_CUENTA_PASIVO CPD,\n\t\tADMODS.DIM_CUENTA_PASIVO CPO,\n\t\tADMODS.DIM_ESTADO DIM_ESTADO,\n\t\tADMODS.DIM_CLIENTE DC,\n\t\tADMODS.TBL_AGRUPACIONES_DETALLE TBL_AGRUPACIONES_DETALLE,\n\t\tADMODS.TBL_AGRUPACIONES TBL_AGRUPACIONES\n WHERE (CPO.STR_DIM_CPA_NUM_CUENTA_NK = NVL(TRIM('#VAP_NUM_CTA_ORIG#'),CPO.STR_DIM_CPA_NUM_CUENTA_NK))\n\tAND (CPD.STR_CODIGO_TIPO_CUENTA IN ('#VAP_ARR_TIPO_CTA_DESTINO#'))\n\tAND (DIM_ESTADO.STR_DIM_STA_COD_ESTADO_NK <> 'REVR')\n\tAND (DMP.STR_TRANSACCION_PRINCIPAL = 'S')\n\tAND (CPD.STR_DIM_CPA_NUM_CUENTA_NK IN ('#VAP_ARR_NUM_CTA#'))\n\tAND (TFA.DTM_DIM_TIE_DIA_NK BETWEEN TO_DATE('#VAP_FEC_INI#','YYYYMMDD') AND TO_DATE('#VAP_FEC_FIN#','YYYYMMDD'))\n\tAND (DMP.STR_NATURALEZA_TRANSACCION = 'C')\n\tAND (CPO.NUM_DIM_CUENTA_PASIVO_SK <> -1)\n\tAND (TBL_AGRUPACIONES.STR_NOMBRE = '179_PRODUCTOS_TRANSFERENCIAS_AVAL')\n\tAND (TBL_AGRUPACIONES_DETALLE.STR_ITEM_AGRUPACION=TTP.STR_DIM_TTP_TIPO_TRANSA_PSV_NK) \n\tAND (TBL_AGRUPACIONES_DETALLE.NUM_ID_AGRUPACION=TBL_AGRUPACIONES.NUM_ID_AGRUPACION) \n\tAND (DMP.NUM_DIM_TIPO_TRANSA_PSV_SK=TTP.NUM_DIM_TIPO_TRANSA_PSV_SK)\n\tAND (DMP.NUM_DIM_CUENTA_PASIVO_DSTNO_SK=CPO.NUM_DIM_CUENTA_PASIVO_SK)\n\tAND (DMP.NUM_DIM_TIEMPO_FECHA_APLICACIO=TFA.NUM_DIM_TIEMPO_SK)\n\tAND (DMP.NUM_DIM_CLIENTE_SK=DC.NUM_DIM_CLIENTE_SK)\n\tAND (DMP.NUM_DIM_CUENTA_PASIVO_ORGEN_SK=CPD.NUM_DIM_CUENTA_PASIVO_SK)\n\tAND (DMP.NUM_DIM_ESTADO_SK=DIM_ESTADO.NUM_DIM_ESTADO_SK)"
+        ],
+        "atributos": [
+            {
+                "nombre": "STR_CODIGO_TIPO_CUENTA",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_TIPO_PRODUCTO",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_NUMERO_PRODUCTO",
+                "tipo_dato": "12",
+                "tamano": "30",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "DTM_FECHA_TRANSFERENCIA",
+                "tipo_dato": "9",
+                "tamano": "0",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "ID_RECAUDADOR",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_PRODUCTO_ORIGINADOR",
+                "tipo_dato": "12",
+                "tamano": "20",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_DIM_TTP_TIPO_TRANSA_PSV_NK",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_DIM_TER_COD_BANCO_NK",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_ENTIDAD_FINANCIERA",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_VALOR_TRANSACCION",
+                "tipo_dato": "12",
+                "tamano": "22",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_REFERENCIAFC",
+                "tipo_dato": "12",
+                "tamano": "16",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "extracción"
+    },
+    {
+        "nombre": "JOB_EXT3_FLEXCUBE",
+        "descripcion": "Job asociado al proceso Compensacion electronica",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "DS_COMPENSACION_ELECTRONICA_3P.ds:Job encargado de EXTRAER LA TABLA ACVW_ALL_AC_ENTRIES\n\nOrigen:  ACVW_ALL_AC_ENTRIES\nDestino:  DS_ACVW_ALL_AC_ENTRIES.ds\nTipo de Proceso: Job de Extracción. \nRequerimiento:  \n\nAutor                             Fecha de Creación    Versión                     Proveedor                              Observaciones \nSEBASTIAN AMAYA            09/07/2021                1.0   \t       SOPHOS SOLUTIONS",
+        "queries": [
+            "SELECT   \n\n\tACC.ACCOUNT_TYPE STR_CODIGO_TIPO_CUENTA,\n\tCASE WHEN ACC.ACCOUNT_TYPE = \\'U\\' THEN \\'CUENTA CORRIENTE\\' WHEN ACC.ACCOUNT_TYPE = \\'S\\' THEN \\'CUENTA AHORROS\\' END STR_TIPO_PRODUCTO,\n\tDRT.TXN_ACC NUM_NUMERO_PRODUCTO,\n\tDRT.TRN_DT DTM_FECHA_TRANSFERENCIA,\n\tTRIM(SUBSTR(CUS.UNIQUE_ID_VALUE, 1, 50))ID_RECAUDADOR,\n\tSUBSTR(UFL.FIELD_VAL_14, 5) NUM_PRODUCTO_ORIGINADOR,\n\tUFL.PRODUCT_CODE STR_DIM_TTP_TIPO_TRANSA_PSV_NK,\n\tTRIM(SUBSTR(BP.BANK_CODE, 1, 10)) STR_DIM_TER_COD_BANCO_NK,\n\tTRIM(SUBSTR(BP.BANK_NAME, 1, 50)) STR_ENTIDAD_FINANCIERA,\n\t \n\nTO_CHAR (DRT.LCY_AMOUNT   , \\'99G999G999G999G999D99\\')  NUM_VALOR_TRANSACCION,\nDRT.TRN_REF_NO AS  STR_REFERENCIAFC\nFROM\tFCJADM.CSTM_CONTRACT_USERDEF_FIELDS UFL,\n\t\tFCJADM.DETB_RTL_TELLER DRT,\n\t\tFCJADM.STTM_CUST_ACCOUNT ACC,\n\t\tFCJADM.PCTM_BANK_PARAM BP,\n\t\tFCJADM.STTM_CUSTOMER CUS,\n\t\tFCJADM_PR.FC_SAM_AGR_TBL_AGRUPACIONES FC_SAM_AGR_TBL_AGRUPACIONES,\n\t\tFCJADM_PR.FC_SAM_AGR_TBL_DETALLES_AGRUP FC_SAM_AGR_TBL_DETALLES_AGRUP\nWHERE (DRT.TRN_DT = TO_DATE(\\'[&\"VAP_FEC_FIN\"]\\',\\'YYYYMMDD\\'))\n\tAND (ACC.CUST_AC_NO IN (\\'[&\"VAP_ARR_NUM_CTA\"]\\'))\n\tAND (ACC.ACCOUNT_TYPE IN (\\'[&\"VAP_ARR_TIPO_CTA_DESTINO\"]\\'))\n\tAND (BP.BANK_CODE = NVL(TRIM(replace(\\'[&\"VAP_COD_ENTIDAD_ORIG\"]\\',\\'TODOS\\',\\'\\')), BP.BANK_CODE))\n\tAND (LTRIM(SUBSTR(UFL.FIELD_VAL_14, 5),\\'0\\') = NVL(LTRIM(TRIM(\\'[&\"VAP_NUM_CTA_ORIG\"]\\'),\\'0\\'), LTRIM(SUBSTR(UFL.FIELD_VAL_14, 5),\\'0\\')))\n\tAND (FC_SAM_AGR_TBL_AGRUPACIONES.STR_NOMBRE = \\'179_PRODUCTOS_TRANSFERENCIAS_AVAL\\')\n\tAND (UFL.CONTRACT_REF_NO=DRT.TRN_REF_NO)\n\tAND (ACC.CUST_AC_NO=DRT.TXN_ACC)\n\tAND (BP.BANK_CODE = SUBSTR(UFL.FIELD_VAL_14, 1, 4))\n\tAND (CUS.CUSTOMER_NO=ACC.CUST_NO)\n\tAND (FC_SAM_AGR_TBL_AGRUPACIONES.NUM_ID_AGRUPACION=FC_SAM_AGR_TBL_DETALLES_AGRUP.NUM_ID_AGRUPACION)\n\tAND (FC_SAM_AGR_TBL_DETALLES_AGRUP.STR_VALOR=UFL.PRODUCT_CODE)",
+            "SELECT   \n\n\tACC.ACCOUNT_TYPE STR_CODIGO_TIPO_CUENTA,\n\tCASE WHEN ACC.ACCOUNT_TYPE = 'U' THEN 'CUENTA CORRIENTE' WHEN ACC.ACCOUNT_TYPE = 'S' THEN 'CUENTA AHORROS' END STR_TIPO_PRODUCTO,\n\tDRT.TXN_ACC NUM_NUMERO_PRODUCTO,\n\tDRT.TRN_DT DTM_FECHA_TRANSFERENCIA,\n\tTRIM(SUBSTR(CUS.UNIQUE_ID_VALUE, 1, 50))ID_RECAUDADOR,\n\tSUBSTR(UFL.FIELD_VAL_14, 5) NUM_PRODUCTO_ORIGINADOR,\n\tUFL.PRODUCT_CODE STR_DIM_TTP_TIPO_TRANSA_PSV_NK,\n\tTRIM(SUBSTR(BP.BANK_CODE, 1, 10)) STR_DIM_TER_COD_BANCO_NK,\n\tTRIM(SUBSTR(BP.BANK_NAME, 1, 50)) STR_ENTIDAD_FINANCIERA,\n\t \n\nTO_CHAR (DRT.LCY_AMOUNT   , '99G999G999G999G999D99')  NUM_VALOR_TRANSACCION,\nDRT.TRN_REF_NO AS  STR_REFERENCIAFC\nFROM\tFCJADM.CSTM_CONTRACT_USERDEF_FIELDS UFL,\n\t\tFCJADM.DETB_RTL_TELLER DRT,\n\t\tFCJADM.STTM_CUST_ACCOUNT ACC,\n\t\tFCJADM.PCTM_BANK_PARAM BP,\n\t\tFCJADM.STTM_CUSTOMER CUS,\n\t\tFCJADM_PR.FC_SAM_AGR_TBL_AGRUPACIONES FC_SAM_AGR_TBL_AGRUPACIONES,\n\t\tFCJADM_PR.FC_SAM_AGR_TBL_DETALLES_AGRUP FC_SAM_AGR_TBL_DETALLES_AGRUP\nWHERE (DRT.TRN_DT = TO_DATE('#VAP_FEC_FIN#','YYYYMMDD'))\n\tAND (ACC.CUST_AC_NO IN ('#VAP_ARR_NUM_CTA#'))\n\tAND (ACC.ACCOUNT_TYPE IN ('#VAP_ARR_TIPO_CTA_DESTINO#'))\n\tAND (BP.BANK_CODE = NVL(TRIM(replace('#VAP_COD_ENTIDAD_ORIG#','TODOS','')), BP.BANK_CODE))\n\tAND (LTRIM(SUBSTR(UFL.FIELD_VAL_14, 5),'0') = NVL(LTRIM(TRIM('#VAP_NUM_CTA_ORIG#'),'0'), LTRIM(SUBSTR(UFL.FIELD_VAL_14, 5),'0')))\n\tAND (FC_SAM_AGR_TBL_AGRUPACIONES.STR_NOMBRE = '179_PRODUCTOS_TRANSFERENCIAS_AVAL')\n\tAND (UFL.CONTRACT_REF_NO=DRT.TRN_REF_NO)\n\tAND (ACC.CUST_AC_NO=DRT.TXN_ACC)\n\tAND (BP.BANK_CODE = SUBSTR(UFL.FIELD_VAL_14, 1, 4))\n\tAND (CUS.CUSTOMER_NO=ACC.CUST_NO)\n\tAND (FC_SAM_AGR_TBL_AGRUPACIONES.NUM_ID_AGRUPACION=FC_SAM_AGR_TBL_DETALLES_AGRUP.NUM_ID_AGRUPACION)\n\tAND (FC_SAM_AGR_TBL_DETALLES_AGRUP.STR_VALOR=UFL.PRODUCT_CODE)"
+        ],
+        "atributos": [
+            {
+                "nombre": "STR_CODIGO_TIPO_CUENTA",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_TIPO_PRODUCTO",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_NUMERO_PRODUCTO",
+                "tipo_dato": "12",
+                "tamano": "30",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "DTM_FECHA_TRANSFERENCIA",
+                "tipo_dato": "9",
+                "tamano": "0",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "ID_RECAUDADOR",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_PRODUCTO_ORIGINADOR",
+                "tipo_dato": "12",
+                "tamano": "20",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_DIM_TTP_TIPO_TRANSA_PSV_NK",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_DIM_TER_COD_BANCO_NK",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_ENTIDAD_FINANCIERA",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_VALOR_TRANSACCION",
+                "tipo_dato": "12",
+                "tamano": "22",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_REFERENCIAFC",
+                "tipo_dato": "12",
+                "tamano": "16",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "extracción"
+    },
+    {
+        "nombre": "JOB_EXT3_FLEXCUBE_190703_DEV",
+        "descripcion": "Job asociado al proceso Compensacion electronica",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "DS_COMPENSACION_ELECTRONICA_3P.ds:Job encargado de EXTRAER LA TABLA ACVW_ALL_AC_ENTRIES\n\nOrigen:  ACVW_ALL_AC_ENTRIES\nDestino:  DS_ACVW_ALL_AC_ENTRIES.ds\nTipo de Proceso: Job de Extracción. \nRequerimiento:  \n\nAutor                             Fecha de Creación    Versión                     Proveedor                              Observaciones \nSEBASTIAN AMAYA            09/07/2021                1.0   \t       SOPHOS SOLUTIONS",
+        "queries": [
+            "SELECT   \n\tACC.ACCOUNT_TYPE STR_CODIGO_TIPO_CUENTA,\n\tCASE WHEN ACC.ACCOUNT_TYPE = \\'U\\' THEN \\'CUENTA CORRIENTE\\' WHEN ACC.ACCOUNT_TYPE = \\'S\\' THEN \\'CUENTA AHORROS\\' END STR_TIPO_PRODUCTO,\n\tDRT.DR_AC_NO NUM_NUMERO_PRODUCTO,\n\tDRT.TXN_VALUE_DATE DTM_FECHA_TRANSFERENCIA,\n\tTRIM(SUBSTR(CUS.UNIQUE_ID_VALUE, 1, 50))ID_RECAUDADOR,\n\tSUBSTR(UFL.FIELD_VAL_14, 5) NUM_PRODUCTO_ORIGINADOR,\n\tUFL.PRODUCT_CODE STR_DIM_TTP_TIPO_TRANSA_PSV_NK,\n\tTRIM(SUBSTR(BP.BANK_CODE, 1, 10)) STR_DIM_TER_COD_BANCO_NK,\n\tTRIM(SUBSTR(BP.BANK_NAME, 1, 50)) STR_ENTIDAD_FINANCIERA,\n \n\nTO_CHAR (DRT.LCY_EQUIVALENT   , \\'99G999G999G999G999D99\\')  NUM_VALOR_TRANSACCION,\nDRT.TXN_REF_NO AS  STR_REFERENCIAFC\nFROM\tFCJADM.CSTM_CONTRACT_USERDEF_FIELDS UFL,  -- PENDIENE POR REAPUNTAMIENTO A TABLA DE MIGRACIÓN\n\t\tFCJADM.PBZB_BRANCH_OUT_TXN DRT,\n\t\tFCJADM.STTM_CUST_ACCOUNT ACC,\n\t\tFCJADM.PCTM_BANK_PARAM BP,\n\t\tFCJADM.STTM_CUSTOMER CUS,\n\t\tFCJADM_PR.FC_SAM_AGR_TBL_AGRUPACIONES FC_SAM_AGR_TBL_AGRUPACIONES,\n\t\tFCJADM_PR.FC_SAM_AGR_TBL_DETALLES_AGRUP FC_SAM_AGR_TBL_DETALLES_AGRUP\nWHERE (DRT.TXN_VALUE_DATE = TO_DATE(\\'[&\"VAP_FEC_FIN\"]\\',\\'YYYYMMDD\\'))\n\tAND (ACC.CUST_AC_NO IN (\\'[&\"VAP_ARR_NUM_CTA\"]\\'))\n\tAND (ACC.ACCOUNT_TYPE IN (\\'[&\"VAP_ARR_TIPO_CTA_DESTINO\"]\\'))\n\tAND (BP.BANK_CODE = NVL(TRIM(replace(\\'[&\"VAP_COD_ENTIDAD_ORIG\"]\\',\\'TODOS\\',\\'\\')), BP.BANK_CODE))\n\tAND (LTRIM(SUBSTR(UFL.FIELD_VAL_14, 5),\\'0\\') = NVL(LTRIM(TRIM(\\'[&\"VAP_NUM_CTA_ORIG\"]\\'),\\'0\\'), LTRIM(SUBSTR(UFL.FIELD_VAL_14, 5),\\'0\\')))\n\tAND (FC_SAM_AGR_TBL_AGRUPACIONES.STR_NOMBRE = \\'179_PRODUCTOS_TRANSFERENCIAS_AVAL\\')\n\tAND (UFL.CONTRACT_REF_NO=DRT.TXN_REF_NO)\n\tAND (ACC.CUST_AC_NO=DRT.DR_AC_NO)\n\tAND (BP.BANK_CODE = SUBSTR(UFL.FIELD_VAL_14, 1, 4))\n\tAND (CUS.CUSTOMER_NO=ACC.CUST_NO)\n\tAND (FC_SAM_AGR_TBL_AGRUPACIONES.NUM_ID_AGRUPACION=FC_SAM_AGR_TBL_DETALLES_AGRUP.NUM_ID_AGRUPACION)\n\tAND (FC_SAM_AGR_TBL_DETALLES_AGRUP.STR_VALOR=UFL.PRODUCT_CODE)",
+            "SELECT   \n\tACC.ACCOUNT_TYPE STR_CODIGO_TIPO_CUENTA,\n\tCASE WHEN ACC.ACCOUNT_TYPE = 'U' THEN 'CUENTA CORRIENTE' WHEN ACC.ACCOUNT_TYPE = 'S' THEN 'CUENTA AHORROS' END STR_TIPO_PRODUCTO,\n\tDRT.DR_AC_NO NUM_NUMERO_PRODUCTO,\n\tDRT.TXN_VALUE_DATE DTM_FECHA_TRANSFERENCIA,\n\tTRIM(SUBSTR(CUS.UNIQUE_ID_VALUE, 1, 50))ID_RECAUDADOR,\n\tSUBSTR(UFL.FIELD_VAL_14, 5) NUM_PRODUCTO_ORIGINADOR,\n\tUFL.PRODUCT_CODE STR_DIM_TTP_TIPO_TRANSA_PSV_NK,\n\tTRIM(SUBSTR(BP.BANK_CODE, 1, 10)) STR_DIM_TER_COD_BANCO_NK,\n\tTRIM(SUBSTR(BP.BANK_NAME, 1, 50)) STR_ENTIDAD_FINANCIERA,\n \n\nTO_CHAR (DRT.LCY_EQUIVALENT   , '99G999G999G999G999D99')  NUM_VALOR_TRANSACCION,\nDRT.TXN_REF_NO AS  STR_REFERENCIAFC\nFROM\tFCJADM.CSTM_CONTRACT_USERDEF_FIELDS UFL,  -- PENDIENE POR REAPUNTAMIENTO A TABLA DE MIGRACIÓN\n\t\tFCJADM.PBZB_BRANCH_OUT_TXN DRT,\n\t\tFCJADM.STTM_CUST_ACCOUNT ACC,\n\t\tFCJADM.PCTM_BANK_PARAM BP,\n\t\tFCJADM.STTM_CUSTOMER CUS,\n\t\tFCJADM_PR.FC_SAM_AGR_TBL_AGRUPACIONES FC_SAM_AGR_TBL_AGRUPACIONES,\n\t\tFCJADM_PR.FC_SAM_AGR_TBL_DETALLES_AGRUP FC_SAM_AGR_TBL_DETALLES_AGRUP\nWHERE (DRT.TXN_VALUE_DATE = TO_DATE('#VAP_FEC_FIN#','YYYYMMDD'))\n\tAND (ACC.CUST_AC_NO IN ('#VAP_ARR_NUM_CTA#'))\n\tAND (ACC.ACCOUNT_TYPE IN ('#VAP_ARR_TIPO_CTA_DESTINO#'))\n\tAND (BP.BANK_CODE = NVL(TRIM(replace('#VAP_COD_ENTIDAD_ORIG#','TODOS','')), BP.BANK_CODE))\n\tAND (LTRIM(SUBSTR(UFL.FIELD_VAL_14, 5),'0') = NVL(LTRIM(TRIM('#VAP_NUM_CTA_ORIG#'),'0'), LTRIM(SUBSTR(UFL.FIELD_VAL_14, 5),'0')))\n\tAND (FC_SAM_AGR_TBL_AGRUPACIONES.STR_NOMBRE = '179_PRODUCTOS_TRANSFERENCIAS_AVAL')\n\tAND (UFL.CONTRACT_REF_NO=DRT.TXN_REF_NO)\n\tAND (ACC.CUST_AC_NO=DRT.DR_AC_NO)\n\tAND (BP.BANK_CODE = SUBSTR(UFL.FIELD_VAL_14, 1, 4))\n\tAND (CUS.CUSTOMER_NO=ACC.CUST_NO)\n\tAND (FC_SAM_AGR_TBL_AGRUPACIONES.NUM_ID_AGRUPACION=FC_SAM_AGR_TBL_DETALLES_AGRUP.NUM_ID_AGRUPACION)\n\tAND (FC_SAM_AGR_TBL_DETALLES_AGRUP.STR_VALOR=UFL.PRODUCT_CODE)"
+        ],
+        "atributos": [
+            {
+                "nombre": "STR_CODIGO_TIPO_CUENTA",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_TIPO_PRODUCTO",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_NUMERO_PRODUCTO",
+                "tipo_dato": "12",
+                "tamano": "30",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "DTM_FECHA_TRANSFERENCIA",
+                "tipo_dato": "9",
+                "tamano": "0",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "ID_RECAUDADOR",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_PRODUCTO_ORIGINADOR",
+                "tipo_dato": "12",
+                "tamano": "20",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_DIM_TTP_TIPO_TRANSA_PSV_NK",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_DIM_TER_COD_BANCO_NK",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_ENTIDAD_FINANCIERA",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_VALOR_TRANSACCION",
+                "tipo_dato": "12",
+                "tamano": "22",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_REFERENCIAFC",
+                "tipo_dato": "12",
+                "tamano": "16",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "extracción"
+    },
+    {
+        "nombre": "JOB_EXT3_FLEXCUBE2",
+        "descripcion": "Job asociado al proceso Compensacion electronica",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "DS_COMPENSACION_ELECTRONICA_3P.ds:Job encargado de EXTRAER LA TABLA ACVW_ALL_AC_ENTRIES\n\nOrigen:  ACVW_ALL_AC_ENTRIES\nDestino:  DS_ACVW_ALL_AC_ENTRIES.ds\nTipo de Proceso: Job de Extracción. \nRequerimiento:  \n\nAutor                             Fecha de Creación    Versión                     Proveedor                              Observaciones \nSEBASTIAN AMAYA            09/07/2021                1.0   \t       SOPHOS SOLUTIONS",
+        "queries": [
+            "SELECT\n\tACD.ACCOUNT_TYPE AS STR_CODIGO_TIPO_CUENTA,\n\tCASE WHEN ACD.ACCOUNT_TYPE = 'U' THEN 'CUENTA CORRIENTE' WHEN ACD.ACCOUNT_TYPE = 'S' THEN 'CUENTA AHORROS' END AS STR_TIPO_PRODUCTO,\n\tDRT.OFS_ACC NUM_NUMERO_PRODUCTO,\n\tDRT.TRN_DT DTM_FECHA_TRANSFERENCIA,\n\tTRIM(SUBSTR(CUS.UNIQUE_ID_VALUE, 1, 50)) ID_RECAUDADOR,\n\tDRT.TXN_ACC NUM_PRODUCTO_ORIGINADOR,\n\tDRT.PRODUCT_CODE STR_DIM_TTP_TIPO_TRANSA_PSV_NK,\n\t'0023' STR_DIM_TER_COD_BANCO_NK,\n\t'BANCO DE OCCIDENTE' STR_ENTIDAD_FINANCIERA,\n\t \nTO_CHAR (  DRT.LCY_AMOUNT    , '99G999G999G999G999D99')  NUM_VALOR_TRANSACCION,\n      DRT.TRN_REF_NO AS  STR_REFERENCIAFC   \nFROM\tFCJADM.DETB_RTL_TELLER DRT,\n\t\tFCJADM.STTM_CUST_ACCOUNT ACO,\n\t\tFCJADM.STTM_CUST_ACCOUNT ACD,\n\t\tFCJADM.STTM_CUSTOMER CUS,\n\t\tFCJADM.ACTB_DAILY_LOG DLG,\n\t\tFCJADM_PR.FC_SAM_AGR_TBL_AGRUPACIONES FC_SAM_AGR_TBL_AGRUPACIONES,\n\t\tFCJADM_PR.FC_SAM_AGR_TBL_DETALLES_AGRUP FC_SAM_AGR_TBL_DETALLES_AGRUP\nWHERE\t(DLG.ENTRY_SEQ_NO = 1)\n\tAND (ACD.CUST_AC_NO IN ('#VAP_ARR_NUM_CTA#')) \n\tAND (ACD.ACCOUNT_TYPE IN ('#VAP_ARR_TIPO_CTA_DESTINO#')) \n\tAND (DRT.TRN_DT = TO_DATE('#VAP_FEC_FIN#','YYYYMMDD')) \n\tAND (LTRIM(DRT.TXN_ACC,'0') = NVL(LTRIM(TRIM('#VAP_NUM_CTA_ORIG#'),'0'), LTRIM(DRT.TXN_ACC,'0')))\n\tAND (FC_SAM_AGR_TBL_AGRUPACIONES.STR_NOMBRE = '179_PRODUCTOS_TRANSFERENCIAS_AVAL')\n\tAND (DRT.TXN_ACC=ACO.CUST_AC_NO)\n\tAND (FC_SAM_AGR_TBL_AGRUPACIONES.NUM_ID_AGRUPACION=FC_SAM_AGR_TBL_DETALLES_AGRUP.NUM_ID_AGRUPACION)\n\tAND (FC_SAM_AGR_TBL_DETALLES_AGRUP.STR_VALOR=DRT.PRODUCT_CODE)\n\tAND (DRT.OFS_ACC=ACD.CUST_AC_NO)\n\tAND (ACD.CUST_NO=CUS.CUSTOMER_NO)\n\tAND (DRT.TRN_REF_NO=DLG.TRN_REF_NO)"
+        ],
+        "atributos": [
+            {
+                "nombre": "STR_CODIGO_TIPO_CUENTA",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_TIPO_PRODUCTO",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_NUMERO_PRODUCTO",
+                "tipo_dato": "12",
+                "tamano": "30",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "DTM_FECHA_TRANSFERENCIA",
+                "tipo_dato": "9",
+                "tamano": "0",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "ID_RECAUDADOR",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_PRODUCTO_ORIGINADOR",
+                "tipo_dato": "12",
+                "tamano": "20",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_DIM_TTP_TIPO_TRANSA_PSV_NK",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_DIM_TER_COD_BANCO_NK",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_ENTIDAD_FINANCIERA",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_VALOR_TRANSACCION",
+                "tipo_dato": "12",
+                "tamano": "22",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_REFERENCIAFC",
+                "tipo_dato": "12",
+                "tamano": "16",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "extracción"
+    },
+    {
+        "nombre": "JOB_EXT3_FLEXCUBE2_190703_DEV",
+        "descripcion": "Job asociado al proceso Compensacion electronica",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "DS_COMPENSACION_ELECTRONICA_3P.ds:Job encargado de EXTRAER LA TABLA ACVW_ALL_AC_ENTRIES\n\nOrigen:  ACVW_ALL_AC_ENTRIES\nDestino:  DS_ACVW_ALL_AC_ENTRIES.ds\nTipo de Proceso: Job de Extracción. \nRequerimiento:  \n\nAutor                             Fecha de Creación    Versión                     Proveedor                              Observaciones \nSEBASTIAN AMAYA            09/07/2021                1.0   \t       SOPHOS SOLUTIONS",
+        "queries": [
+            "SELECT\n\tACD.ACCOUNT_TYPE AS STR_CODIGO_TIPO_CUENTA,\n\tCASE WHEN ACD.ACCOUNT_TYPE = \\'U\\' THEN \\'CUENTA CORRIENTE\\' WHEN ACD.ACCOUNT_TYPE = \\'S\\' THEN \\'CUENTA AHORROS\\' END AS STR_TIPO_PRODUCTO,\n\tDRT.OFS_ACC NUM_NUMERO_PRODUCTO,\n\tDRT.TRN_DT DTM_FECHA_TRANSFERENCIA,\n\tTRIM(SUBSTR(CUS.UNIQUE_ID_VALUE, 1, 50)) ID_RECAUDADOR,\n\tDRT.TXN_ACC NUM_PRODUCTO_ORIGINADOR,\n\tDRT.PRODUCT_CODE STR_DIM_TTP_TIPO_TRANSA_PSV_NK,\n\t\\'0023\\' STR_DIM_TER_COD_BANCO_NK,\n\t\\'BANCO DE OCCIDENTE\\' STR_ENTIDAD_FINANCIERA,\n\t \nTO_CHAR (  DRT.LCY_AMOUNT    , \\'99G999G999G999G999D99\\')  NUM_VALOR_TRANSACCION,\n      DRT.TRN_REF_NO AS  STR_REFERENCIAFC   \nFROM\tFCJADM.DETB_RTL_TELLER DRT,\n\t\tFCJADM.STTM_CUST_ACCOUNT ACO,\n\t\tFCJADM.STTM_CUST_ACCOUNT ACD,\n\t\tFCJADM.STTM_CUSTOMER CUS,\n\t\tFCJADM.ACTB_DAILY_LOG DLG,\n\t\tFCJADM_PR.FC_SAM_AGR_TBL_AGRUPACIONES FC_SAM_AGR_TBL_AGRUPACIONES,\n\t\tFCJADM_PR.FC_SAM_AGR_TBL_DETALLES_AGRUP FC_SAM_AGR_TBL_DETALLES_AGRUP\nWHERE\t(DLG.ENTRY_SEQ_NO = 1)\n\tAND (ACD.CUST_AC_NO IN (\\'[&\"VAP_ARR_NUM_CTA\"]\\')) \n\tAND (ACD.ACCOUNT_TYPE IN (\\'[&\"VAP_ARR_TIPO_CTA_DESTINO\"]\\')) \n\tAND (DRT.TRN_DT = TO_DATE(\\'[&\"VAP_FEC_FIN\"]\\',\\'YYYYMMDD\\')) \n\tAND (LTRIM(DRT.TXN_ACC,\\'0\\') = NVL(LTRIM(TRIM(\\'[&\"VAP_NUM_CTA_ORIG\"]\\'),\\'0\\'), LTRIM(DRT.TXN_ACC,\\'0\\')))\n\tAND (FC_SAM_AGR_TBL_AGRUPACIONES.STR_NOMBRE = \\'179_PRODUCTOS_TRANSFERENCIAS_AVAL\\')\n\tAND (DRT.TXN_ACC=ACO.CUST_AC_NO)\n\tAND (FC_SAM_AGR_TBL_AGRUPACIONES.NUM_ID_AGRUPACION=FC_SAM_AGR_TBL_DETALLES_AGRUP.NUM_ID_AGRUPACION)\n\tAND (FC_SAM_AGR_TBL_DETALLES_AGRUP.STR_VALOR=DRT.PRODUCT_CODE)\n\tAND (DRT.OFS_ACC=ACD.CUST_AC_NO)\n\tAND (ACD.CUST_NO=CUS.CUSTOMER_NO)\n\tAND (DRT.TRN_REF_NO=DLG.TRN_REF_NO)",
+            "SELECT\n\tACD.ACCOUNT_TYPE AS STR_CODIGO_TIPO_CUENTA,\n\tCASE WHEN ACD.ACCOUNT_TYPE = 'U' THEN 'CUENTA CORRIENTE' WHEN ACD.ACCOUNT_TYPE = 'S' THEN 'CUENTA AHORROS' END AS STR_TIPO_PRODUCTO,\n\tDRT.OFS_ACC NUM_NUMERO_PRODUCTO,\n\tDRT.TRN_DT DTM_FECHA_TRANSFERENCIA,\n\tTRIM(SUBSTR(CUS.UNIQUE_ID_VALUE, 1, 50)) ID_RECAUDADOR,\n\tDRT.TXN_ACC NUM_PRODUCTO_ORIGINADOR,\n\tDRT.PRODUCT_CODE STR_DIM_TTP_TIPO_TRANSA_PSV_NK,\n\t'0023' STR_DIM_TER_COD_BANCO_NK,\n\t'BANCO DE OCCIDENTE' STR_ENTIDAD_FINANCIERA,\n\t \nTO_CHAR (  DRT.LCY_AMOUNT    , '99G999G999G999G999D99')  NUM_VALOR_TRANSACCION,\n      DRT.TRN_REF_NO AS  STR_REFERENCIAFC   \nFROM\tFCJADM.DETB_RTL_TELLER DRT,\n\t\tFCJADM.STTM_CUST_ACCOUNT ACO,\n\t\tFCJADM.STTM_CUST_ACCOUNT ACD,\n\t\tFCJADM.STTM_CUSTOMER CUS,\n\t\tFCJADM.ACTB_DAILY_LOG DLG,\n\t\tFCJADM_PR.FC_SAM_AGR_TBL_AGRUPACIONES FC_SAM_AGR_TBL_AGRUPACIONES,\n\t\tFCJADM_PR.FC_SAM_AGR_TBL_DETALLES_AGRUP FC_SAM_AGR_TBL_DETALLES_AGRUP\nWHERE\t(DLG.ENTRY_SEQ_NO = 1)\n\tAND (ACD.CUST_AC_NO IN ('#VAP_ARR_NUM_CTA#')) \n\tAND (ACD.ACCOUNT_TYPE IN ('#VAP_ARR_TIPO_CTA_DESTINO#')) \n\tAND (DRT.TRN_DT = TO_DATE('#VAP_FEC_FIN#','YYYYMMDD')) \n\tAND (LTRIM(DRT.TXN_ACC,'0') = NVL(LTRIM(TRIM('#VAP_NUM_CTA_ORIG#'),'0'), LTRIM(DRT.TXN_ACC,'0')))\n\tAND (FC_SAM_AGR_TBL_AGRUPACIONES.STR_NOMBRE = '179_PRODUCTOS_TRANSFERENCIAS_AVAL')\n\tAND (DRT.TXN_ACC=ACO.CUST_AC_NO)\n\tAND (FC_SAM_AGR_TBL_AGRUPACIONES.NUM_ID_AGRUPACION=FC_SAM_AGR_TBL_DETALLES_AGRUP.NUM_ID_AGRUPACION)\n\tAND (FC_SAM_AGR_TBL_DETALLES_AGRUP.STR_VALOR=DRT.PRODUCT_CODE)\n\tAND (DRT.OFS_ACC=ACD.CUST_AC_NO)\n\tAND (ACD.CUST_NO=CUS.CUSTOMER_NO)\n\tAND (DRT.TRN_REF_NO=DLG.TRN_REF_NO)"
+        ],
+        "atributos": [
+            {
+                "nombre": "STR_CODIGO_TIPO_CUENTA",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_TIPO_PRODUCTO",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_NUMERO_PRODUCTO",
+                "tipo_dato": "12",
+                "tamano": "30",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "DTM_FECHA_TRANSFERENCIA",
+                "tipo_dato": "9",
+                "tamano": "0",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "ID_RECAUDADOR",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_PRODUCTO_ORIGINADOR",
+                "tipo_dato": "12",
+                "tamano": "20",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_DIM_TTP_TIPO_TRANSA_PSV_NK",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_DIM_TER_COD_BANCO_NK",
+                "tipo_dato": "12",
+                "tamano": "10",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_ENTIDAD_FINANCIERA",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_VALOR_TRANSACCION",
+                "tipo_dato": "12",
+                "tamano": "22",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_REFERENCIAFC",
+                "tipo_dato": "12",
+                "tamano": "16",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "extracción"
+    },
+    {
+        "nombre": "JOB_EXT3_GWTB_MSG_IN_LOG",
+        "descripcion": "Job asociado al proceso Archivo_ATH",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "JOB_EXT_ARCHIVO_ATH: Extraer información del archivo enviado por ATH BTXAVAL_BOCC_Conciliacion_AAAAMMDD_HHMM.txt y guardarlo en el DS_Ext_Archivo_ATH\n\nOrigen:   BTXAVAL_BOCC_Conciliacion_AAAAMMDD_HHMM.txt\nDestino:  DS_Ext_Archivo_ATH\nTipo de Proceso: Job de Extracción. \nRequerimiento: SBBO0303\n\nAutor                             Fecha de Creación    Versión                     Proveedor                              Observaciones \nYeneris Yepez               25-08-2020                1.0   \t                        SOPHOS SOLUTIONS",
+        "queries": [
+            "select\n \nA.FC_TRN_REF_NO as STR_REFERENCIAFC,\nSUBSTR( B.MESSAGE ,  INSTR(B.MESSAGE ,\\'UDFCLIENTEIDENTIFICACION\\') +59,15) AS MENSAJE  \n     \nFROM FCJADM.GWTB_MSG_IN_LOG A\nINNER JOIN FCJADM.gwtb_msg_out_log B ON A.MSG_REF_NO = B.RELATED_msg_ref_no\nINNER JOIN FCJADM.ACVW_ALL_AC_ENTRIES C ON C.TRN_REF_NO  = A.FC_TRN_REF_NO \nwhere     A.OPERATION_CODE NOT LIKE \\'%Reverse%\\'  \n \nAND (   C.TRN_DT    BETWEEN TO_DATE(\\'[&\"VAP_FEC_INI\"]\\',\\'YYYYMMDD\\') AND TO_DATE(\\'[&\"VAP_FEC_FIN\"]\\',\\'YYYYMMDD\\'))\nAND C.AC_NO = \\'[&\"VAP_NUM_CTA\"]\\'",
+            "select\n \nA.FC_TRN_REF_NO as STR_REFERENCIAFC,\nSUBSTR( B.MESSAGE ,  INSTR(B.MESSAGE ,'UDFCLIENTEIDENTIFICACION') +59,15) AS MENSAJE  \n     \nFROM FCJADM.GWTB_MSG_IN_LOG A\nINNER JOIN FCJADM.gwtb_msg_out_log B ON A.MSG_REF_NO = B.RELATED_msg_ref_no\nINNER JOIN FCJADM.ACVW_ALL_AC_ENTRIES C ON C.TRN_REF_NO  = A.FC_TRN_REF_NO \nwhere     A.OPERATION_CODE NOT LIKE '%Reverse%'  \n \nAND (   C.TRN_DT    BETWEEN TO_DATE('#VAP_FEC_INI#','YYYYMMDD') AND TO_DATE('#VAP_FEC_FIN#','YYYYMMDD'))\nAND C.AC_NO = '#VAP_NUM_CTA#'"
+        ],
+        "atributos": [
+            {
+                "nombre": "STR_REFERENCIAFC",
+                "tipo_dato": "12",
+                "tamano": "16",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "MENSAJE",
+                "tipo_dato": "12",
+                "tamano": "200",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "extracción"
+    },
+    {
+        "nombre": "JOB_EXT3_MSG_ODS",
+        "descripcion": "",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "",
+        "queries": [
+            "SELECT\n  STR_NO_REF_FC as  STR_REFERENCIAFC, \n\tSUBSTR(EXTRACTVALUE(XMLTYPE(DMP.CLB_XML_INFORMACION_ADICIONAL), '/PivotSet/item[column[1]=\"UDFCLIENTEIDENTIFICACION\"]/column[2]'),5) as  MENSAJE\n  \nFROM\tADMODS.FCT_DETALLE_MOVIMIENTO_PASIVO DMP, \n\t\tADMODS.DIM_TIPO_TRANSACCION_PASIVO TTP,\n\t\tADMODS.DIM_TIEMPO TFA, \n\t\tADMODS.DIM_MEDIO DM,\n\t\tADMODS.DIM_CUENTA_PASIVO CPD, \n\t\tADMODS.DIM_TERCERO DTB,\n\t\tADMODS.DIM_CLIENTE DC, \n\t\tADMODS.TBL_AGRUPACIONES TBL_AGRUPACIONES,\n\t\tADMODS.TBL_AGRUPACIONES_DETALLE TBL_AGRUPACIONES_DETALLE\nWHERE  (DMP.STR_TRANSACCION_PRINCIPAL = 'S')\n\tAND (DM.STR_DIM_MED_COD_MEDIO_PAGO_NK IN ('ACC','EAC'))\n\tAND (TFA.DTM_DIM_TIE_DIA_NK BETWEEN TO_DATE('#VAP_FEC_INI#','YYYYMMDD') AND TO_DATE('#VAP_FEC_FIN#','YYYYMMDD'))\n\tAND (CPD.STR_DIM_CPA_NUM_CUENTA_NK IN ('#VAP_ARR_NUM_CTA#'))\n\tAND (CPD.STR_CODIGO_TIPO_CUENTA IN ('#VAP_ARR_TIPO_CTA_DESTINO#'))\n\tAND (DTB.STR_DIM_TER_COD_TIPO_IDENT_NK = 'BANCO')\n\n\tAND (DTB.STR_DIM_TER_COD_BANCO_NK = NVL(TRIM(replace('#VAP_COD_ENTIDAD_ORIG#','TODOS','')) , DTB.STR_DIM_TER_COD_BANCO_NK))\n\n\tAND (LTRIM(SUBSTR(EXTRACTVALUE(XMLTYPE(DMP.CLB_XML_INFORMACION_ADICIONAL), '/PivotSet/item[column[1]=\"UDFDEBCTANUM\"]/column[2]'),5),'0') = NVL(LTRIM(TRIM('#VAP_NUM_CTA_ORIG#'),'0'), LTRIM(SUBSTR(EXTRACTVALUE(XMLTYPE(DMP.CLB_XML_INFORMACION_ADICIONAL), '/PivotSet/item[column[1]=\"UDFDEBCTANUM\"]/column[2]'),5),'0'))) \n\tAND (TBL_AGRUPACIONES.STR_NOMBRE = '179_PRODUCTOS_TRANSFERENCIAS_AVAL')\n\tAND (TTP.NUM_DIM_TIPO_TRANSA_PSV_SK=DMP.NUM_DIM_TIPO_TRANSA_PSV_SK)\n\tAND (DM.NUM_DIM_MEDIO_SK=DMP.NUM_DIM_MEDIO_PAGO_SK)\n\tAND (CPD.NUM_DIM_CUENTA_PASIVO_SK=DMP.NUM_DIM_CUENTA_PASIVO_ORGEN_SK)\n\tAND (DMP.NUM_DIM_TIEMPO_FECHA_APLICACIO=TFA.NUM_DIM_TIEMPO_SK)\n\tAND (DTB.STR_DIM_TER_COD_BANCO_NK = SUBSTR(EXTRACTVALUE(XMLTYPE(DMP.CLB_XML_INFORMACION_ADICIONAL),'/PivotSet/item[column[1]=\"UDFDEBCTANUM\"]/column[2]'), 1, 4))\n\tAND (DC.NUM_DIM_CLIENTE_SK=DMP.NUM_DIM_CLIENTE_SK)\n\tAND (TBL_AGRUPACIONES_DETALLE.NUM_ID_AGRUPACION=TBL_AGRUPACIONES.NUM_ID_AGRUPACION)\n\tAND (TBL_AGRUPACIONES_DETALLE.STR_ITEM_AGRUPACION=TTP.STR_DIM_TTP_TIPO_TRANSA_PSV_NK)"
+        ],
+        "atributos": [
+            {
+                "nombre": "STR_REFERENCIAFC",
+                "tipo_dato": "12",
+                "tamano": "16",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "MENSAJE",
+                "tipo_dato": "12",
+                "tamano": "200",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "extracción"
+    },
+    {
+        "nombre": "JOB_EXT3_MSG_ODS2",
+        "descripcion": "",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "",
+        "queries": [
+            "SELECT\n  STR_NO_REF_FC as  STR_REFERENCIAFC, \n\tSUBSTR(EXTRACTVALUE(XMLTYPE(DMP.CLB_XML_INFORMACION_ADICIONAL), '/PivotSet/item[column[1]=\"UDFCLIENTEIDENTIFICACION\"]/column[2]'),5) as  MENSAJE\n  FROM\tADMODS.FCT_DETALLE_MOVIMIENTO_PASIVO DMP,\n\t\tADMODS.DIM_TIPO_TRANSACCION_PASIVO TTP,\n\t\tADMODS.DIM_TIEMPO TFA, \n\t\tADMODS.DIM_CUENTA_PASIVO CPD,\n\t\tADMODS.DIM_CUENTA_PASIVO CPO,\n\t\tADMODS.DIM_ESTADO DIM_ESTADO,\n\t\tADMODS.DIM_CLIENTE DC,\n\t\tADMODS.TBL_AGRUPACIONES_DETALLE TBL_AGRUPACIONES_DETALLE,\n\t\tADMODS.TBL_AGRUPACIONES TBL_AGRUPACIONES\n WHERE (CPO.STR_DIM_CPA_NUM_CUENTA_NK = NVL(TRIM('#VAP_NUM_CTA_ORIG#'),CPO.STR_DIM_CPA_NUM_CUENTA_NK))\n\tAND (CPD.STR_CODIGO_TIPO_CUENTA IN ('#VAP_ARR_TIPO_CTA_DESTINO#'))\n\tAND (DIM_ESTADO.STR_DIM_STA_COD_ESTADO_NK <> 'REVR')\n\tAND (DMP.STR_TRANSACCION_PRINCIPAL = 'S')\n\tAND (CPD.STR_DIM_CPA_NUM_CUENTA_NK IN ('#VAP_ARR_NUM_CTA#'))\n\tAND (TFA.DTM_DIM_TIE_DIA_NK BETWEEN TO_DATE('#VAP_FEC_INI#','YYYYMMDD') AND TO_DATE('#VAP_FEC_FIN#','YYYYMMDD'))\n\tAND (DMP.STR_NATURALEZA_TRANSACCION = 'C')\n\tAND (CPO.NUM_DIM_CUENTA_PASIVO_SK <> -1)\n\tAND (TBL_AGRUPACIONES.STR_NOMBRE = '179_PRODUCTOS_TRANSFERENCIAS_AVAL')\n\tAND (TBL_AGRUPACIONES_DETALLE.STR_ITEM_AGRUPACION=TTP.STR_DIM_TTP_TIPO_TRANSA_PSV_NK) \n\tAND (TBL_AGRUPACIONES_DETALLE.NUM_ID_AGRUPACION=TBL_AGRUPACIONES.NUM_ID_AGRUPACION) \n\tAND (DMP.NUM_DIM_TIPO_TRANSA_PSV_SK=TTP.NUM_DIM_TIPO_TRANSA_PSV_SK)\n\tAND (DMP.NUM_DIM_CUENTA_PASIVO_DSTNO_SK=CPO.NUM_DIM_CUENTA_PASIVO_SK)\n\tAND (DMP.NUM_DIM_TIEMPO_FECHA_APLICACIO=TFA.NUM_DIM_TIEMPO_SK)\n\tAND (DMP.NUM_DIM_CLIENTE_SK=DC.NUM_DIM_CLIENTE_SK)\n\tAND (DMP.NUM_DIM_CUENTA_PASIVO_ORGEN_SK=CPD.NUM_DIM_CUENTA_PASIVO_SK)\n\tAND (DMP.NUM_DIM_ESTADO_SK=DIM_ESTADO.NUM_DIM_ESTADO_SK)"
+        ],
+        "atributos": [
+            {
+                "nombre": "STR_REFERENCIAFC",
+                "tipo_dato": "12",
+                "tamano": "16",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "MENSAJE",
+                "tipo_dato": "12",
+                "tamano": "200",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "extracción"
+    },
+    {
+        "nombre": "JOB_LOD_EXCEL_TRANS_ISCBS",
+        "descripcion": "",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "---------------------------------------------------------------------\n----------------------Job Properties---------------------------\nShort Job Description:\nPor medio de este Job se carga el archivo ds que genera la estructura del archivo plano\n------------------------------------------------\nFull Job Description:\nPor medio de este Job se carga el archivo ds que genera la estructura del archivo plano\n\nOrigen: DS_COMPENSACION_ELECTRONICA_3P.ds\nDestino: file_hhmmss.txt\nTipo de Proceso: Carga\nRequerimiento:compensacion electronica\n\nAutor                                           Fecha de Creación           Versión                     Proveedor                                 Observaciones \n---------------------------------                 -------------------------------        --------------------               --------------------                             -------------------------\nSebastian Amaya                           09/07/2021                   1.0                     Sophos Solutions              <comentarios/observaciones>",
+        "queries": [],
+        "atributos": [
+            {
+                "nombre": "DTM_FECHA_TRANSFERENCIA",
+                "tipo_dato": "12",
+                "tamano": "0",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "ID_RECAUDADOR",
+                "tipo_dato": "12",
+                "tamano": "0",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "PRODUCTO_RECAUDADOR",
+                "tipo_dato": "12",
+                "tamano": "0",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "BANCO",
+                "tipo_dato": "12",
+                "tamano": "0",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_PRODUCTO_ORIGINADOR",
+                "tipo_dato": "12",
+                "tamano": "0",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUMERO_IDENTIFICACION_ORIGINADOR",
+                "tipo_dato": "12",
+                "tamano": "0",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_VALOR_TRANSACCION",
+                "tipo_dato": "12",
+                "tamano": "0",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "cargue"
+    },
+    {
+        "nombre": "JOB_LOD_SF_TRANS_ISCBS",
+        "descripcion": "",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "---------------------------------------------------------------------\n----------------------Job Properties---------------------------\nShort Job Description:\nPor medio de este Job se carga el archivo ds que genera la estructura del archivo plano\n------------------------------------------------\nFull Job Description:\nPor medio de este Job se carga el archivo ds que genera la estructura del archivo plano\n\nOrigen: DS_COMPENSACION_ELECTRONICA_3P.ds\nDestino: file_hhmmss.txt\nTipo de Proceso: Carga\nRequerimiento:compensacion electronica\n\nAutor                                           Fecha de Creación           Versión                     Proveedor                                 Observaciones \n---------------------------------                 -------------------------------        --------------------               --------------------                             -------------------------\nSebastian Amaya                           09/07/2021                   1.0                     Sophos Solutions              <comentarios/observaciones>",
+        "queries": [],
+        "atributos": [
+            {
+                "nombre": "COLUMN",
+                "tipo_dato": "12",
+                "tamano": "0",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "cargue"
+    },
+    {
+        "nombre": "JOB_SW_TRANSFERENCIAS_ICBS",
+        "descripcion": "Job asociado al proceso Archivo_ATH",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\SEQUENCE",
+        "full_description": "JOB_SW_TRANSFERENCIAS_ICBS: Extraer información del ODS y genera el archivo de transferencias ICBS\n\nOrigen:   ODS, FLEXCUBE\nDestino:   archivo de transferencias ICBS\nTipo de Proceso: ETL invocada desde el bus\n\n\nAutor                             Fecha de Creación    Versión                     Proveedor                              Observaciones \nSebastian Amaya               07-12-2021                1.0   \t                        SOPHOS SOLUTIONS",
+        "queries": [
+            "select   \n\nACVW_ALL_AC_ENTRIES.TRN_REF_NO as STR_REFERENCIAFC,\n \nACVW_ALL_AC_ENTRIES.AC_NO ,\n \nSUBSTR(FCJADM_PR.PAQ_FC_UDF.FNC_OBTENERVALORUDF( TRN_REF_NO,  PRODUCT, 'UDFCLIENTEIDENTIFICACION', 'RT', 'S'), -15) as hora\n\nfrom   FCJADM.ACVW_ALL_AC_ENTRIES   ACVW_ALL_AC_ENTRIES \n where\nACVW_ALL_AC_ENTRIES.TRN_DT BETWEEN TO_DATE('#VAP_FEC_INI#','YYYYMMDD') AND TO_DATE('#VAP_FEC_FIN#','YYYYMMDD')",
+            "select\n \nA.EXT_SYSTEM,\n \nA.FC_TRN_REF_NO as STR_REFERENCIAFC,\n \nSUBSTR( B.MESSAGE ,  INSTR(B.MESSAGE ,'UDFCLIENTEIDENTIFICACION') +59,15) AS MENSAJE       \n\nFROM FCJADM.GWTB_MSG_IN_LOG A, FCJADM.gwtb_msg_out_log B\nwhere     A.OPERATION_CODE NOT LIKE '%Reverse%' and \nA.MSG_REF_NO = B.RELATED_msg_ref_no",
+            "select\t\n\t\tTRIM(SUBSTR(CPD.STR_CODIGO_TIPO_CUENTA, 1, 10)) STR_CODIGO_TIPO_CUENTA,\n\tTRIM(SUBSTR(CPD.STR_TIPO_CUENTA\t, 1, 50)) STR_TIPO_PRODUCTO,\n\tTRIM(SUBSTR(CPD.STR_DIM_CPA_NUM_CUENTA_NK, 1, 30)) NUM_NUMERO_PRODUCTO,\n\t\tTFA.DTM_DIM_TIE_DIA_NK  DTM_FECHA_TRANSFERENCIA,\n\t\tSUBSTR(EXTRACTVALUE(XMLTYPE(DMP.CLB_XML_INFORMACION_ADICIONAL), '/PivotSet/item[column[1]=\"UDFDEBCTANUM\"]/column[2]'),5) as  NUM_PRODUCTO_ORIGINADOR,\nDMP.NUM_VALOR_TRANSACCION NUM_VALOR_TRANSACCION,\nDC.STR_DIM_CLI_TIPO_CLIENTE_NK AS STR_DIM_CLI_TIPO_CLIENTE_NK, \nTTP.STR_DIM_TTP_TIPO_TRANSA_PSV_NK\t   STR_DIM_TTP_TIPO_TRANSA_PS,\nDC.STR_DIM_CLI_NUM_CLIENTE_NK\t   STR_DIM_CLI_NUM_CLIENTE_NK,\nDC.STR_DIGITO_VERIFICACION\t   STR_DIGITO_VERIFICACION,\n STR_NO_REF_FC,\n  TRIM(SUBSTR(DTB.STR_BANCO, 1, 50))\t  STR_ENTIDAD_FINANCIERA\n\t\n\t\n\n\nfrom\tADMODS.FCT_DETALLE_MOVIMIENTO_PASIVO   DMP, ADMODS.DIM_TIPO_TRANSACCION_PASIVO   TTP, ADMODS.DIM_TIEMPO   TFA, ADMODS.DIM_MEDIO   DM, ADMODS.DIM_CUENTA_PASIVO   CPD, ADMODS.DIM_TERCERO   DTB, ADMODS.DIM_CLIENTE   DC, ADMODS.TBL_AGRUPACIONES   TBL_AGRUPACIONES, ADMODS.TBL_AGRUPACIONES_DETALLE   TBL_AGRUPACIONES_DETALLE\nwhere\t(1=1)\nAnd (DMP.STR_TRANSACCION_PRINCIPAL = 'S')\n And (DM.STR_DIM_MED_COD_MEDIO_PAGO_NK IN ('ACC','EAC'))\n-- And (TFA.DTM_DIM_TIE_DIA_NK BETWEEN TO_DATE(#VAP_FEC_INI#,'YYYYMMDD') AND TO_DATE(#VAP_FEC_INI#,'YYYYMMDD'))\n --And (CPD.STR_DIM_CPA_NUM_CUENTA_NK IN (#VAP_ARR_NUM_CTA#))\n-- And (CPD.STR_CODIGO_TIPO_CUENTA IN (#VAP_ARR_TIPO_CTA_DESTINO#))\n And (DTB.STR_DIM_TER_COD_TIPO_IDENT_NK = 'BANCO')\n --And (DTB.STR_DIM_TER_COD_BANCO_NK = NVL(TRIM(#VAP_COD_ENTIDAD_ORIG#), DTB.STR_DIM_TER_COD_BANCO_NK))\n-- And (LTRIM(SUBSTR(EXTRACTVALUE(XMLTYPE(DMP.CLB_XML_INFORMACION_ADICIONAL), '/PivotSet/item[column[1]=\"UDFDEBCTANUM\"]/column[2]'),5),'0') = NVL(LTRIM(TRIM(#VAP_NUM_CTA_ORIG#),'0'), LTRIM(SUBSTR(EXTRACTVALUE(XMLTYPE(DMP.CLB_XML_INFORMACION_ADICIONAL), '/PivotSet/item[column[1]=\"UDFDEBCTANUM\"]/column[2]'),5),'0')))\n And (TBL_AGRUPACIONES.STR_NOMBRE = '179_PRODUCTOS_TRANSFERENCIAS_AVAL')\n And (TTP.NUM_DIM_TIPO_TRANSA_PSV_SK=DMP.NUM_DIM_TIPO_TRANSA_PSV_SK)\nAND (DM.NUM_DIM_MEDIO_SK=DMP.NUM_DIM_MEDIO_PAGO_SK)\nAND (CPD.NUM_DIM_CUENTA_PASIVO_SK=DMP.NUM_DIM_CUENTA_PASIVO_ORGEN_SK)\nAND (DMP.NUM_DIM_TIEMPO_FECHA_APLICACIO=TFA.NUM_DIM_TIEMPO_SK)\nAND (DTB.STR_DIM_TER_COD_BANCO_NK = SUBSTR(EXTRACTVALUE(XMLTYPE(DMP.CLB_XML_INFORMACION_ADICIONAL),'/PivotSet/item[column[1]=\"UDFDEBCTANUM\"]/column[2]'), 1, 4))\nAND (DC.NUM_DIM_CLIENTE_SK=DMP.NUM_DIM_CLIENTE_SK)\nAND (TBL_AGRUPACIONES_DETALLE.NUM_ID_AGRUPACION=TBL_AGRUPACIONES.NUM_ID_AGRUPACION)\nAND (TBL_AGRUPACIONES_DETALLE.STR_ITEM_AGRUPACION=TTP.STR_DIM_TTP_TIPO_TRANSA_PSV_NK)",
+            "select\nTRIM(SUBSTR(CPD.STR_CODIGO_TIPO_CUENTA, 1, 10))       STR_CODIGO_TIPO_CUENTA,   \n  TRIM(SUBSTR(CPD.STR_TIPO_CUENTA, 1, 50))       STR_TIPO_PRODUCTO, \n    TRIM(SUBSTR(CPD.STR_DIM_CPA_NUM_CUENTA_NK, 1, 30))       NUM_NUMERO_PRODUCTO,  \n   TFA.DTM_DIM_TIE_DIA_NK       DTM_FECHA_TRANSFERENCIA\n,     CPO.STR_DIM_CPA_NUM_CUENTA_NK       NUM_PRODUCTO_ORIGINADOR\n,     DMP.NUM_VALOR_TRANSACCION       NUM_VALOR_TRANSACCION\n,     DC.STR_DIM_CLI_TIPO_CLIENTE_NK       STR_DIM_CLI_TIPO_CLIENTE_NK,\n     TTP.STR_DIM_TTP_TIPO_TRANSA_PSV_NK       STR_DIM_TTP_TIPO_TRANSA_PS,  \n   DC.STR_DIM_CLI_NUM_CLIENTE_NK       STR_DIM_CLI_NUM_CLIENTE_NK,   \n  DC.STR_DIGITO_VERIFICACION       STR_DIGITO_VERIFICACION,\n STR_NO_REF_FC,\n'BANCO DE OCCIDENTE' STR_ENTIDAD_FINANCIERA\nfrom    ADMODS.FCT_DETALLE_MOVIMIENTO_PASIVO   DMP, \nADMODS.DIM_TIPO_TRANSACCION_PASIVO   TTP, \n ADMODS.DIM_TIEMPO   TFA, \n ADMODS.DIM_CUENTA_PASIVO   CPD, \n ADMODS.DIM_CUENTA_PASIVO   CPO, \n ADMODS.DIM_ESTADO   DIM_ESTADO, \n ADMODS.DIM_CLIENTE   DC \n where    (1=1)\n --And (TTP.STR_DIM_TTP_TIPO_TRANSA_PSV_NK IN (#VAP_ITEMS_AGRUPA_TRANSFERENCIAS#))  \n --And (CPO.STR_DIM_CPA_NUM_CUENTA_NK = NVL(TRIM(#VAP_NUM_CTA_ORIG#), CPO.STR_DIM_CPA_NUM_CUENTA_NK)) \n --And (CPD.STR_CODIGO_TIPO_CUENTA IN (#VAP_ARR_TIPO_CTA_DESTINO#))  \n \n And (DIM_ESTADO.STR_DIM_STA_COD_ESTADO_NK <> 'REVR')  \n And (DMP.STR_TRANSACCION_PRINCIPAL = 'S')  \n --And (CPD.STR_DIM_CPA_NUM_CUENTA_NK IN (#VAP_ARR_NUM_CTA#))  \n --And (TFA.DTM_DIM_TIE_DIA_NK BETWEEN TO_DATE(#VAP_FEC_INI#,'YYYYMMDD') AND TO_DATE(#VAP_FEC_FIN#,'YYYYMMDD')) \n And (DMP.STR_NATURALEZA_TRANSACCION = 'C')  And (CPO.NUM_DIM_CUENTA_PASIVO_SK <> -1)  \n And (DMP.NUM_DIM_TIPO_TRANSA_PSV_SK=TTP.NUM_DIM_TIPO_TRANSA_PSV_SK)\n AND (DMP.NUM_DIM_CUENTA_PASIVO_DSTNO_SK=CPO.NUM_DIM_CUENTA_PASIVO_SK) AND (DMP.NUM_DIM_TIEMPO_FECHA_APLICACIO=TFA.NUM_DIM_TIEMPO_SK) \n AND (DMP.NUM_DIM_CLIENTE_SK=DC.NUM_DIM_CLIENTE_SK) \n AND (DMP.NUM_DIM_CUENTA_PASIVO_ORGEN_SK=CPD.NUM_DIM_CUENTA_PASIVO_SK) AND (DMP.NUM_DIM_ESTADO_SK=DIM_ESTADO.NUM_DIM_ESTADO_SK)"
+        ],
+        "atributos": [
+            {
+                "nombre": "EXT_SYSTEM",
+                "tipo_dato": "12",
+                "tamano": "16",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_REFERENCIAFC",
+                "tipo_dato": "12",
+                "tamano": "16",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "hora",
+                "tipo_dato": "12",
+                "tamano": "15",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "MENSAJE",
+                "tipo_dato": "12",
+                "tamano": "200",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "OTRO"
+    },
+    {
+        "nombre": "JOB_TRF_ADMODS",
+        "descripcion": "Job asociado al proceso Archivo_ATH",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "JOB_EXT_ARCHIVO_ATH: Extraer información del archivo enviado por ATH BTXAVAL_BOCC_Conciliacion_AAAAMMDD_HHMM.txt y guardarlo en el DS_Ext_Archivo_ATH\n\nOrigen:   BTXAVAL_BOCC_Conciliacion_AAAAMMDD_HHMM.txt\nDestino:  DS_Ext_Archivo_ATH\nTipo de Proceso: Job de Extracción. \nRequerimiento: SBBO0303\n\nAutor                             Fecha de Creación    Versión                     Proveedor                              Observaciones \nYeneris Yepez               25-08-2020                1.0   \t                        SOPHOS SOLUTIONS",
+        "queries": [],
+        "atributos": [
+            {
+                "nombre": "DTM_FECHA_TRANSFERENCIA",
+                "tipo_dato": "12",
+                "tamano": "0",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "ID_RECAUDADOR",
+                "tipo_dato": "12",
+                "tamano": "100",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "PRODUCTO_RECAUDADOR",
+                "tipo_dato": "12",
+                "tamano": "18",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "BANCO",
+                "tipo_dato": "12",
+                "tamano": "50",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_PRODUCTO_ORIGINADOR",
+                "tipo_dato": "12",
+                "tamano": "18",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUMERO_IDENTIFICACION_ORIGINADOR",
+                "tipo_dato": "12",
+                "tamano": "16",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "NUM_VALOR_TRANSACCION",
+                "tipo_dato": "12",
+                "tamano": "22",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "ORDEN",
+                "tipo_dato": "3",
+                "tamano": "2",
+                "obligatorio": "NO",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "transformación"
+    },
+    {
+        "nombre": "JOB_TRF_ADMODS2",
+        "descripcion": "Job asociado al proceso Archivo_ATH",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "JOB_EXT_ARCHIVO_ATH: Extraer información del archivo enviado por ATH BTXAVAL_BOCC_Conciliacion_AAAAMMDD_HHMM.txt y guardarlo en el DS_Ext_Archivo_ATH\n\nOrigen:   BTXAVAL_BOCC_Conciliacion_AAAAMMDD_HHMM.txt\nDestino:  DS_Ext_Archivo_ATH\nTipo de Proceso: Job de Extracción. \nRequerimiento: SBBO0303\n\nAutor                             Fecha de Creación    Versión                     Proveedor                              Observaciones \nYeneris Yepez               25-08-2020                1.0   \t                        SOPHOS SOLUTIONS",
+        "queries": [],
+        "atributos": [
+            {
+                "nombre": "EXT_SYSTEM",
+                "tipo_dato": "12",
+                "tamano": "16",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "STR_REFERENCIAFC",
+                "tipo_dato": "12",
+                "tamano": "16",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "hora",
+                "tipo_dato": "12",
+                "tamano": "15",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            },
+            {
+                "nombre": "MENSAJE",
+                "tipo_dato": "12",
+                "tamano": "200",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "transformación"
+    },
+    {
+        "nombre": "JOB_VARIABLES_TBL_CTL_CARGUE_ICBS",
+        "descripcion": "Job que se encarga del cargue de las variables de la tabla de control cargue.",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\JOBS",
+        "full_description": "Job: JOB_VARIABLES_TBL_CTL_CARGUE_RBAR\n\nDescripción: job que se encarga del cargue de las variables de la tabla de control cargue.\n\nAutor:  Francisco Peñuela (Sophos Solutions)\nFecha Creación: 02/03/2022\nFecha Última Modificación: 02/03/2022\nVersión: 1.0",
+        "queries": [
+            "SELECT \n  FTP.STR_NOMBRE_DESTINO,\n  FTP.STR_TIPO_CARGUE,\n  FTP.STR_NOMBRE_ARCHIVO,\n  FTP.STR_NOMBRE_ARCHIVO_FULL,\n  FTP.STR_NOMBRE_ARCHIVO_DELTA,\n  FTP.STR_DIRECCION_IP,\n  FTP.STR_NOMBRE_USUARIO,\n  FTP.STR_PALABRA_CLAVE,\n  FTP.STR_RUTA_FTP,\n  FTP.STR_RUTA_ETL,\n  FTP.NUM_REGLA_FECHA,\n  FTP.STR_DESCRIPCION,\n  FTP.STR_CIFRADO,\n  FTP.STR_TIPO_PLANO,\n  FTP.STR_COMPRIMIR,\n  FTP.STR_AUDITAR,\n  FTP.STR_NOMBRE_DINAMICO,\n  FTP.STR_REQUIERE_EXTENSION,\n  FTP.STR_NOTIFICACION,\n  FTP.STR_ENDPOINT_PTO,\n  FTP.STR_ESQUEMA,\n  FTP.STR_NOMBRE_COLUMNA,\n  FTP.STR_BORRA_STAGE,\n  FTP.STR_FTP_SO\nFROM ADMSTAGE.STG_TBL_CONTROLFTP FTP\nWHERE 1=1\nAND FTP.STR_NOMBRE_DESTINO ='#VAG_CTL_NOMBRE_DESTINO#'\nAND STR_NOMBRE_PROYECTO = 'PRY_PLANOS_SALIDA'"
+        ],
+        "atributos": [
+            {
+                "nombre": "Valor",
+                "tipo_dato": "12",
+                "tamano": "0",
+                "obligatorio": "SÍ",
+                "clave": "NO",
+                "descripcion": ""
+            }
+        ],
+        "tipo_proceso": "OTRO"
+    },
+    {
+        "nombre": "SEQ_LOD_EXCEL_TRASN_ICBS",
+        "descripcion": "VAP_RUTA_ETL",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\SEQUENCE",
+        "full_description": "",
+        "queries": [],
+        "atributos": [],
+        "tipo_proceso": "OTRO"
+    },
+    {
+        "nombre": "SEQ_LOD_SF_TRASN_ICBS",
+        "descripcion": "VAP_RUTA_ETL",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\SEQUENCE",
+        "full_description": "",
+        "queries": [],
+        "atributos": [],
+        "tipo_proceso": "OTRO"
+    },
+    {
+        "nombre": "SEQ_PPAL_TRANSFERENCIAS_ICBS",
+        "descripcion": "JOB_EXT3_FLEXCUBE_#UVA_HORA.IDejecucion#",
+        "ruta": "\\Jobs\\CQ117923 - Transferencias Masivas AVAL\\TRANSFERENCIAS_ICBS\\SEQUENCE",
+        "full_description": "",
+        "queries": [],
+        "atributos": [],
+        "tipo_proceso": "principal"
+    }
+]

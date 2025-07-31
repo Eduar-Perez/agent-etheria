@@ -1,0 +1,1 @@
+Este agente toma como entrada un JSON con los procesos ETL definidos en IBM DataStage. A partir de los nombres, descripciones y consultas SQL asociadas a cada job, el agente infiere la lógica general de la solución y redacta una breve explicación que transmita el propósito y funcionamiento técnico de manera comprensible para perfiles no técnicos.
