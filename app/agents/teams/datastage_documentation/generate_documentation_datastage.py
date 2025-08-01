@@ -18,16 +18,17 @@ def generate_document_datastage(intpu_tmp_folder):
         s3_key = f"sql-joiner/{os.path.basename(path_docx)}" 
         url_download = save_and_generate_url_s3(s3_key, path_docx)
     response = f'''
+Generación de Documento Exitosa\n
 
-##Generación de Documento Exitosa
+El documento ha sido generado exitosamente.\n
 
-El documento ha sido generado exitosamente.
+Todos los datos han sido procesados correctamente y el archivo está listo para su uso.\n
 
-Todos los datos han sido procesados correctamente y el archivo está listo para su uso.
+Puedes descargar el archivo desde este link:\n
 
-Puedes descargar el archivo desde este link:
+[Descargar archivo]({url_download})
 
-[Descargar archivo]({url_download})'''
+'''
     return response
         
 
