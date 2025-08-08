@@ -23,7 +23,7 @@ def subir_a_s3_y_generar_url(file_path: str, bucket_name, s3_key) -> str:
     url = s3.generate_presigned_url(
         "get_object",
         Params={"Bucket": bucket_name, "Key": s3_key},
-        ExpiresIn=300,  # 5 minutos
+        ExpiresIn=1200,  # 5 minutos
     )
 
     # Crear hilo para borrar el archivo después de 5 minutos
