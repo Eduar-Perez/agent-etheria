@@ -16,7 +16,7 @@ def save_base64_files(file_items: List[dict], upload_dir: str) -> List[str]:
     if len(file_items) < 1:
         return "No se recibieron los archivos para procesar"
     for item in file_items:
-        print(item)
+        print(item.file.split(",")[1])
         file_content = base64.b64decode(item.file.split(",")[1])
         filename = item.fileName
         file_path = os.path.join(upload_dir, filename)
