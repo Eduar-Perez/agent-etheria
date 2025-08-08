@@ -13,16 +13,39 @@ def eliminar_carpeta_completa(path: str):
 
 def save_base64_files(file_items: List[dict], upload_dir: str) -> List[str]:
     os.makedirs(upload_dir, exist_ok=True)
-    if len(file_items) < 1:
-        return "No se recibieron los archivos para procesar"
+    if not file_items:
+        return []
+
+    saved = []
     for item in file_items:
-        print("Este es el item",item)
-        print(item.file.split(",")[1])
-        file_content = base64.b64decode(item.file.split(",")[1])
-        filename = item.fileName
+        # Soporta dicts o objetos con atributos
+        raw_file = getattr(item, "file", None) or (item.get("file") if isinstance(item, dict) else None)
+        filename = getattr(item, "fileName", None) or (item.get("fileName") if isinstance(item, dict) else None)
+
+        if not raw_file or not filename:
+            print("Ítem sin 'file' o 'fileName', lo omito:", item)
+            continue
+
+        # Si viene con 'data:...;base64,<data>', nos quedamos con <data>
+        if "," in raw_file:
+            raw_file = raw_file.split(",", 1)[1]
+
+        # Arreglar padding de base64 si falta
+        raw_file = raw_file.strip()
+        missing = (-len(raw_file)) % 4
+        if missing:
+            raw_file += "=" * missing
+
+        try:
+            file_content = base64.b64decode(raw_file)
+        except Exception as e:
+            print(f"Error decodificando base64 para {filename}: {e}")
+            continue
+
         file_path = os.path.join(upload_dir, filename)
         with open(file_path, "wb") as f:
             f.write(file_content)
+        saved.append(file_path)
 
 def team_manager(request):
     team_id = request.agent_id
