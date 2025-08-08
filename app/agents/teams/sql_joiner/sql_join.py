@@ -4,7 +4,7 @@ import json
 import boto3
 import logging
 import textwrap
-from ..utilities.save_and_generate_url import save_and_generate_url_s3, eliminar_archivo_temporal
+from ..utilities.save_and_generate_url import save_and_generate_url_s3
 # from dotenv import load_dotenv
 from botocore.config import Config
 from langchain_aws import ChatBedrock
@@ -175,34 +175,59 @@ def show_grouping_explanation(data: dict) -> str:
     return "\n".join(lines)
 
 
+# def separate_sql_by_keyword(source_folder):
+#     """
+#     Separa los scripts SQL en carpetas organizadas por contenido:
+#     - "ADMODS" → ODS
+#     - "CHEQUES_GERENCIA" → CBS - CHEQUES_GERENCIA
+#     - Otro → CBS - PRODUCTOS PASIVAS
+#     """
+#     output_folder = os.path.join(source_folder,"SQL_separados")
+#     for file in sorted(f for f in os.listdir(source_folder) if f.endswith(".sql")):
+#         full_path = os.path.join(source_folder, file)
+#         with open(full_path, "r", encoding="utf-8") as input_file:
+#             content = input_file.read()
+
+#             if "ADMODS" in content:
+#                 category = "ODS"
+#             elif "CHEQUES_GERENCIA" in content:
+#                 category = "CBS - CHEQUES_GERENCIA"
+#             else:
+#                 category = "CBS - PRODUCTOS PASIVAS"
+
+#             output_path = os.path.join(output_folder, category, file)
+#             os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+#             with open(output_path, "w", encoding="utf-8") as output_file:
+#                 output_file.write(content)
+
+#     return output_folder
+
 def separate_sql_by_keyword(source_folder):
-    """
-    Separa los scripts SQL en carpetas organizadas por contenido:
-    - "ADMODS" → ODS
-    - "CHEQUES_GERENCIA" → CBS - CHEQUES_GERENCIA
-    - Otro → CBS - PRODUCTOS PASIVAS
-    """
-    output_folder = os.path.join(source_folder,"SQL_separados")
+    output_folder = os.path.join(source_folder, "SQL_separados")
+    os.makedirs(output_folder, exist_ok=True)
+
     for file in sorted(f for f in os.listdir(source_folder) if f.endswith(".sql")):
         full_path = os.path.join(source_folder, file)
-        with open(full_path, "r", encoding="utf-8") as input_file:
+        with open(full_path, "r", encoding="utf-8", errors="ignore") as input_file:
             content = input_file.read()
+            low = content.casefold()
 
-            if "ADMODS" in content:
+            if re.search(r"\bADMODS\b", content, flags=re.IGNORECASE):
                 category = "ODS"
-            elif "CHEQUES_GERENCIA" in content:
+            elif re.search(r"\bCHEQUES?_GERENCIA\b", content, flags=re.IGNORECASE):
                 category = "CBS - CHEQUES_GERENCIA"
             else:
                 category = "CBS - PRODUCTOS PASIVAS"
 
+            print(f"[split] {file} -> {category}")  # << logging
+
             output_path = os.path.join(output_folder, category, file)
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
-            with open(output_path, "w", encoding="utf-8") as output_file:
-                output_file.write(content)
+            with open(output_path, "w", encoding="utf-8") as out:
+                out.write(content)
 
     return output_folder
-
 
 def merge_sql_group(
     folder_path, files_to_merge, output_filename="join_sql_files_no_errors.txt"
@@ -280,8 +305,8 @@ def join_sql_scripts_team(folder_path):
                 group_scripts = list(group["scripts"])
                 merged_sql = merge_sql_group(category_path, group_scripts)
                 unified_sql = unify_sqls_with_model(merged_sql)
-                sql_unified[category] = unified_sql
-                saved_paths[category] = save_merged_sql(unified_sql, category, str(i), group["nombre_grupo"])
+                sql_unified.setdefault(category, []).append(unified_sql)
+                saved_paths.setdefault(category, []).append(save_merged_sql(unified_sql, category, str(i), group["nombre_grupo"]))
         # print("\nLos archivos SQL unificados se guardaron en:")
         # for path in saved_paths:
         #     print(f" - {path}")
