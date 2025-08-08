@@ -3,33 +3,30 @@ import re
 import json
 import boto3
 import logging
-import textwrap
+from typing import Dict, List
 from ..utilities.save_and_generate_url import save_and_generate_url_s3
-# from dotenv import load_dotenv
 from botocore.config import Config
 from langchain_aws import ChatBedrock
 
-# Configurar el logger
+# Logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-
-# Cargar variables de entorno desde el archivo .env
-# dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
-# load_dotenv(dotenv_path)
-
 MODEL_ID = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
-def get_prompt_path(filename):
-    base_dir = os.path.dirname(os.path.abspath(__file__))  # directorio actual del script
+# ---------- Infra / helpers ----------
+
+def get_prompt_path(filename: str) -> str:
+    """Resuelve ruta absoluta del archivo de prompt junto al módulo actual."""
+    base_dir = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(base_dir, "prompts", filename)
 
 def get_bedrock_llm():
-    """Inicializa el cliente de Bedrock y devuelve el modelo de lenguaje."""
+    """Inicializa cliente de Bedrock usando el rol/credenciales del entorno."""
     client = boto3.client(
         service_name="bedrock-runtime",
         region_name="us-east-1",
-        config=Config(read_timeout=300, connect_timeout=60)
+        config=Config(read_timeout=300, connect_timeout=60),
     )
     return ChatBedrock(
         model_id=MODEL_ID,
@@ -41,124 +38,81 @@ def get_bedrock_llm():
         client=client,
     )
 
+# ---------- IO / SQL helpers ----------
 
-def join_sql_scripts(folder_path, output_filename="join_sql_files_no_errors.txt"):
-    """Une todos los archivos .sql de una carpeta en un solo archivo de texto."""
+def join_sql_scripts(folder_path: str, output_filename: str = "join_sql_files_no_errors.txt"):
+    """Concatena todos los .sql de una carpeta (solo de esa carpeta, no recursivo)."""
     sql_files = sorted(f for f in os.listdir(folder_path) if f.endswith(".sql"))
     combined_sql = ""
-
-    with open(output_filename, "w", encoding="utf-8") as output_file:
+    with open(output_filename, "w", encoding="utf-8") as out:
         for i, filename in enumerate(sql_files, 1):
             path = os.path.join(folder_path, filename)
             with open(path, "r", encoding="utf-8") as f:
                 content = f.read()
-                header = f"--- SCRIPT {i}: {filename} ---\n"
-                output_file.write(header + content + "\n\n")
-                combined_sql += header + content + "\n\n"
+            header = f"--- SCRIPT {i}: {filename} ---\n"
+            out.write(header + content + "\n\n")
+            combined_sql += header + content + "\n\n"
     return combined_sql, sql_files
 
-
 def request_grouping(sql_text: str) -> str:
-    """Envía los scripts SQL unidos al modelo para que agrupe por compatibilidad."""
+    """Pide al modelo que agrupe scripts compatibles."""
     prompt_path = get_prompt_path("detect_sqls_to_join.txt")
     with open(prompt_path, "r", encoding="utf-8") as file:
         template = file.read()
     prompt = template.format(sql_join=sql_text)
     llm = get_bedrock_llm()
-    response = llm.invoke([{"role": "user", "content": prompt}])
-    return str(response.content) if hasattr(response, "content") else str(response)
-
+    resp = llm.invoke([{"role": "user", "content": prompt}])
+    return str(resp.content) if hasattr(resp, "content") else str(resp)
 
 def clean_and_parse_json(raw_text: str) -> dict:
-    """Limpia y convierte una respuesta con JSON en un objeto de Python."""
-    cleaned = (
-        re.sub(r"```(?:json)?", "", raw_text, flags=re.IGNORECASE)
-        .replace("```", "")
-        .strip()
-    )
+    """Extrae el bloque JSON de la respuesta del modelo y lo parsea."""
+    cleaned = re.sub(r"```(?:json)?", "", raw_text, flags=re.IGNORECASE).replace("```", "").strip()
     start = cleaned.find("{")
     end = cleaned.rfind("}")
     if start == -1 or end == -1 or end <= start:
         raise ValueError("No se encontró bloque JSON válido")
-    json_str = cleaned[start: end + 1]
+    json_str = cleaned[start:end + 1]
     try:
         return json.loads(json_str)
     except json.JSONDecodeError as e:
-        logger.error("Error al parsear JSON:\n", json_str[:1000])
+        logger.error("Error al parsear JSON:\n%s", json_str[:1000])
         raise ValueError(f"JSON inválido: {e}") from e
 
-
 def save_merged_sql(
-    sql_text,
+    sql_text: str,
     subfolder: str,
     group_number: str,
     group_name: str,
-    folder_name="tmp/SQL_unificados",
-):
-    """Guarda el SQL unificado en una carpeta organizada por grupos."""
+    folder_name: str = "tmp/SQL_unificados",
+) -> str:
+    """Guarda el SQL unificado (1 archivo) y retorna la ruta."""
     os.makedirs(folder_name, exist_ok=True)
     save_path = os.path.join(folder_name, subfolder)
     os.makedirs(save_path, exist_ok=True)
-    safe_name = re.sub(r"\W+", "_", group_name)
+    safe_name = re.sub(r"\W+", "_", group_name).strip("_") or "grupo"
     file_name = f"{group_number}_{safe_name}.sql"
     full_path = os.path.join(save_path, file_name)
-
-    with open(full_path, "w", encoding="utf-8") as file:
-        file.write(f"-- Grupo: {group_number}\n\n")
-        file.write(sql_text)
-
+    with open(full_path, "w", encoding="utf-8") as f:
+        f.write(f"-- Grupo: {group_number}\n\n")
+        f.write(sql_text)
     return full_path
 
-
-# las function: def show_grouping_explanation(data: dict):
-#     """Imprime la explicación generada por el modelo sobre cómo agrupó los scripts."""
-#     print("\n" + "=" * 60)
-#     print("EXPLICACIÓN DEL PROCESO DE AGRUPACIÓN")
-#     print("=" * 60)
-
-#     print(f"\n{data.get('explicacion', '').strip()}\n")
-
-#     groups = data.get("grupos", [])
-#     if groups:
-#         print("Grupos detectados:")
-#         for group in groups:
-#             print(f"\n {group['nombre_grupo']}:")
-#             print(f"   Explicación: {group.get('explicacion_union', 'No disponible')}")
-#             for script in group["scripts"]:
-#                 print(f"   - {script}")
-#     else:
-#         print("No se detectaron grupos.")
-
-#     ungrouped = data.get("no_agrupados", [])
-#     if ungrouped:
-#         print("\nReportes no agrupados:")
-#         for entry in ungrouped:
-#             print(f"   - {entry['script']}: {entry['razon']}")
-#     else:
-#         print("\nTodos los scripts fueron agrupados correctamente.")
-
-#     print("\n" + "=" * 60 + "\n")
-
-
 def show_grouping_explanation(data: dict) -> str:
-    """Genera un resumen explicativo en texto sobre cómo se agruparon los scripts."""
+    """Convierte la explicación de agrupación en texto plano."""
     lines = []
     lines.append("=" * 60)
     lines.append("EXPLICACIÓN DEL PROCESO DE AGRUPACIÓN")
     lines.append("=" * 60)
     lines.append("")
-
-    lines.append(data.get("explicacion", "").strip())
+    lines.append((data.get("explicacion") or "").strip())
 
     groups = data.get("grupos", [])
     if groups:
         lines.append("\nGrupos detectados:")
         for group in groups:
-            lines.append(f"\n{group['nombre_grupo']}:")
-            lines.append(
-                f"  Explicación: {group.get('explicacion_union', 'No disponible')}"
-            )
-            for script in group["scripts"]:
+            lines.append(f"\n{group.get('nombre_grupo','(sin nombre)')}:")
+            lines.append(f"  Explicación: {group.get('explicacion_union', 'No disponible')}")
+            for script in group.get("scripts", []):
                 lines.append(f"  - {script}")
     else:
         lines.append("\nNo se detectaron grupos.")
@@ -167,162 +121,180 @@ def show_grouping_explanation(data: dict) -> str:
     if ungrouped:
         lines.append("\nReportes no agrupados:")
         for entry in ungrouped:
-            lines.append(f"  - {entry['script']}: {entry['razon']}")
+            lines.append(f"  - {entry.get('script','(sin nombre)')}: {entry.get('razon','(sin razón)')}")
     else:
         lines.append("\nTodos los scripts fueron agrupados correctamente.")
 
     lines.append("\n" + "=" * 60 + "\n")
     return "\n".join(lines)
 
-
-# def separate_sql_by_keyword(source_folder):
-#     """
-#     Separa los scripts SQL en carpetas organizadas por contenido:
-#     - "ADMODS" → ODS
-#     - "CHEQUES_GERENCIA" → CBS - CHEQUES_GERENCIA
-#     - Otro → CBS - PRODUCTOS PASIVAS
-#     """
-#     output_folder = os.path.join(source_folder,"SQL_separados")
-#     for file in sorted(f for f in os.listdir(source_folder) if f.endswith(".sql")):
-#         full_path = os.path.join(source_folder, file)
-#         with open(full_path, "r", encoding="utf-8") as input_file:
-#             content = input_file.read()
-
-#             if "ADMODS" in content:
-#                 category = "ODS"
-#             elif "CHEQUES_GERENCIA" in content:
-#                 category = "CBS - CHEQUES_GERENCIA"
-#             else:
-#                 category = "CBS - PRODUCTOS PASIVAS"
-
-#             output_path = os.path.join(output_folder, category, file)
-#             os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
-#             with open(output_path, "w", encoding="utf-8") as output_file:
-#                 output_file.write(content)
-
-#     return output_folder
-
-def separate_sql_by_keyword(source_folder):
+def separate_sql_by_keyword(source_folder: str) -> str:
+    """
+    Separa los .sql directos de source_folder según contenido:
+      - Contiene 'ADMODS'  -> 'ODS'
+      - Contiene 'CHEQUES_GERENCIA' -> 'CBS - CHEQUES_GERENCIA'
+      - Otro -> 'CBS - PRODUCTOS PASIVAS'
+    Retorna la ruta de la carpeta de salida.
+    """
     output_folder = os.path.join(source_folder, "SQL_separados")
     os.makedirs(output_folder, exist_ok=True)
 
     for file in sorted(f for f in os.listdir(source_folder) if f.endswith(".sql")):
         full_path = os.path.join(source_folder, file)
-        with open(full_path, "r", encoding="utf-8", errors="ignore") as input_file:
-            content = input_file.read()
-            low = content.casefold()
+        with open(full_path, "r", encoding="utf-8", errors="ignore") as inp:
+            content = inp.read()
 
-            if re.search(r"\bADMODS\b", content, flags=re.IGNORECASE):
-                category = "ODS"
-            elif re.search(r"\bCHEQUES?_GERENCIA\b", content, flags=re.IGNORECASE):
-                category = "CBS - CHEQUES_GERENCIA"
-            else:
-                category = "CBS - PRODUCTOS PASIVAS"
+        if re.search(r"\bADMODS\b", content, flags=re.IGNORECASE):
+            category = "ODS"
+        elif re.search(r"\bCHEQUES?_GERENCIA\b", content, flags=re.IGNORECASE):
+            category = "CBS - CHEQUES_GERENCIA"
+        else:
+            category = "CBS - PRODUCTOS PASIVAS"
 
-            print(f"[split] {file} -> {category}")  # << logging
-
-            output_path = os.path.join(output_folder, category, file)
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
-            with open(output_path, "w", encoding="utf-8") as out:
-                out.write(content)
+        logger.info("[split] %s -> %s", file, category)
+        output_path = os.path.join(output_folder, category, file)
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        with open(output_path, "w", encoding="utf-8") as out:
+            out.write(content)
 
     return output_folder
 
-def merge_sql_group(
-    folder_path, files_to_merge, output_filename="join_sql_files_no_errors.txt"
-):
-    """Une scripts SQL específicos en un solo bloque de texto."""
-    files_to_merge.sort()
-    combined = ""
-
-    with open(output_filename, "w", encoding="utf-8") as output:
-        for i, filename in enumerate(files_to_merge, 1):
-            full_path = os.path.join(folder_path, filename)
-            with open(full_path, "r", encoding="utf-8") as file:
-                content = file.read()
-                header = f"--- SCRIPT {i}: {filename} ---\n"
-                combined += header + content + "\n\n"
-    return combined
-
+def merge_sql_group(folder_path: str, files_to_merge: List[str]) -> str:
+    """Une un subconjunto de archivos .sql (en 'folder_path') en un solo string."""
+    combined = []
+    for i, filename in enumerate(sorted(files_to_merge), 1):
+        full_path = os.path.join(folder_path, filename)
+        with open(full_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        header = f"--- SCRIPT {i}: {filename} ---\n"
+        combined.append(header + content + "\n")
+    return "".join(combined)
 
 def unify_sqls_with_model(sql_block: str) -> str:
-    """Envía los scripts agrupados al modelo para que los combine en uno solo."""
+    """Pide al modelo que unifique varios scripts en uno solo."""
     prompt_path = get_prompt_path("join_sqls.txt")
     with open(prompt_path, "r", encoding="utf-8") as file:
         template = file.read()
     prompt = template.format(sql_join=sql_block)
     llm = get_bedrock_llm()
-    response = llm.invoke([{"role": "user", "content": prompt}])
-    return response.content if hasattr(response, "content") else str(response)
-
+    resp = llm.invoke([{"role": "user", "content": prompt}])
+    return resp.content if hasattr(resp, "content") else str(resp)
 
 def optimze_sql(sql_text: str) -> str:
-    """Optimiza el SQL unificado enviándolo al modelo."""
+    """Pide al modelo que optimice el SQL unificado (opcional)."""
     prompt_path = get_prompt_path("optimize_sql.txt")
     with open(prompt_path, "r", encoding="utf-8") as file:
         template = file.read()
     prompt = template.format(sql_to_optimize=sql_text)
     llm = get_bedrock_llm()
-    response = llm.invoke([{"role": "user", "content": prompt}])
-    return response.content if hasattr(response, "content") else str(response)
+    resp = llm.invoke([{"role": "user", "content": prompt}])
+    return resp.content if hasattr(resp, "content") else str(resp)
 
-def convert_to_markdown(sql_text):
-    prompt_path = get_prompt_path("convert_to_marckdown.txt")
+def convert_to_markdown(sql_text: str) -> str:
+    """Convierte SQL a bloque apto para ngx-markdown."""
+    # OJO: corrige el typo del archivo
+    prompt_path = get_prompt_path("convert_to_markdown.txt")
     with open(prompt_path, "r", encoding="utf-8") as file:
         template = file.read()
     prompt = template.format(sql_to_optimize=sql_text)
     llm = get_bedrock_llm()
-    response = llm.invoke([{"role": "user", "content": prompt}])
-    return response.content if hasattr(response, "content") else str(response)
+    resp = llm.invoke([{"role": "user", "content": prompt}])
+    return resp.content if hasattr(resp, "content") else str(resp)
 
-def join_sql_scripts_team(folder_path):
+# ---------- Orquestador principal ----------
+
+def join_sql_scripts_team(folder_path: str) -> str:
+    """
+    1) Separa por categoría
+    2) Une por carpeta y pide agrupación al modelo
+    3) Unifica por grupo
+    4) Sube a S3 cada SQL resultante y arma respuesta markdown con links
+    """
     logger.info("Optimiza tus archivos de SQL")
+
     if not os.path.exists(folder_path):
-        logger.error(f"No se encontró la carpeta: {folder_path}")
-        return
+        logger.error("No se encontró la carpeta: %s", folder_path)
+        return "No se encontró la carpeta de entrada."
+
     separated_folder = separate_sql_by_keyword(folder_path)
-    sql_unified = {}
-    grouping_explanation = {}
-    saved_paths = {}
-    url_download = {}
-    for category in os.listdir(separated_folder):
+
+    sql_unified: Dict[str, List[str]] = {}          # categoría -> [sql_text_unificado, ...]
+    saved_paths: Dict[str, List[str]] = {}          # categoría -> [ruta_archivo, ...]
+    grouping_explanation: Dict[str, str] = {}       # categoría -> explicación
+
+    for category in sorted(os.listdir(separated_folder)):
         category_path = os.path.join(separated_folder, category)
+        if not os.path.isdir(category_path):
+            continue  # ignora archivos sueltos
         sql_combined, file_list = join_sql_scripts(category_path)
-        logger.info(f"\nAnalizano archivos de {category}:\n")
+        if not file_list:
+            continue
+
+        logger.info("\nAnalizando archivos de %s:\n", category)
         for i, file in enumerate(file_list, 1):
-            logger.info(f"  {i}. {file}")
+            logger.info("  %d. %s", i, file)
         logger.info("\nEnviando a modelo...")
+
         try:
             logger.info("\n" + "=" * 60)
-            logger.info("Analizando cuales scripts deben unirse...")
+            logger.info("Analizando cuáles scripts deben unirse...")
             raw_response = request_grouping(sql_combined)
             parsed_json = clean_and_parse_json(raw_response)
             grouping_explanation[category] = show_grouping_explanation(parsed_json)
-            for i, group in enumerate(parsed_json.get("grupos", []), 1):
-                logger.info(f"\nUnificando scripts de {category}...")
-                logger.info(f"Convirtiendo {group['nombre_grupo']}")
-                group_scripts = list(group["scripts"])
+
+            grupos = parsed_json.get("grupos", [])
+            if not grupos:
+                logger.info("No se detectaron grupos para %s", category)
+                continue
+
+            for i, group in enumerate(grupos, 1):
+                logger.info("\nUnificando scripts de %s...", category)
+                logger.info("Convirtiendo %s", group.get("nombre_grupo", f"grupo_{i}"))
+                group_scripts = list(group.get("scripts", []))
+                if not group_scripts:
+                    continue
                 merged_sql = merge_sql_group(category_path, group_scripts)
                 unified_sql = unify_sqls_with_model(merged_sql)
                 sql_unified.setdefault(category, []).append(unified_sql)
-                saved_paths.setdefault(category, []).append(save_merged_sql(unified_sql, category, str(i), group["nombre_grupo"]))
-        # print("\nLos archivos SQL unificados se guardaron en:")
-        # for path in saved_paths:
-        #     print(f" - {path}")
+                out_path = save_merged_sql(
+                    unified_sql, category, str(i), group.get("nombre_grupo", f"grupo_{i}")
+                )
+                saved_paths.setdefault(category, []).append(out_path)
+
         except ValueError as err:
             logger.error("Error al procesar la respuesta del modelo:")
-            logger.error(err)
-    for script in sql_unified:
-        file_path  = saved_paths[script]
-        s3_key = f"sql-joiner/{os.path.basename(file_path)}" 
-        url_download[script] = save_and_generate_url_s3(s3_key, file_path)
-    response = f'''
-    ##Se unificó correctamente los sql de la siguiente forma:
+            logger.exception(err)
 
-{grouping_explanation}
-Puedes descargar los sql en los siguientes links:
+    # Subida a S3 y armado de links
+    url_download: Dict[str, List[str]] = {}
+    for category, paths in saved_paths.items():
+        urls = []
+        for p in paths:
+            s3_key = f"sql-joiner/{os.path.basename(p)}"
+            try:
+                url = save_and_generate_url_s3(s3_key, p)
+                urls.append(url)
+            except Exception as e:
+                logger.exception("Error subiendo %s a S3: %s", p, e)
+        if urls:
+            url_download[category] = urls
 
-[Descargar archivo]({url_download})'''
-        
-    return response
+    # Respuesta final en Markdown
+    # Nota: mostramos la explicación por categoría y luego la lista de URLs
+    lines = []
+    lines.append("## Se unificaron correctamente los SQL de la siguiente forma:\n")
+    for category in sorted(grouping_explanation.keys()):
+        lines.append(f"### {category}\n")
+        lines.append("```text")
+        lines.append(grouping_explanation[category].rstrip())
+        lines.append("```")
+        if url_download.get(category):
+            lines.append("**Descargas:**")
+            for idx, url in enumerate(url_download[category], 1):
+                lines.append(f"- [Archivo {idx}]({url})")
+        lines.append("")  # separador
+
+    if not lines:
+        return "No se generaron unificaciones (ver logs)."
+
+    return "\n".join(lines)
