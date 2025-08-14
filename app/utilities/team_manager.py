@@ -76,6 +76,7 @@ def team_manager(request):
         response = bus_migration_team(upload_dir)
         eliminar_carpeta_completa(upload_dir)
         return response
+    
     elif team_id == "team_datastage_documentation": 
         if len(request.files) < 1:
             return "Para hacer este procesamiento, necesito que cargues el documento de XML del proceso de la ETL"
