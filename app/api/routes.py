@@ -1,5 +1,6 @@
 import os
 import json
+import shutil
 from fastapi import Request, HTTPException, FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -11,7 +12,12 @@ from utilities.team_manager import team_manager
 import base64
 import logging
 import traceback
-
+def eliminar_carpeta_completa(path: str):
+    if os.path.exists(path) and os.path.isdir(path):
+        shutil.rmtree(path)
+        print(f"Carpeta eliminada: {path}")
+    else:
+        print(f"La ruta no existe o no es una carpeta: {path}")
 
 logger = logging.getLogger(__name__)
 
@@ -60,9 +66,12 @@ def configure_routes(app: FastAPI):
             return JSONResponse(content={"response": safe_serialize(response)})
         except RequestValidationError as rve:
             print("rve", rve)
+            eliminar_carpeta_completa("./tmp")
             raise HTTPException(status_code=422, detail=rve.errors()) from rve
         except ValueError as ve:
+            eliminar_carpeta_completa("./tmp")
             raise HTTPException(status_code=400, detail=str(ve)) from ve
         except Exception as e:
+            eliminar_carpeta_completa("./tmp")
             logger.error("Unhandled Exception:\n%s", traceback.format_exc())
             raise HTTPException(status_code=500, detail=str(e)) from e

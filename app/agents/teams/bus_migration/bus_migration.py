@@ -1,10 +1,16 @@
 import os
 import logging
+import shutil
 from .utilities.migration import DummyJsonWorkflow
 from ..utilities.save_and_generate_url import save_and_generate_url_s3, eliminar_archivo_temporal
 import json
 logger = logging.getLogger(__name__)
-
+def eliminar_carpeta_completa(path: str):
+    if os.path.exists(path) and os.path.isdir(path):
+        shutil.rmtree(path)
+        print(f"Carpeta eliminada: {path}")
+    else:
+        print(f"La ruta no existe o no es una carpeta: {path}")
 def bus_migration_team(input_path_file):
     files = os.listdir(input_path_file)
     esql_path = os.path.join(input_path_file, [f for f in files if f.endswith('.esql')][0])
@@ -40,5 +46,4 @@ Este proceso garantiza que las asignaciones y referencias dentro del código ESQ
 Puedes descargar el archivo migrado desde el siguiente enlace:
 
 [Descargar archivo]({url_download})'''
-
     return user_response
