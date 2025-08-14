@@ -66,12 +66,12 @@ def configure_routes(app: FastAPI):
             return JSONResponse(content={"response": safe_serialize(response)})
         except RequestValidationError as rve:
             print("rve", rve)
-            eliminar_carpeta_completa("./tmp")
+            eliminar_carpeta_completa("../tmp/")
             raise HTTPException(status_code=422, detail=rve.errors()) from rve
         except ValueError as ve:
-            eliminar_carpeta_completa("./tmp")
+            eliminar_carpeta_completa("../tmp/")
             raise HTTPException(status_code=400, detail=str(ve)) from ve
         except Exception as e:
-            eliminar_carpeta_completa("./tmp")
+            eliminar_carpeta_completa("../tmp/")
             logger.error("Unhandled Exception:\n%s", traceback.format_exc())
             raise HTTPException(status_code=500, detail=str(e)) from e
