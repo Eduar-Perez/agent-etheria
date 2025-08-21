@@ -11,7 +11,7 @@ def generate_document_datastage(intpu_tmp_folder):
         xml_path = os.path.join(intpu_tmp_folder, xmls_file)
         output_docx_path = os.path.join(intpu_tmp_folder,"..","output_documents", "datastage")
         json_output = os.path.join(intpu_tmp_folder,"..", "output_data", "datastage")
-        dame_json = extraer_jobs_con_queries(xml_path, json_output)
+        extraer_jobs_con_queries(xml_path, json_output)
         section_1 = get_info_section_1(xml_path,json_output)
         rutinas,comandos = extraer_rutinas_comandos(xml_path)
         path_docx = document_generator(json_output, output_docx_path,section_1,rutinas,comandos)
@@ -30,6 +30,5 @@ Puedes descargar el archivo desde este link:\n
 
 '''
     return response
-        
 
 

@@ -281,8 +281,6 @@ def agregar_tabla_ficha_jobs_section_2(doc, job_name, db, esquema, tipo, descrip
     table = doc.add_table(rows=1, cols=5)
     table.style = 'Table Grid'
     table.autofit = True
-
-
     # Fila título azul
     cell = table.rows[0].cells[0]
     cell.text = f"JOB {job_name}"
@@ -295,7 +293,6 @@ def agregar_tabla_ficha_jobs_section_2(doc, job_name, db, esquema, tipo, descrip
     shading = OxmlElement('w:shd')
     shading.set(qn('w:fill'), '0070C0')
     cell._element.get_or_add_tcPr().append(shading)
-
     # Fila datos generales
     row = table.add_row().cells
     row[0].text = "Base de datos:"
@@ -303,21 +300,18 @@ def agregar_tabla_ficha_jobs_section_2(doc, job_name, db, esquema, tipo, descrip
     row[2].text = "Esquema:"
     row[3].text = esquema
     row[4].text = f"Tipo: {tipo}"
-
     # Fila descripción
     row = table.add_row().cells
     row[0].text = "Descripción:"
     for i in range(1, 5):
         row[0].merge(row[i])
     row[0].paragraphs[0].add_run(f"\n{descripcion}")
-
     # Encabezado columnas
     encabezados = ["Atributos", "Tipo de Dato", "Obligatorio", "Clave", "Descripción"]
     row = table.add_row().cells
     for i, titulo in enumerate(encabezados):
         run = row[i].paragraphs[0].add_run(titulo)
         run.bold = True
-
     # Filas de atributos
     for campo in atributos:
         tipo_crudo = campo.get("tipo_dato", "")
@@ -338,7 +332,6 @@ def agregar_tabla_ficha_jobs_section_2(doc, job_name, db, esquema, tipo, descrip
             row[0].merge(row[i])
         p = row[0].paragraphs[0]
         p.add_run("\n" + query_sql.strip()).italic = True
-
     doc.add_paragraph("")
 
 def agregar_tabla_parametros(doc, parametros, type_param):
@@ -472,15 +465,13 @@ def document_generator(json_path, output_docx, parameters_ppal, rutinas,comandos
     doc = Document()
     
     #Generar texto de introduccion
-    # intro_text = intro_generator(jobs_descriptions)
-    intro_text = '''El presente documento técnico detalla el diseño de procesos ETL implementados en IBM DataStage v11.7 para la gestión de transacciones financieras y operaciones de compensación electrónica. El conjunto de jobs documentados está enfocado principalmente en la extracción de información desde sistemas como FLEXCUBE, ODS y archivos externos, su transformación mediante reglas de negocio específicas, y la carga de datos procesados tanto en sistemas de archivos como en bases de datos destino.
+    intro_text = intro_generator(jobs_descriptions)
+# La estructura de los procesos ETL se organiza en tres tipos principales de jobs: extracción (identificados con el prefijo "JOB_EXT3"), transformación (con prefijo "JOB_TRF") y carga (con prefijo "JOB_LOD"). Adicionalmente, se han implementado jobs auxiliares para la gestión de variables de control y limpieza de datasets temporales, como el "JOB_BORRA_DS_ICBS" y "JOB_VARIABLES_TBL_CTL_CARGUE_ICBS".
 
-La estructura de los procesos ETL se organiza en tres tipos principales de jobs: extracción (identificados con el prefijo "JOB_EXT3"), transformación (con prefijo "JOB_TRF") y carga (con prefijo "JOB_LOD"). Adicionalmente, se han implementado jobs auxiliares para la gestión de variables de control y limpieza de datasets temporales, como el "JOB_BORRA_DS_ICBS" y "JOB_VARIABLES_TBL_CTL_CARGUE_ICBS".
+# Los procesos extraen información desde diversas fuentes, destacando tablas como ACVW_ALL_AC_ENTRIES, GWTB_MSG_IN_LOG, archivos de conciliación provenientes de ATH ("BTXAVAL_BOCC_Conciliacion_AAAAMMDD_HHMM.txt") y datos de los sistemas FLEXCUBE y ODS. Los destinos principales incluyen datasets temporales (DS_ACVW_ALL_AC_ENTRIES.ds, DS_COMPENSACION_ELECTRONICA_3P.ds) y archivos de salida con formato específico para la compensación electrónica y transferencias ICBS.
 
-Los procesos extraen información desde diversas fuentes, destacando tablas como ACVW_ALL_AC_ENTRIES, GWTB_MSG_IN_LOG, archivos de conciliación provenientes de ATH ("BTXAVAL_BOCC_Conciliacion_AAAAMMDD_HHMM.txt") y datos de los sistemas FLEXCUBE y ODS. Los destinos principales incluyen datasets temporales (DS_ACVW_ALL_AC_ENTRIES.ds, DS_COMPENSACION_ELECTRONICA_3P.ds) y archivos de salida con formato específico para la compensación electrónica y transferencias ICBS.
-
-El flujo de procesamiento incluye secuencias (SEQ_LOD_EXCEL_TRASN_ICBS, SEQ_LOD_SF_TRASN_ICBS, SEQ_PPAL_TRANSFERENCIAS_ICBS) que orquestan la ejecución de los jobs principales, utilizando parámetros como "VAP_RUTA_ETL" para definir rutas de procesamiento. Particularmente, el proceso de compensación electrónica implementado por SOPHOS SOLUTIONS entre 2020 y 2021 (requerimientos como SBBO0303) contempla la extracción, transformación y generación de archivos para transacciones y conciliación entre sistemas.
-'''
+# El flujo de procesamiento incluye secuencias (SEQ_LOD_EXCEL_TRASN_ICBS, SEQ_LOD_SF_TRASN_ICBS, SEQ_PPAL_TRANSFERENCIAS_ICBS) que orquestan la ejecución de los jobs principales, utilizando parámetros como "VAP_RUTA_ETL" para definir rutas de procesamiento. Particularmente, el proceso de compensación electrónica implementado por SOPHOS SOLUTIONS entre 2020 y 2021 (requerimientos como SBBO0303) contempla la extracción, transformación y generación de archivos para transacciones y conciliación entre sistemas.
+# '''
     
     #Flujo Seccion 2
     
@@ -496,11 +487,13 @@ El flujo de procesamiento incluye secuencias (SEQ_LOD_EXCEL_TRASN_ICBS, SEQ_LOD_
     )
 
     logo_izq_path = os.path.join(BASE_DIR,'input_data', 'periferia_logo.png')
+    logo_der_path = os.path.join(BASE_DIR,'input_data', 'banco_logo.png')
+    
     # Encabezado con logos
     agregar_encabezado_personalizado(
         doc,
         logo_izq_path=logo_izq_path,
-        logo_der_path=logo_izq_path,
+        logo_der_path=logo_der_path,
         titulo_encabezado= titulo_portada
     )
     
@@ -527,8 +520,7 @@ El flujo de procesamiento incluye secuencias (SEQ_LOD_EXCEL_TRASN_ICBS, SEQ_LOD_
 #============construccion de seccion 1 parametros de ppal============
     doc.add_heading("1. Diseño técnico de la solución", level=1)
     # aqui esta el texto de introudccion a la seccion
-    # text_section_1 = intro_section_1(jobs_descriptions)
-    text_section_1 = "La solución ETL implementada en IBM DataStage está diseñada para soportar el proceso de compensación electrónica y gestión de transferencias bancarias. El sistema se encarga de extraer información de diversas fuentes como tablas de FLEXCUBE (ACVW_ALL_AC_ENTRIES), archivos enviados por ATH y otros sistemas operativos, procesarla mediante transformaciones intermedias y finalmente cargar los resultados en archivos estructurados para su posterior uso. El flujo automatizado incluye tareas de mantenimiento como la limpieza de datasets temporales, el cargue de variables de control, y la generación de archivos de salida en formatos específicos para las transferencias ICBS. La arquitectura permite la interacción entre diferentes sistemas bancarios, facilitando la conciliación de transacciones y el procesamiento de operaciones masivas, todo ello orquestado mediante una secuencia controlada de jobs que garantiza la integridad y consistencia de los datos a lo largo del proceso."
+    text_section_1 = intro_section_1(jobs_descriptions)
     parrafo = doc.add_paragraph(text_section_1)
     parrafo.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY
     doc.add_heading("1.1 Diagrama de flujo de información", level=2)

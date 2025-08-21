@@ -55,7 +55,7 @@ def team_manager(request):
         upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "sql_inputs")
         save_base64_files(request.files, upload_dir)
         response = join_sql_scripts_team(upload_dir)
-        # eliminar_carpeta_completa(upload_dir)
+        eliminar_carpeta_completa(upload_dir)
         return response
     
     elif team_id == "team_odi_migration":
@@ -70,7 +70,7 @@ def team_manager(request):
     
     elif team_id == "team_bus_migration":
         if len(request.files) < 1:
-            return "Para hacer este procesamiento, necesito que cargues los archivos de esq y excel"
+            return "Para hacer este procesamiento, se necesita que cargues los archivos de esq y excel"
         upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "bus_migration_inputs")
         save_base64_files(request.files, upload_dir)
         response = bus_migration_team(upload_dir)
@@ -79,7 +79,7 @@ def team_manager(request):
     
     elif team_id == "team_datastage_documentation": 
         if len(request.files) < 1:
-            return "Para hacer este procesamiento, necesito que cargues el documento de XML del proceso de la ETL"
+            return "Para hacer este procesamiento, se necesita que cargues el documento de XML del proceso de la ETL"
         upload_dir = os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "datastage_documentation_input")
         save_base64_files(request.files, upload_dir)
         response = generate_document_datastage(upload_dir)
